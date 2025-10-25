@@ -3,4 +3,7 @@ project(celery)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(celery main.cpp)
+# Include modular CMake files
+include(cmake/deps.cmake)
+include(cmake/source.cmake)
+include(cmake/link.cmake)

@@ -164,7 +164,7 @@ namespace Celery::Buffer
             void Write(U &&val)
             {
                 // Forward to emplace_back
-                emplace_back(val);
+                EmplaceBack(val);
             }
 
             /**

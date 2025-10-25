@@ -28,6 +28,7 @@ namespace Celery::Base
      */
     class Sizeable
     {
+    protected:
         /// Stored length (number of elements).
         size_t len{};
 

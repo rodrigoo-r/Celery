@@ -33,6 +33,7 @@ namespace Celery::Base
         size_t len{};
 
     public:
+        virtual ~Sizeable() = default;
         /**
          * @brief Return the current stored size.
          * @return The number of elements represented by this object.

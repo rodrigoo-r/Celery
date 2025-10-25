@@ -35,5 +35,16 @@ namespace Celery::Pmr
             // Return the constructed object
             return ptr;
         }
+
+        static inline void Deallocate(T *ptr)
+        {
+            // Only call destructor if not trivially destructible
+            if constexpr (!std::is_trivially_destructible_v<T>)
+            {
+                ptr->~T(); // Call the destructor
+            }
+
+            ::operator delete(ptr); // Free the memory
+        }
     };
 }

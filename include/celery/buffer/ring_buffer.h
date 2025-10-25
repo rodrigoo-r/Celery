@@ -110,6 +110,17 @@ namespace Celery::Buffer
                 return len == Capacity;
             }
 
+            void PopBack()
+            {
+                if (len == 0)
+                {
+                    throw Except::OutOfRangeException();
+                }
+
+                // Decrement length
+                --len;
+            }
+
             void Clear()
             {
                 // Reset length to zero

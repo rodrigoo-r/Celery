@@ -28,7 +28,7 @@
 namespace Celery::Except
 {
     /**
-     * @class OutOfRangeException
+     * @class OutOfRange
      * @brief Thrown when access is attempted outside a valid range.
      *
      * This exception represents range-related errors (for example, accessing
@@ -36,7 +36,7 @@ namespace Celery::Except
      * and currently provides a default descriptive message. Additional
      * constructors can be added to include contextual information.
      */
-    class OutOfRangeException : public Exception
+    class OutOfRange : public Exception
     {
     public:
         /**
@@ -44,7 +44,7 @@ namespace Celery::Except
          *
          * The message "Out of range." is forwarded to the base Exception class.
          */
-        OutOfRangeException()
+        OutOfRange()
             : Exception("Out of range.")
         {}
     };

@@ -228,7 +228,7 @@ namespace Celery::Buffer
             {
                 if (index >= len)
                 {
-                    throw Except::OutOfRangeException();
+                    throw Except::OutOfRange();
                 }
 
                 return buffer[index];
@@ -257,7 +257,7 @@ namespace Celery::Buffer
             {
                 if (len == 0)
                 {
-                    throw Except::OutOfRangeException();
+                    throw Except::OutOfRange();
                 }
 
                 // Decrement length

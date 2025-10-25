@@ -269,6 +269,22 @@ namespace Celery::Buffer
             Base::Iterable<T> end() const { return Base::Iterable<T>(buffer + len); }
 
             /**
+             * @brief Get raw pointer to the underlying storage.
+             *
+             * Returns a pointer to the internal buffer storage. For heap-backed buffers
+             * this returns the allocated pointer; for inline storage it returns a pointer
+             * to the first element. The returned pointer provides direct access to raw
+             * storage (no bounds checking). It may be invalidated when the buffer is
+             * destroyed or when operations that reallocate occur.
+             *
+             * @return T* Pointer to the first element of the buffer.
+             */
+            [[nodiscard]] T *Ptr() const noexcept
+            {
+                return buffer;
+            }
+
+            /**
              * @brief Destroy the ring buffer.
              *
              * If heap storage was used, deallocates the storage using

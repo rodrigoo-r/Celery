@@ -13,4 +13,4 @@ foreach(file ${ALL_FILES})
     endif()
 endforeach()
 
-add_executable(${PROJECT_NAME} ${ALL_FILES})
+add_library(${PROJECT_NAME} STATIC ${ALL_FILES})

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 4.0)
-project(celery)
+project(Celery)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -7,3 +7,6 @@ set(CMAKE_CXX_STANDARD 20)
 include(cmake/deps.cmake)
 include(cmake/source.cmake)
 include(cmake/link.cmake)
+
+# Alias
+add_library(Celery::Celery ALIAS Celery)

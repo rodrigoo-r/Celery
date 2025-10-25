@@ -312,7 +312,7 @@ namespace Celery::Buffer
              * If heap storage was used, deallocates the storage using
              * \p Allocator::Deallocate.
              */
-            ~RingBuffer()
+            ~RingBuffer() override
             {
                 // Call destructors if necessary
                 if constexpr (!std::is_trivially_destructible_v<T>)

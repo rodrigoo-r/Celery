@@ -52,5 +52,18 @@ namespace Celery::Base
         const noexcept {
             return len;
         }
+
+        /**
+         * @brief Check whether the stored size is zero.
+         *
+         * Returns true when no elements are represented by this object.
+         * This method does not modify the object and is guaranteed not to throw.
+         *
+         * @return `true` if empty, `false` otherwise
+         */
+        [[nodiscard]] bool Empty()
+        const noexcept {
+            return len == 0;
+        }
     };
 }

@@ -32,6 +32,7 @@ namespace Celery::Io
 {
     class Stdout
     {
+    public:
         static inline void Write(const char *data, size_t size)
         {
 #           ifndef _WIN32

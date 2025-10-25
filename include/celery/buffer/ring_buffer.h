@@ -17,6 +17,7 @@
 
 #pragma once
 #include "celery/base/sizeable.h"
+#include "celery/except/out_of_range.h"
 #include "celery/memory/system.h"
 
 namespace Celery::Buffer
@@ -66,7 +67,7 @@ namespace Celery::Buffer
             }
 
             template <typename ...Args>
-            void emplace_back(Args &&...args)
+            void EmplaceBack(Args &&...args)
             {
                 if (len >= Capacity)
                 {
@@ -88,10 +89,31 @@ namespace Celery::Buffer
             }
 
             template <class U>
-            void write(U &&val)
+            void Write(U &&val)
             {
                 // Forward to emplace_back
                 emplace_back(val);
+            }
+
+            T &operator[](const size_t index)
+            {
+                if (index >= len)
+                {
+                    throw Except::OutOfRangeException();
+                }
+
+                return buffer[index];
+            }
+
+            [[nodiscard]] bool Full() const
+            {
+                return len == Capacity;
+            }
+
+            void Clear()
+            {
+                // Reset length to zero
+                len = 0;
             }
 
             ~RingBuffer()

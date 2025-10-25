@@ -157,7 +157,7 @@ namespace Celery::Buffer
              * @param data Pointer to the source elements (must point to at least \p count elements).
              * @param count Number of elements to insert from \p data.
              */
-            void Batch(T *data, const size_t count)
+            void Batch(const T *data, const size_t count)
             {
                 // Use memset if trivially copyable
                 if constexpr (std::is_trivially_copyable_v<T>)

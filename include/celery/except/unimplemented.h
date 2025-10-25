@@ -28,13 +28,13 @@
 namespace Celery::Except
 {
     /**
-     * @class UnimplementedException
+     * @class Unimplemented
      * @brief Exception thrown when a requested feature or function is not implemented.
      *
      * Use this exception to mark code paths that are intentionally left
      * unimplemented (for example, as stubs during development).
      */
-    class UnimplementedException : public Exception
+    class Unimplemented : public Exception
     {
     public:
         /**
@@ -42,7 +42,7 @@ namespace Celery::Except
          *
          * The default diagnostic message is "Functionality not yet implemented."
          */
-        UnimplementedException()
+        Unimplemented()
             : Exception("Functionality not yet implemented.")
         {}
     };

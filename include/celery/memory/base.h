@@ -50,7 +50,7 @@ namespace Celery::Pmr
         static inline T *Allocate(Args &&...args)
         {
             // Implementation should be user-defined
-            throw Except::UnimplementedException();
+            throw Except::Unimplemented();
         }
 
         /**
@@ -65,7 +65,7 @@ namespace Celery::Pmr
         static void Deallocate(T *ptr)
         {
             // Implementation should be user-defined
-            throw Except::UnimplementedException();
+            throw Except::Unimplemented();
         }
     };
 
@@ -95,7 +95,7 @@ namespace Celery::Pmr
         static inline T *Allocate(size_t size)
         {
             // Implementation should be user-defined
-            throw Except::UnimplementedException();
+            throw Except::Unimplemented();
         }
 
         /**
@@ -110,7 +110,7 @@ namespace Celery::Pmr
         static void Deallocate(T *ptr)
         {
             // Implementation should be user-defined
-            throw Except::UnimplementedException();
+            throw Except::Unimplemented();
         }
     };
 }

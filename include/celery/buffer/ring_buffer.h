@@ -177,7 +177,7 @@ namespace Celery::Buffer
                         }
 
                         const auto to_copy = (remaining < available) ? remaining : available;
-                        memcpy(&buffer[len], data + len, sizeof(T) * to_copy);
+                        memcpy(&buffer[len], data + (count - remaining), sizeof(T) * to_copy);
                         len += to_copy;
                         remaining -= to_copy;
                     }

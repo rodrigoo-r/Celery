@@ -17,34 +17,15 @@
 
 #pragma once
 #include <cstddef>
-#include <iostream>
-
-#include "descriptor.h"
-
-// Guard against malware operating systems
-#ifndef _WIN32
-    // Unix-like system headers
-#   include <unistd.h>
-#else
-    // For losers
-#   include <iostream>
-#endif
 
 namespace Celery::Io
 {
-    class Stdout : public Descriptor
+    class Descriptor
     {
     public:
         static inline void Write(const char *data, size_t size)
         {
-#           ifndef _WIN32
-                // Normal person:
-                write(STDOUT_FILENO, data, size);
-#           else
-                // Mentally disabled person who uses
-                // malware as their operating system:
-                std::cout.write(data, size);
-#           endif
+            // Placeholder implementation
         }
-    };
+    }
 }

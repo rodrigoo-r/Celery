@@ -17,6 +17,7 @@
 
 #pragma once
 #include "base.h"
+#include "celery/except/bad_alloc.h"
 
 namespace Celery::Pmr
 {
@@ -40,6 +41,10 @@ namespace Celery::Pmr
         {
             // Create a raw ptr
             T *ptr = static_cast<T *>(::operator new(sizeof(T)));
+            if (ptr == nullptr)
+            {
+                throw Except::BadAlloc(); // Allocation failed
+            }
 
             // Use placement new to construct the object
             new (ptr) T(std::forward<Args>(args)...);
@@ -88,6 +93,11 @@ namespace Celery::Pmr
         {
             // Allocate raw memory for count T objects
             T *ptr = static_cast<T *>(::operator new(sizeof(T) * count));
+            if (ptr == nullptr)
+            {
+                throw Except::BadAlloc(); // Allocation failed
+            }
+
             return ptr;
         }
 

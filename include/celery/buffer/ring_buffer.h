@@ -74,6 +74,23 @@ namespace Celery::Buffer
              */
             DataType buffer;
 
+        protected:
+            /**
+             * @brief Handle a batch of elements from the buffer.
+             *
+             * Pure virtual hook invoked to process or consume up to \p count elements
+             * starting at \p data. Implementations must define how the batch is handled
+             * (e.g. forwarding, processing, or transferring ownership).
+             *
+             * @note \p data points into the ring buffer's internal storage and is valid
+             *       for at least \p count elements. Do not assume null-termination or
+             *       lifetime beyond the caller's contract.
+             *
+             * @param data Pointer to the first element of the batch.
+             * @param count Number of elements available at \p data.
+             */
+            virtual void HandleBatch(T *data, size_t count) = 0;
+
         public:
             /**
              * @brief Construct a new RingBuffer.
@@ -115,6 +132,9 @@ namespace Celery::Buffer
             {
                 if (len >= Capacity)
                 {
+                    // Handle full buffer
+                    HandleBatch(buffer, len);
+
                     // Wrap around
                     len = 0;
                 }
@@ -172,6 +192,8 @@ namespace Celery::Buffer
                         auto available = Capacity - len;
                         if (available == 0)
                         {
+                            // Handle full buffer
+                            HandleBatch(buffer, len);
                             len = 0; // Wrap around
                             available = len;
                         }

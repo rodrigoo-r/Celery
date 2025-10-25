@@ -23,6 +23,17 @@ namespace Celery::Pmr
     template <typename T>
     class SystemAllocator : Allocator<T>
     {
+        /**
+         * @brief Allocate raw memory for a single object of type T and construct it.
+         *
+         * Allocates exactly sizeof(T) bytes using the global ::operator new and then
+         * constructs an instance of T in-place using placement new with the provided
+         * constructor arguments.
+         *
+         * @tparam Args Variadic template parameter pack for constructor arguments.
+         * @param args Constructor arguments forwarded to T's constructor.
+         * @return Pointer to the newly-constructed T instance.
+         */
         template <typename ...Args>
         static inline T *Allocate(Args &&...args)
         {
@@ -36,6 +47,15 @@ namespace Celery::Pmr
             return ptr;
         }
 
+        /**
+         * @brief Destroy and deallocate an object created by Allocate.
+         *
+         * If T is not trivially destructible, explicitly calls the destructor.
+         * Afterwards releases the memory using the global ::operator delete. Passing
+         * a null pointer is safe (operator delete accepts null).
+         *
+         * @param ptr Pointer to the object to be destroyed and deallocated.
+         */
         static inline void Deallocate(T *ptr)
         {
             // Only call destructor if not trivially destructible

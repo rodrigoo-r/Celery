@@ -18,11 +18,30 @@
 #pragma once
 #include "base.h"
 
+/**
+ * @namespace Celery::Except
+ * @brief Contains exception types used across the Celery library.
+ *
+ * Exceptions in this namespace provide consistent error reporting
+ * for various error conditions encountered by Celery components.
+ */
 namespace Celery::Except
 {
+    /**
+     * @class UnimplementedException
+     * @brief Exception thrown when a requested feature or function is not implemented.
+     *
+     * Use this exception to mark code paths that are intentionally left
+     * unimplemented (for example, as stubs during development).
+     */
     class UnimplementedException : public Exception
     {
     public:
+        /**
+         * @brief Construct a new UnimplementedException with a default message.
+         *
+         * The default diagnostic message is "Functionality not yet implemented."
+         */
         UnimplementedException()
             : Exception("Functionality not yet implemented.")
         {}

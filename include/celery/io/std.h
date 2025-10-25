@@ -57,6 +57,6 @@ namespace Celery::Io
     };
 
     // Predefined output descriptors
-    inline OutputDescriptor<STDOUT_FILENO> Stdout;
-    inline OutputDescriptor<STDERR_FILENO> Stderr;
+    class Stdout : public OutputDescriptor<STDOUT_FILENO> {};
+    class Stderr : public OutputDescriptor<STDERR_FILENO> {};
 }

@@ -16,6 +16,9 @@
 */
 
 #pragma once
+#include <cstring>
+
+
 #include "celery/base/iterable.h"
 #include "celery/base/sizeable.h"
 #include "celery/except/out_of_range.h"
@@ -142,6 +145,51 @@ namespace Celery::Buffer
             {
                 // Forward to emplace_back
                 emplace_back(val);
+            }
+
+            /**
+             * @brief Batch-insert elements into the ring buffer.
+             *
+             * Copies up to \p count elements from the provided \p data array by calling
+             * EmplaceBack for each element. This will follow the ring buffer's wrap-around
+             * and overwrite behavior when the capacity is exceeded.
+             *
+             * @param data Pointer to the source elements (must point to at least \p count elements).
+             * @param count Number of elements to insert from \p data.
+             */
+            void Batch(T *data, const size_t count)
+            {
+                // Use memset if trivially copyable
+                if constexpr (std::is_trivially_copyable_v<T>)
+                {
+                    // Define the remaining count
+                    size_t remaining = count;
+
+                    // Copy what fits until we run out of space
+                    while (remaining != 0)
+                    {
+                        // Get what fits
+                        auto available = Capacity - len;
+                        if (available == 0)
+                        {
+                            len = 0; // Wrap around
+                            available = len;
+                        }
+
+                        const auto to_copy = (remaining < available) ? remaining : available;
+                        memcpy(&buffer[len], data + len, sizeof(T) * to_copy);
+                        len += to_copy;
+                        remaining -= to_copy;
+                    }
+                }
+                else
+                {
+                    // Emplace each element individually
+                    for (size_t i = 0; i < count; ++i)
+                    {
+                        EmplaceBack(data[i]);
+                    }
+                }
             }
 
             /**

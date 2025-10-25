@@ -61,7 +61,7 @@ namespace Celery::Buffer
                 >
             >
         >
-        class RingBuffer : Base::Sizeable
+        class RingBuffer : public Base::Sizeable
         {
             // Data storage type
             using DataType = std::conditional_t<UseHeap, T *, T[Capacity]>;

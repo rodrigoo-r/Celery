@@ -27,5 +27,5 @@ namespace Celery::Io
         {
             // Placeholder implementation
         }
-    }
+    };
 }

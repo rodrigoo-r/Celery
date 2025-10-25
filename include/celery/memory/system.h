@@ -22,7 +22,7 @@
 namespace Celery::Pmr
 {
     template <typename T>
-    class SystemAllocator : Allocator<T>
+    class SystemAllocator : public Allocator<T>
     {
     public:
         /**
@@ -75,7 +75,7 @@ namespace Celery::Pmr
     };
 
     template <typename T>
-    class SystemArrayAllocator : ArrayAllocator<T>
+    class SystemArrayAllocator : public ArrayAllocator<T>
     {
     public:
         /**

@@ -16,6 +16,7 @@
 */
 
 #pragma once
+#include "celery/base/iterable.h"
 #include "celery/base/sizeable.h"
 #include "celery/except/out_of_range.h"
 #include "celery/memory/system.h"
@@ -24,34 +25,59 @@ namespace Celery::Buffer
 {
     namespace Pmr
     {
-        template <
-        typename T,
-        unsigned int Capacity = 50,
-        bool UseHeap = Capacity >= 256,
-        typename Allocator = Pmr::SystemArrayAllocator<T>,
-        // SFINAE to ensure Capacity > 0
-        typename = std::enable_if_t<(Capacity > 0)>,
-        // SFINAE to ensure Allocator is a valid
-        typename = std::enable_if_t<
-            std::is_base_of_v<
-                Pmr::ArrayAllocator<T>,
-                Allocator
+        /**
+         * @brief Fixed-capacity ring buffer (circular buffer) template.
+         *
+         * The buffer stores up to \p Capacity elements of type \p T. If
+         * \p UseHeap is true, the storage is allocated on the heap using the
+         * provided \p Allocator; otherwise the storage is placed inline as a
+         * C-style array of size \p Capacity.
+         *
+         * Template parameters:
+         * @tparam T Element type stored in the buffer.
+         * @tparam Capacity Maximum number of elements the buffer can hold.
+         * @tparam UseHeap If true, use heap allocation for storage.
+         * @tparam Allocator Allocator type used when \p UseHeap is true.
+         *
+         * Requirements:
+         * - \p Capacity must be > 0 (enforced via SFINAE).
+         * - \p Allocator must derive from Pmr::ArrayAllocator<T> (enforced via SFINAE).
+         */
+        template<
+            typename T,
+            unsigned int Capacity = 50,
+            bool UseHeap = Capacity >= 256,
+            typename Allocator = Celery::Pmr::SystemArrayAllocator<T>,
+            // SFINAE to ensure Capacity > 0
+            typename = std::enable_if_t<(Capacity > 0)>,
+            // SFINAE to ensure Allocator is a valid
+            typename = std::enable_if_t<
+                std::is_base_of_v<
+                    Celery::Pmr::ArrayAllocator<T>,
+                    Allocator
+                >
             >
         >
-    >
-    class RingBuffer : Base::Sizeable
+        class RingBuffer : Base::Sizeable
         {
             // Data storage type
-            using DataType = std::conditional_t<
-                UseHeap,
-                T*,
-                T[Capacity]
-            >;
+            using DataType = std::conditional_t<UseHeap, T *, T[Capacity]>;
 
-            // Buffer storage
+            /**
+             * @brief Underlying storage for the ring buffer.
+             *
+             * When \p UseHeap is true, this is a pointer returned by \p Allocator::Allocate.
+             * When \p UseHeap is false, this is an inline array of \p Capacity elements.
+             */
             DataType buffer;
 
         public:
+            /**
+             * @brief Construct a new RingBuffer.
+             *
+             * If heap storage is selected via the template parameter \p UseHeap,
+             * the constructor will allocate storage using \p Allocator::Allocate.
+             */
             RingBuffer() : Sizeable()
             {
                 // Allocate heap storage if needed
@@ -61,12 +87,27 @@ namespace Celery::Buffer
                 }
             }
 
-            [[nodiscard]] size_t Head()
-            const noexcept {
+            /**
+             * @brief Return the current head index (number of elements stored).
+             *
+             * @return size_t Current occupied length of the buffer.
+             */
+            [[nodiscard]] size_t Head() const noexcept
+            {
                 return len;
             }
 
-            template <typename ...Args>
+            /**
+             * @brief Construct an element in-place at the back of the ring buffer.
+             *
+             * If the buffer is full, this will wrap around and overwrite from the beginning.
+             * For trivially copyable types, assignment is used. For non-trivial types,
+             * placement new is used to construct the object.
+             *
+             * @tparam Args Argument pack forwarded to \p T constructor.
+             * @param args Constructor arguments for the new element.
+             */
+            template<typename... Args>
             void EmplaceBack(Args &&...args)
             {
                 if (len >= Capacity)
@@ -88,13 +129,31 @@ namespace Celery::Buffer
                 }
             }
 
-            template <class U>
+            /**
+             * @brief Write a value into the buffer by forwarding to emplace.
+             *
+             * This is a convenience wrapper that forwards to the emplacing routine.
+             *
+             * @tparam U Type of the value being written.
+             * @param val Value to write into the buffer.
+             */
+            template<class U>
             void Write(U &&val)
             {
                 // Forward to emplace_back
                 emplace_back(val);
             }
 
+            /**
+             * @brief Access element by index.
+             *
+             * Performs bounds checking against the current length and throws
+             * Except::OutOfRangeException on invalid index.
+             *
+             * @param index Index of the element to access (0-based).
+             * @return T& Reference to the element at \p index.
+             * @throws Except::OutOfRangeException if index >= Head().
+             */
             T &operator[](const size_t index)
             {
                 if (index >= len)
@@ -105,11 +164,25 @@ namespace Celery::Buffer
                 return buffer[index];
             }
 
-            [[nodiscard]] bool Full() const
-            {
-                return len == Capacity;
-            }
+            /**
+             * @brief Check whether the buffer is full.
+             *
+             * @return true if the number of elements equals \p Capacity.
+             */
+            [[nodiscard]] bool Full() const { return len == Capacity; }
 
+            /**
+             * @brief Remove the last element from the buffer.
+             *
+             * Decrements the stored length. If the buffer is empty, throws
+             * Except::OutOfRangeException.
+             *
+             * Note: this does not call the destructor for trivially copyable
+             * types; for non-trivial types the storage will remain but the
+             * logical length is decremented.
+             *
+             * @throws Except::OutOfRangeException if the buffer is empty.
+             */
             void PopBack()
             {
                 if (len == 0)
@@ -121,14 +194,49 @@ namespace Celery::Buffer
                 --len;
             }
 
+            /**
+             * @brief Clear the buffer logically.
+             *
+             * Resets the stored length to zero. Does not deallocate storage or
+             * call destructors for contained objects.
+             */
             void Clear()
             {
                 // Reset length to zero
                 len = 0;
             }
 
+            /**
+             * @brief Return iterator to beginning of stored elements.
+             *
+             * @return Base::Iterable<T> Iterator pointing to start of data.
+             */
+            Base::Iterable<T> begin() const { return Base::Iterable<T>(buffer); }
+
+            /**
+             * @brief Return iterator to one-past-last stored element.
+             *
+             * @return Base::Iterable<T> Iterator pointing to end of stored data.
+             */
+            Base::Iterable<T> end() const { return Base::Iterable<T>(buffer + len); }
+
+            /**
+             * @brief Destroy the ring buffer.
+             *
+             * If heap storage was used, deallocates the storage using
+             * \p Allocator::Deallocate.
+             */
             ~RingBuffer()
             {
+                // Call destructors if necessary
+                if constexpr (!std::is_trivially_destructible_v<T>)
+                {
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        buffer[i].~T();
+                    }
+                }
+
                 // Deallocate heap storage if used
                 if constexpr (UseHeap)
                 {
@@ -136,9 +244,14 @@ namespace Celery::Buffer
                 }
             }
         };
-    }
+    } // namespace Pmr
 
-    // Safe alias for RingBuffer with default parameters
-    template <typename T, unsigned int Capacity = 50>
+    /**
+     * @brief Convenience alias for the PMR ring buffer with default allocator decisions.
+     *
+     * @tparam T Element type.
+     * @tparam Capacity Buffer capacity (default 50).
+     */
+    template<typename T, unsigned int Capacity = 50>
     using RingBuffer = Pmr::RingBuffer<T, Capacity>;
-}
+} // namespace Celery::Buffer

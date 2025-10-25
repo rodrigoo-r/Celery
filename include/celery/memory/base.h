@@ -34,6 +34,7 @@ namespace Celery::Pmr
     template <typename T>
     class Allocator
     {
+    public:
         /**
          * @brief Allocate and construct an object of type T.
          *
@@ -81,6 +82,7 @@ namespace Celery::Pmr
     template <typename T>
     class ArrayAllocator
     {
+    public:
         /**
          * @brief Allocate an array of `size` elements of type T.
          *

@@ -32,14 +32,22 @@
 
 namespace Celery::Io
 {
-    class Stdout : public Descriptor
+    template <
+        unsigned short FileDescriptor,
+        // SFINAE to ensure valid file descriptor
+        typename = std::enable_if_t<
+            (FileDescriptor == STDOUT_FILENO ||
+                FileDescriptor == STDERR_FILENO)
+        >
+    >
+    class OutputDescriptor : public Descriptor
     {
     public:
         static inline void Write(const char *data, size_t size)
         {
 #           ifndef _WIN32
                 // Normal person:
-                write(STDOUT_FILENO, data, size);
+                write(FileDescriptor, data, size);
 #           else
                 // Mentally disabled person who uses
                 // malware as their operating system:
@@ -47,4 +55,8 @@ namespace Celery::Io
 #           endif
         }
     };
+
+    // Predefined output descriptors
+    inline OutputDescriptor<STDOUT_FILENO> Stdout;
+    inline OutputDescriptor<STDERR_FILENO> Stderr;
 }

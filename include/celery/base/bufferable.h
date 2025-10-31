@@ -58,5 +58,16 @@ namespace Celery::Base
          *   is managed externally.
          */
         T *data = nullptr;
+
+    public:
+        /**
+         * @brief Accessor for the raw buffer pointer.
+         *
+         * @return Pointer to the underlying buffer of type `T`.
+         */
+        T *Ptr()
+        {
+            return data;
+        }
     };
 }

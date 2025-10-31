@@ -26,10 +26,27 @@
 #include "celery/trait/default.h"
 #include "celery/util/copy.h"
 
+#pragma once
+
 namespace Celery::Array
 {
     namespace Pmr
     {
+        /**
+         * @brief A resizable dynamic array with PMR-style allocator support.
+         *
+         * This class models a high-performance vector container similar to
+         * std::vector but tailored for Celery's allocator and trait system.
+         *
+         * @tparam T Element type stored in the Vector.
+         * @tparam GrowthFactor Multiplicative growth factor used when expanding capacity.
+         * @tparam InitialCapacity Initial number of elements to allocate.
+         * @tparam Allocator Allocator type providing Allocate/Deallocate for T.
+         *
+         * @note Template SFINAE constraints:
+         * - \c T must be copy-constructible, move-constructible, and destructible.
+         * - \c Allocator must be derived from Celery::Pmr::ArrayAllocator<T>.
+         */
         template <
             typename T,
             Trait::Decimal GrowthFactor = Trait::GrowthFactor,
@@ -54,6 +71,12 @@ namespace Celery::Array
         >
         class Vector : public Base::Indexable<T>, public Base::Resizable
         {
+            /**
+             * @brief Initialize internal storage with the configured initial capacity.
+             *
+             * Allocates memory for \c InitialCapacity elements using the provided
+             * \c Allocator and sets the internal capacity value.
+             */
             void Init()
             {
                 // Allocate initial capacity
@@ -62,11 +85,24 @@ namespace Celery::Array
             }
 
         public:
+            /**
+             * @brief Default constructor.
+             *
+             * Initializes the internal storage and sets length to zero (via
+             * the Base::Indexable and Base::Resizable base initializations).
+             */
             Vector() : Base::Indexable<T>(), Resizable()
             {
                 this->Init();
             }
 
+            /**
+             * @brief Construct from an initializer list.
+             *
+             * Each element in \p init_list is copied/emplaced into the vector.
+             *
+             * @param init_list Initial values to insert.
+             */
             Vector(std::initializer_list<T> init_list) : Base::Indexable<T>(), Resizable()
             {
                 this->Init();
@@ -78,6 +114,15 @@ namespace Celery::Array
                 }
             }
 
+            /**
+             * @brief Copy assignment operator.
+             *
+             * Clears current contents, ensures sufficient capacity, and copies
+             * elements from \p other to this vector.
+             *
+             * @param other Source vector to copy from.
+             * @return Reference to this vector.
+             */
             Vector &operator=(const Vector &other)
             {
                 if (this != &other)
@@ -98,6 +143,12 @@ namespace Celery::Array
                 return *this;
             }
 
+            /**
+             * @brief Clear all elements from the vector.
+             *
+             * Calls destructors for non-trivially-destructible elements and
+             * resets the stored length to zero. Does not deallocate capacity.
+             */
             void Clear()
             {
                 // Call the destructor for each element if necessary
@@ -113,6 +164,12 @@ namespace Celery::Array
                 this->len = 0;
             }
 
+            /**
+             * @brief Reset the vector to initial state.
+             *
+             * Clears contents, deallocates the current storage, and
+             * re-initializes allocation to the configured initial capacity.
+             */
             void Reset()
             {
                 // Clear the vector
@@ -125,6 +182,15 @@ namespace Celery::Array
                 this->Init();
             }
 
+            /**
+             * @brief Resize internal storage to at least \p new_capacity.
+             *
+             * If \p new_capacity is less than or equal to current capacity, the
+             * call is a no-op. Otherwise allocates new storage, copies existing
+             * elements, deallocates old storage, and updates internal state.
+             *
+             * @param new_capacity Desired new capacity (number of element slots).
+             */
             void Resize(Trait::VeryLarge new_capacity)
             override {
                 if (new_capacity <= capacity) return;
@@ -147,6 +213,14 @@ namespace Celery::Array
                 capacity = new_capacity;
             }
 
+            /**
+             * @brief Ensure capacity is at least \p cap, growing by the configured factor.
+             *
+             * Repeatedly multiplies the current capacity by \c GrowthFactor until
+             * it meets or exceeds \p cap, then resizes to that capacity.
+             *
+             * @param cap Minimum required capacity.
+             */
             void EnsureGrowth(const Trait::VeryLarge cap)
             {
                 if (cap <= capacity) return; // Already enough capacity
@@ -163,6 +237,13 @@ namespace Celery::Array
                 Resize(new_cap);
             }
 
+            /**
+             * @brief Construct an element at the end of the vector by copying \p value.
+             *
+             * If necessary, the vector will grow using the configured growth factor.
+             *
+             * @param value Element to copy-construct at the end of the container.
+             */
             void EmplaceBack(const T &value)
             {
                 // Resize if necessary
@@ -176,12 +257,27 @@ namespace Celery::Array
                 ++this->len;
             }
 
+            /**
+             * @brief Push an rvalue element to the back of the vector.
+             *
+             * This forwards to EmplaceBack using move semantics.
+             *
+             * @param value Rvalue reference to the element to push.
+             */
             void PushBack(T &&value)
             {
                 // Move the value into place
                 EmplaceBack(std::move(value));
             }
 
+            /**
+             * @brief Remove the last element from the vector.
+             *
+             * Throws Except::OutOfRange if the vector is empty. For non-trivial
+             * destructible types, the destructor is invoked.
+             *
+             * @throws Except::OutOfRange when the vector has zero elements.
+             */
             void PopBack()
             {
                 if (this->len == 0)
@@ -199,6 +295,12 @@ namespace Celery::Array
                 }
             }
 
+            /**
+             * @brief Destructor.
+             *
+             * Clears elements (invoking destructors as needed) and deallocates
+             * the allocated storage via the chosen Allocator.
+             */
             ~Vector() override
             {
                 // Call the destructor for each element
@@ -210,6 +312,13 @@ namespace Celery::Array
         };
     }
 
+    /**
+     * @brief Convenience alias for PMR Vector in the Celery::Array namespace.
+     *
+     * This alias exposes the PMR-based Vector with default template parameters.
+     *
+     * @tparam T Element type.
+     */
     template <typename T>
     using Vector = Pmr::Vector<T>;
 }

@@ -12,9 +12,10 @@ namespace Celery::Utility
     template <typename T>
     void Copy(const T *src, T *dst, const size_t count)
     {
+        if (count == 0) return; // Nothing to copy
+
         // This method assumes either
         // EnsureGrowth or Resize has been called already.
-
         if constexpr (std::is_trivially_constructible_v<T>)
         {
             // Use memcpy directly

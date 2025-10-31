@@ -131,6 +131,7 @@ namespace Celery::Array
                 {
                     // Clear current contents
                     Clear();
+                    if (other.len == 0) return *this; // Nothing to copy
 
                     // Ensure capacity
                     EnsureGrowth(other.len);
@@ -288,8 +289,19 @@ namespace Celery::Array
             template <class U = T>
             void PushBack(U &&value)
             {
-                // Move the value into place
-                EmplaceBack(std::forward<U>(value));
+                if constexpr (!std::is_trivially_constructible_v<T>)
+                {
+                    // Move the value into place
+                    EmplaceBack(std::forward<U>(value));
+                }
+                else
+                {
+                    // For trivially constructible types, we can optimize
+                    // by directly assigning the value after ensuring capacity.
+                    EnsureGrowth(1);
+                    this->data[this->len] = std::forward<U>(value);
+                    ++this->len;
+                }
             }
 
             /**
@@ -325,6 +337,7 @@ namespace Celery::Array
              */
             ~Vector() override
             {
+                if (!this->data) return; // Nothing to do
                 // Call the destructor for each element
                 Clear();
 

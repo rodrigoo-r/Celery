@@ -57,7 +57,7 @@ namespace Celery::Base
          */
         It operator*()
         {
-            return buffer;
+            return *buffer;
         }
 
         /**

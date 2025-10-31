@@ -36,7 +36,7 @@ namespace Celery::Io
                 >
             >
         >
-        class OStream : protected Buffer::Pmr::RingBuffer<char, Capacity, UseHeap, Allocator>
+        class OStream : public Buffer::Pmr::RingBuffer<char, Capacity, UseHeap, Allocator>
         {
             void WriteStream(char *data, size_t count)
             {

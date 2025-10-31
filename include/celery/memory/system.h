@@ -16,13 +16,12 @@
 */
 
 #pragma once
-#include "base.h"
 #include "celery/except/bad_alloc.h"
 
 namespace Celery::Pmr
 {
     template <typename T>
-    class SystemAllocator : public Allocator<T>
+    class Allocator
     {
     public:
         /**
@@ -75,7 +74,7 @@ namespace Celery::Pmr
     };
 
     template <typename T>
-    class SystemArrayAllocator : public ArrayAllocator<T>
+    class ArrayAllocator
     {
     public:
         /**

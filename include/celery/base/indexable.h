@@ -82,6 +82,26 @@ namespace Celery::Base
         }
 
         /**
+         * @brief Get a pointer to the first element.
+         *
+         * @return Pointer to the first element in the container.
+         */
+        T Front()
+        {
+            return operator[](0);
+        }
+
+        /**
+         * @brief Get a pointer to the last element.
+         *
+         * @return Pointer to the last element in the container.
+         */
+        T *Back()
+        {
+            return operator[](this->len - 1);
+        }
+
+        /**
          * @brief Virtual default destructor.
          *
          * Declared `override` to ensure proper polymorphic destruction through

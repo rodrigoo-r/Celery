@@ -50,7 +50,7 @@ namespace Celery::Buffer
             typename T,
             unsigned int Capacity = 50,
             bool UseHeap = Capacity >= 256,
-            typename Allocator = Celery::Pmr::SystemArrayAllocator<T>,
+            typename Allocator = Celery::Pmr::ArrayAllocator<T>,
             // SFINAE to ensure Capacity > 0
             typename = std::enable_if_t<(Capacity > 0)>,
             // SFINAE to ensure Allocator is a valid

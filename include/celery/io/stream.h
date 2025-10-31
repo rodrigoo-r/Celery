@@ -27,7 +27,7 @@ namespace Celery::Io
             typename Desc = Stdout,
             unsigned int Capacity = 1024,
             bool UseHeap = Capacity >= 1024,
-            typename Allocator = Celery::Pmr::SystemArrayAllocator<char>,
+            typename Allocator = Celery::Pmr::ArrayAllocator<char>,
             // SFINAE to check that the Descriptor is valid
             typename = std::enable_if_t<
                 std::is_base_of_v<

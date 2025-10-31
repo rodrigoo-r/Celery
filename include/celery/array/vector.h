@@ -21,7 +21,6 @@
 
 #include "celery/base/indexable.h"
 #include "celery/base/resizable.h"
-#include "celery/memory/base.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"
 #include "celery/util/copy.h"
@@ -51,7 +50,7 @@ namespace Celery::Array
             typename T,
             Trait::Decimal GrowthFactor = Trait::GrowthFactor,
             Trait::Uint InitialCapacity = Trait::InitialCapacity,
-            typename Allocator = Celery::Pmr::SystemArrayAllocator<T>,
+            typename Allocator = Celery::Pmr::ArrayAllocator<T>,
             // --- SFINAE Checks --- //
             typename = std::enable_if_t<
                 std::is_copy_constructible_v<T>
@@ -220,11 +219,14 @@ namespace Celery::Array
                 T *new_data = Allocator::Allocate(new_capacity);
 
                 // Copy existing elements to new data
-                Utility::Copy(
-                    this->data,
-                    new_data,
-                    this->len
-                );
+                if (this->len != 0)
+                {
+                    Utility::Copy(
+                        this->data,
+                        new_data,
+                        this->len
+                    );
+                }
 
                 // Deallocate old data
                 Allocator::Deallocate(this->data);

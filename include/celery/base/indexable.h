@@ -16,6 +16,7 @@
 */
 
 #pragma once
+#include "bufferable.h"
 #include "celery/except/out_of_range.h"
 #include "celery/trait/default.h"
 #include "sizeable.h"
@@ -36,17 +37,8 @@ namespace Celery::Base
      * @tparam T Element type stored by the container.
      */
     template<typename T>
-    class Indexable : public Sizeable
+    class Indexable : public Sizeable, Bufferable<T>
     {
-    protected:
-        /**
-         * @brief Pointer to the first element of the contiguous storage.
-         *
-         * This pointer may be `nullptr` when the container is empty. Ownership
-         * semantics are not defined by this base class.
-         */
-        T *data = nullptr;
-
     public:
         /**
          * @brief Non-const subscript operator with bounds checking.
@@ -66,7 +58,7 @@ namespace Celery::Base
                 throw Except::OutOfRange();
             }
 
-            return data[index];
+            return this->data[index];
         }
 
         /**
@@ -86,7 +78,7 @@ namespace Celery::Base
                 throw Except::OutOfRange();
             }
 
-            return data[index];
+            return this->data[index];
         }
 
         /**

@@ -43,7 +43,7 @@ namespace Celery::Io
     class OutputDescriptor : public Descriptor
     {
     public:
-        static inline void Write(const char *data, size_t size)
+        static inline void Write(const char *data, const size_t size)
         {
 #           ifndef _WIN32
                 // Normal person:

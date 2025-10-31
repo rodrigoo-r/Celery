@@ -68,7 +68,5 @@ namespace Celery::Trait
 
     // --- Default Traits --- //
     constexpr double GrowthFactor = 1.8;
-    constexpr unsigned int InitialCapacity = 16;
-
-
+    constexpr unsigned int InitialCapacity = 25;
 }

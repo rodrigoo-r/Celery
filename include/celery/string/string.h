@@ -18,6 +18,7 @@
 #pragma once
 
 #include "celery/array/vector.h"
+#include "celery/base/display.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"
 
@@ -69,7 +70,9 @@ namespace Celery::Str
                 >
             >
         >
-        class String : public Array::Pmr::Vector<char, GrowthFactor, InitialCapacity, Allocator>
+        class String :
+            public Array::Pmr::Vector<char, GrowthFactor, InitialCapacity, Allocator>,
+            public Base::Display
         {
         public:
             // Inherit constructors from the base PMR vector.
@@ -158,7 +161,23 @@ namespace Celery::Str
                 other.capacity = 0;
             }
 
+            /**
+             * @brief Default destructor.
+             */
             String() = default;
+
+            /**
+             * @brief Convert the String to a String representation.
+             *
+             * Overrides Base::Display::ToString to return a copy of this String.
+             *
+             * @returns A String representing this String.
+             */
+            [[nodiscard]] String ToString()
+            const noexcept override
+            {
+                return *this;
+            }
 
             /**
              * @brief Return a pointer to a null-terminated view of the string.

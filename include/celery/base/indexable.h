@@ -37,7 +37,7 @@ namespace Celery::Base
      * @tparam T Element type stored by the container.
      */
     template<typename T>
-    class Indexable : public Sizeable, Bufferable<T>
+    class Indexable : public Sizeable, public Bufferable<T>
     {
     public:
         /**

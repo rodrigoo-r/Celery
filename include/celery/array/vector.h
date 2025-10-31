@@ -144,6 +144,21 @@ namespace Celery::Array
             }
 
             /**
+             * @brief Append an element to the vector using += operator.
+             *
+             * Forwards to EmplaceBack to add \p value to the end of the vector.
+             *
+             * @param value Element to append.
+             * @return Reference to this vector.
+             */
+            template <class U = T>
+            Vector &operator+=(U &&value)
+            {
+                EmplaceBack(value);
+                return *this;
+            }
+
+            /**
              * @brief Clear all elements from the vector.
              *
              * Calls destructors for non-trivially-destructible elements and
@@ -244,7 +259,8 @@ namespace Celery::Array
              *
              * @param value Element to copy-construct at the end of the container.
              */
-            void EmplaceBack(const T &value)
+            template <class U = T>
+            void EmplaceBack(U &&value)
             {
                 // Resize if necessary
                 if (this->len >= capacity)
@@ -258,16 +274,17 @@ namespace Celery::Array
             }
 
             /**
-             * @brief Push an rvalue element to the back of the vector.
+             * @brief Push an element to the back of the vector.
              *
              * This forwards to EmplaceBack using move semantics.
              *
              * @param value Rvalue reference to the element to push.
              */
-            void PushBack(T &&value)
+            template <class U = T>
+            void PushBack(U &&value)
             {
                 // Move the value into place
-                EmplaceBack(std::move(value));
+                EmplaceBack(std::forward<U>(value));
             }
 
             /**

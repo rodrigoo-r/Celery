@@ -332,6 +332,29 @@ namespace Celery::Array
             }
 
             /**
+             * @brief Remove the last element and return it by reference for move semantics.
+             *
+             * Throws Except::OutOfRange if the vector is empty. Does not call the
+             * destructor, allowing the caller to move from the returned reference.
+             *
+             * @return Reference to the removed element for move semantics.
+             * @throws Except::OutOfRange when the vector has zero elements.
+             */
+            T &PopBackMove()
+            {
+                if (this->len == 0)
+                {
+                    throw Except::OutOfRange();
+                }
+
+                // Decrease length
+                --this->len;
+
+                // Return the element by reference for move semantics
+                return this->data[this->len];
+            }
+
+            /**
              * @brief Destructor.
              *
              * Clears elements (invoking destructors as needed) and deallocates

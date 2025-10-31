@@ -93,7 +93,9 @@ namespace Celery::Array
              */
             Vector() : Base::Indexable<T>(), Resizable()
             {
-                this->Init();
+                // Vector is lazily initialized, thus
+                // no allocation is done here.
+                this->len = 0;
             }
 
             /**
@@ -166,6 +168,8 @@ namespace Celery::Array
              */
             void Clear()
             {
+                if (this->len == 0) return; // Already empty
+
                 // Call the destructor for each element if necessary
                 if constexpr (!std::is_trivially_destructible_v<T>)
                 {
@@ -208,6 +212,7 @@ namespace Celery::Array
              */
             void Resize(Trait::VeryLarge new_capacity)
             override {
+                if (!this->data) Init(); // Lazy initialization
                 if (new_capacity <= capacity) return;
 
                 // Allocate new data
@@ -238,12 +243,15 @@ namespace Celery::Array
              */
             void EnsureGrowth(const Trait::VeryLarge cap)
             {
-                if (cap <= capacity) return; // Already enough capacity
+                if (!this->data) Init(); // Lazy initialization
+
+                const auto required = static_cast<Trait::VeryLarge>(this->len + cap);
+                if (required <= capacity) return; // Already enough capacity
 
                 auto new_cap = capacity;
 
                 // Grow until we reach the required capacity
-                while (new_cap < cap)
+                while (new_cap < required)
                 {
                     new_cap = static_cast<Trait::VeryLarge>(new_cap * GrowthFactor);
                 }
@@ -257,19 +265,16 @@ namespace Celery::Array
              *
              * If necessary, the vector will grow using the configured growth factor.
              *
-             * @param value Element to copy-construct at the end of the container.
+             * @param args Arguments forwarded to T's constructor.
              */
-            template <class U = T>
-            void EmplaceBack(U &&value)
+            template <typename ...Args>
+            void EmplaceBack(Args&&... args)
             {
                 // Resize if necessary
-                if (this->len >= capacity)
-                {
-                    Resize(static_cast<Trait::VeryLarge>(capacity * GrowthFactor));
-                }
+                EnsureGrowth(1);
 
                 // Construct the new element in place
-                new (this->data + this->len) T(value);
+                new (&this->data[this->len]) T(std::forward<Args>(args)...);
                 ++this->len;
             }
 

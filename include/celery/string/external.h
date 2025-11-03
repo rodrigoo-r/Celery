@@ -24,8 +24,9 @@ namespace Celery::Str
     {
     public:
         template <
-            typename T = char *,
+            typename T,
             typename = std::enable_if_t<
+                std::is_pointer_v<std::decay_t<T>> &&
                 std::is_same_v<
                     std::remove_cv_t<std::remove_pointer_t<std::decay_t<T>>>,
                     char
@@ -36,6 +37,22 @@ namespace Celery::Str
         {
             this->data = const_cast<char *>(data_ptr);
             this->len = length;
+        }
+
+        template <
+            typename T,
+            typename = std::enable_if_t<
+                std::is_pointer_v<std::decay_t<T>> &&
+                std::is_same_v<
+                    std::remove_cv_t<std::remove_pointer_t<std::decay_t<T>>>,
+                    char
+                >
+            >
+        >
+        External(T &&data_ptr)
+        {
+            this->data = const_cast<char *>(data_ptr);
+            this->len = strlen(this->data);
         }
     };
 }

@@ -124,68 +124,6 @@ namespace Celery::Base
         }
 
         /**
-         * @brief Remove an element at the specified index.
-         *
-         * Reindexes the internal data to remove the element at `idx`.
-         * Throws `Except::OutOfRange` if `idx` is out of bounds.
-         *
-         * @param idx Index of the element to remove.
-         * @throws Except::OutOfRange When `idx >= len`.
-         */
-        template <class U = Trait::VeryLarge>
-        void RemoveAt(U &&idx)
-        {
-            Utility::Reindex(this->data, this->len, idx);
-            --this->len; // Decrease length after removal
-        }
-
-        /**
-         * @brief Remove the first occurrence of a value.
-         *
-         * Searches for the first occurrence of `value` and removes it
-         * by reindexing the internal data. If the value is not found,
-         * no action is taken.
-         *
-         * @param value The value to remove.
-         */
-        template <
-            class U = T,
-            typename = std::enable_if_t<
-                !std::is_same_v<T, Trait::VeryLarge>
-            >
-        >
-        void Remove(const U &value)
-        {
-            for (Trait::VeryLarge i = 0; i < this->len; ++i)
-            {
-                if (this->data[i] == value)
-                {
-                    Utility::Reindex(this->data, this->len, i);
-                    --this->len; // Decrease length after removal
-                    return; // Remove only the first occurrence
-                }
-            }
-        }
-
-        /**
-         * @brief Remove an element by pointer.
-         *
-         * Calculates the index of the element pointed to by `ptr`
-         * and removes it by reindexing. Throws `Except::OutOfRange`
-         * if the pointer is out of bounds.
-         *
-         * @param ptr Pointer to the element to remove.
-         * @throws Except::OutOfRange When `ptr` is out of bounds.
-         */
-        template <class U = T>
-        void Erase(U *&&ptr)
-        {
-            // Calculate index from pointer
-            const auto index = static_cast<Trait::VeryLarge>(ptr - this->data);
-            RemoveAt(index);
-        }
-
-        /**
          * @brief Remove an element by value.
          *
          * Forwards to `Remove` to delete the first occurrence

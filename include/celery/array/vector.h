@@ -20,6 +20,7 @@
 
 
 #include "celery/base/indexable.h"
+#include "celery/base/iterable.h"
 #include "celery/base/pushable.h"
 #include "celery/base/removable.h"
 #include "celery/base/resizable.h"
@@ -74,10 +75,12 @@ namespace Celery::Array
             public Base::Indexable<T>,
             public Base::Resizable,
             public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
-            public Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
+            public Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
+            public Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
         {
-            // Make BufferedRemovable friend to access protected members
+            // Make Base::BufferedRemovable and Base::BufferedIterable friends to access protected members
             friend class Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>;
+            friend class Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>;
 
             /**
              * @brief Initialize internal storage with the configured initial capacity.

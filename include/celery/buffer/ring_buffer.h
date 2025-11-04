@@ -20,6 +20,7 @@
 
 
 #include "celery/base/iterable.h"
+#include "celery/base/iterator.h"
 #include "celery/base/pushable.h"
 #include "celery/base/removable.h"
 #include "celery/base/sizeable.h"
@@ -66,8 +67,15 @@ namespace Celery::Buffer
         class RingBuffer :
             public Base::Sizeable,
             public Base::Pushable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
-            public Base::Removable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
+            public Base::Removable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
+            public Base::BufferedIterable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
         {
+            // Make Base::BufferedIterable a friend to access protected members
+            friend class Base::BufferedIterable<
+                RingBuffer<T, Capacity, UseHeap, Allocator>,
+                T
+            >;
+
             // Data storage type
             using DataType = std::conditional_t<UseHeap, T *, T[Capacity]>;
 
@@ -277,23 +285,18 @@ namespace Celery::Buffer
              */
             void Clear()
             {
+                // Call destructors if necessary
+                if constexpr (!std::is_trivially_destructible_v<T>)
+                {
+                    for (size_t i = 0; i < len; ++i)
+                    {
+                        data[i].~T();
+                    }
+                }
+
                 // Reset length to zero
                 len = 0;
             }
-
-            /**
-             * @brief Return iterator to beginning of stored elements.
-             *
-             * @return Base::Iterable<T> Iterator pointing to start of data.
-             */
-            Base::Iterable<T> begin() const { return Base::Iterable<T>(data); }
-
-            /**
-             * @brief Return iterator to one-past-last stored element.
-             *
-             * @return Base::Iterable<T> Iterator pointing to end of stored data.
-             */
-            Base::Iterable<T> end() const { return Base::Iterable<T>(data + len); }
 
             /**
              * @brief Get raw pointer to the underlying storage.

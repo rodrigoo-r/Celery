@@ -76,6 +76,9 @@ namespace Celery::Array
             public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
             public Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
         {
+            // Make BufferedRemovable friend to access protected members
+            friend class Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>;
+
             /**
              * @brief Initialize internal storage with the configured initial capacity.
              *

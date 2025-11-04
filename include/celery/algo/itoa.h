@@ -72,7 +72,7 @@ namespace Celery::Algorithm
         using UValue = std::make_unsigned_t<ValueType>;
         using AbsValueType = std::conditional_t<
             std::is_unsigned_v<ValueType>,
-            ValueType &,
+            ValueType,
             UValue
         >;
 
@@ -96,7 +96,7 @@ namespace Celery::Algorithm
         }
 
         // Work with absolute value for digit extraction
-        AbsValueType abs_value = value;
+        AbsValueType &abs_value = value;
 
         // Change only for signed types
         if constexpr (std::is_signed_v<ValueType>)

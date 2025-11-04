@@ -25,6 +25,21 @@ namespace Celery::List
 {
     namespace Pmr
     {
+        /**
+         * @brief A doubly-linked list implementation that uses a polymorphic memory resource allocator.
+         *
+         * This class is an STL-like container providing basic list operations
+         * such as push/pop at both ends, removal by value or index, iteration,
+         * and clearing. It stores nodes of type Celery::List::Internal::LinkedListNode<T>
+         * and uses the provided Allocator for node allocation and deallocation.
+         *
+         * @tparam T The element type stored in the list. Must be copy-constructible.
+         * @tparam Allocator The allocator type used to allocate/deallocate nodes.
+         *         Defaults to Celery::Pmr::Allocator<Internal::LinkedListNode<T>>.
+         *
+         * @note SFINAE constraints enforce that T is copy-constructible and that
+         *       Allocator derives from the expected allocator base.
+         */
         template<
             typename T,
             typename Allocator = Celery::Pmr::Allocator<Internal::LinkedListNode<T>>,
@@ -45,9 +60,23 @@ namespace Celery::List
             public Base::Removable<LinkedList<T, Allocator>, T>
         {
         protected:
+            /** @brief Pointer to the first node in the list (or nullptr if empty). */
             Internal::LinkedListNode<T> *head = nullptr;
+
+            /** @brief Pointer to the last node in the list (or nullptr if empty). */
             Internal::LinkedListNode<T> *tail = nullptr;
 
+            /**
+             * @brief Remove and deallocate a node from the list, updating links and size.
+             *
+             * This method relinks adjacent nodes (previous and next), updates the
+             * head/tail pointers when removing at boundaries, deallocates the node
+             * through the Allocator, and decrements the container size.
+             *
+             * @param node Pointer to the node to remove. Must not be nullptr.
+             *
+             * @throws Except::OutOfRange If `node` is nullptr.
+             */
             void RemoveNode(Internal::LinkedListNode<T> *node)
             {
                 if (!node)
@@ -79,6 +108,16 @@ namespace Celery::List
             }
 
         public:
+            /**
+             * @brief Construct and append a new element at the end of the list.
+             *
+             * Forwards arguments to the node allocator which constructs the element in-place.
+             *
+             * @tparam Args Parameter pack for element construction.
+             * @param args Arguments forwarded to T's constructor.
+             *
+             * Complexity: constant time.
+             */
             template<typename... Args>
             void EmplaceBack(Args&&... args)
             {
@@ -105,6 +144,16 @@ namespace Celery::List
                 ++this->len;
             }
 
+            /**
+             * @brief Construct and insert a new element at the front of the list.
+             *
+             * Forwards arguments to the node allocator which constructs the element in-place.
+             *
+             * @tparam Args Parameter pack for element construction.
+             * @param args Arguments forwarded to T's constructor.
+             *
+             * Complexity: constant time.
+             */
             template<typename... Args>
             void EmplaceFront(Args&&... args)
             {
@@ -131,6 +180,13 @@ namespace Celery::List
                 ++this->len;
             }
 
+            /**
+             * @brief Remove the last element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             */
             void PopBack()
             {
                 if (!tail)
@@ -141,6 +197,13 @@ namespace Celery::List
                 RemoveNode(tail);
             }
 
+            /**
+             * @brief Remove the first element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             */
             void PopFront()
             {
                 if (!head)
@@ -151,6 +214,13 @@ namespace Celery::List
                 RemoveNode(head);
             }
 
+            /**
+             * @brief Remove all elements from the list.
+             *
+             * After this call the list is empty and size is zero.
+             *
+             * Complexity: linear.
+             */
             void Clear()
             {
                 while (this->len > 0)
@@ -161,12 +231,30 @@ namespace Celery::List
                 this->len = 0;
             }
 
+            /**
+             * @brief Insert a value at the front of the list by forwarding the provided value.
+             *
+             * @tparam U Type of the value being inserted (deduced).
+             * @param value Value to insert (forwarded).
+             */
             template <class U = T>
             void PushFront(U &&value)
             {
                 EmplaceFront(std::forward<U>(value));
             }
 
+            /**
+             * @brief Remove the element at the specified index.
+             *
+             * Traverses from the head to locate the node at position `idx` and removes it.
+             *
+             * @tparam U Unsigned integral index type (defaults to Trait::Uint).
+             * @param idx Index of the element to remove (0-based).
+             *
+             * @throws Except::OutOfRange If `idx` is greater than or equal to the current size.
+             *
+             * Complexity: linear in `idx` (worst-case linear in list size).
+             */
             template <
                 class U = Trait::Uint,
                 typename = std::enable_if_t<
@@ -193,6 +281,17 @@ namespace Celery::List
                 RemoveNode(current);
             }
 
+            /**
+             * @brief Remove the first occurrence of a value equal to `value`.
+             *
+             * Traverses the list and compares elements using `operator==`. If a match
+             * is found, the node is removed and the function returns.
+             *
+             * @tparam U Type of the value to remove (deduced).
+             * @param value Value to remove.
+             *
+             * Complexity: linear in list size (stops at first match).
+             */
             template <typename U = T>
             void Remove(U &&value)
             {
@@ -211,16 +310,31 @@ namespace Celery::List
                 }
             }
 
+            /**
+             * @brief Return an iterator to the beginning of the list.
+             *
+             * @return Iterator pointing to the first element (or `end()` if empty).
+             */
             Iterator<T> begin()
             {
                 return { head };
             }
 
+            /**
+             * @brief Return an iterator representing the end of the list.
+             *
+             * @return Iterator representing one-past-the-last element (nullptr).
+             */
             Iterator<T> end()
             {
                 return { nullptr };
             }
 
+            /**
+             * @brief Destructor: clean up all nodes and release resources.
+             *
+             * Ensures all nodes are removed and deallocated via the Allocator.
+             */
             ~LinkedList()
             override {
                 // Clean up all nodes

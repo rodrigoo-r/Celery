@@ -168,6 +168,38 @@ namespace Celery::Base
         }
 
         /**
+         * @brief Remove an element by pointer.
+         *
+         * Calculates the index of the element pointed to by `ptr`
+         * and removes it by reindexing. Throws `Except::OutOfRange`
+         * if the pointer is out of bounds.
+         *
+         * @param ptr Pointer to the element to remove.
+         * @throws Except::OutOfRange When `ptr` is out of bounds.
+         */
+        template <class U = T>
+        void Erase(U *&&ptr)
+        {
+            // Calculate index from pointer
+            const auto index = static_cast<Trait::VeryLarge>(ptr - this->data);
+            RemoveAt(index);
+        }
+
+        /**
+         * @brief Remove an element by value.
+         *
+         * Forwards to `Remove` to delete the first occurrence
+         * of `ref` from the container.
+         *
+         * @param ref The value to remove.
+         */
+        template <class U = T>
+        void Erase(U &&ref)
+        {
+            Remove(ref);
+        }
+
+        /**
          * @brief Virtual default destructor.
          *
          * Declared `override` to ensure proper polymorphic destruction through

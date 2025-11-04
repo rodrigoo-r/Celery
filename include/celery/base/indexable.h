@@ -19,6 +19,7 @@
 #include "bufferable.h"
 #include "celery/except/out_of_range.h"
 #include "celery/trait/default.h"
+#include "celery/util/reindex.h"
 #include "iterable.h"
 #include "sizeable.h"
 
@@ -120,6 +121,87 @@ namespace Celery::Base
         Iterable<T> end()
         {
             return Iterable<T>(this->data + this->len);
+        }
+
+        /**
+         * @brief Append an element to the container using += operator.
+         *
+         * Pure virtual; must be implemented by subclasses to define
+         * how elements are added.
+         *
+         * @param value Element to append.
+         * @return Reference to this container after appending.
+         */
+        virtual Indexable &operator+=(const T &value) = 0;
+
+        /**
+         * @brief Append an element to the container using += operator.
+         *
+         * Pure virtual; must be implemented by subclasses to define
+         * how elements are added.
+         *
+         * @param value Element to append.
+         * @return Reference to this container after appending.
+         */
+        virtual Indexable &operator+=(T &value) = 0;
+
+        /**
+         * @brief Append an element to the container using += operator.
+         *
+         * Pure virtual; must be implemented by subclasses to define
+         * how elements are added.
+         *
+         * @param value Element to append.
+         * @return Reference to this container after appending.
+         */
+        virtual Indexable &operator+=(T &&value) = 0;
+
+        /**
+         * @brief Remove an element at the specified index using -= operator.
+         *
+         * Reindexes the internal data to remove the element at `idx`.
+         * Throws `Except::OutOfRange` if `idx` is out of bounds.
+         *
+         * @param idx Index of the element to remove.
+         * @return Reference to this container after removal.
+         * @throws Except::OutOfRange When `idx >= len`.
+         */
+        Indexable &operator-=(const Trait::VeryLarge &idx)
+        {
+            Utility::Reindex(this->data, this->len, idx);
+            return *this;
+        }
+
+        /**
+         * @brief Remove an element at the specified index using -= operator (const).
+         *
+         * Reindexes the internal data to remove the element at `idx`.
+         * Throws `Except::OutOfRange` if `idx` is out of bounds.
+         *
+         * @param idx Index of the element to remove.
+         * @return Reference to this container after removal.
+         * @throws Except::OutOfRange When `idx >= len`.
+         */
+        Indexable &operator-=(Trait::VeryLarge &idx)
+        {
+            Utility::Reindex(this->data, this->len, idx);
+            return *this;
+        }
+
+        /**
+         * @brief Remove an element at the specified index using -= operator (rvalue).
+         *
+         * Reindexes the internal data to remove the element at `idx`.
+         * Throws `Except::OutOfRange` if `idx` is out of bounds.
+         *
+         * @param idx Index of the element to remove.
+         * @return Reference to this container after removal.
+         * @throws Except::OutOfRange When `idx >= len`.
+         */
+        Indexable &operator-=(Trait::VeryLarge &&idx)
+        {
+            Utility::Reindex(this->data, this->len, idx);
+            return *this;
         }
 
         /**

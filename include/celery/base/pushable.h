@@ -25,7 +25,6 @@ namespace Celery::Base
      *
      * @tparam Derived The final type that inherits from Pushable\<Derived, T\>. Must implement:
      *         - void EmplaceBack(T&&) or equivalent overloads for push-back behavior used by operator+=
-     *         - void Remove(const T&) or compatible overload used by operator-=
      *
      * @tparam T The element type the container holds.
      *
@@ -57,36 +56,6 @@ namespace Celery::Base
         {
             // Forward to the derived class's EmplaceBack method
             static_cast<Derived*>(this)->EmplaceBack(std::forward<U>(value));
-            return static_cast<Derived&>(*this);
-        }
-
-        /**
-         * @brief Remove an element (or perform a front-removal semantics) by forwarding to Derived::Remove.
-         *
-         * This operator uses SFINAE to constrain U so that its decayed type matches the decayed T.
-         * That avoids accidental overload resolution with incompatible types.
-         *
-         * @tparam U Type of the supplied value (deduced). Defaults to T.
-         * @param value The value to remove or identify which element to remove (forwarded).
-         * @return Reference to the derived container to allow chaining.
-         *
-         * @note The precise semantics of Remove(...) (e.g., removing the first matching element,
-         *       removing by value, or popping front) are determined by the Derived type's implementation.
-         */
-        template <
-            class U = T,
-            // SFINAE to ensure U is the same type as T
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        Derived &operator-=(U &&value)
-        {
-            // Forward to the derived class's EmplaceFront method
-            static_cast<Derived*>(this)->Remove(std::forward<U>(value));
             return static_cast<Derived&>(*this);
         }
     };

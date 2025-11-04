@@ -235,6 +235,48 @@ namespace Celery::Buffer
             }
 
             /**
+             * @brief Append an element to the buffer using += operator.
+             *
+             * Forwards to \p Write to add \p value to the end of the buffer.
+             *
+             * @param value Element to append.
+             * @return Reference to this RingBuffer.
+             */
+            RingBuffer &operator+=(const T &value)
+            {
+                Write(value);
+                return *this;
+            }
+
+            /**
+             * @brief Append an element to the buffer using += operator (rvalue).
+             *
+             * Forwards to \p Write to add \p value to the end of the buffer.
+             *
+             * @param value Element to append.
+             * @return Reference to this RingBuffer.
+             */
+            RingBuffer &operator+=(T &&value)
+            {
+                Write(std::move(value));
+                return *this;
+            }
+
+            /**
+             * @brief Append an element to the buffer using += operator (non-const lvalue).
+             *
+             * Forwards to \p Write to add \p value to the end of the buffer.
+             *
+             * @param value Element to append.
+             * @return Reference to this RingBuffer.
+             */
+            RingBuffer &operator+=(T &value)
+            {
+                Write(std::move(value));
+                return *this;
+            }
+
+            /**
              * @brief Check whether the buffer is full.
              *
              * @return true if the number of elements equals \p Capacity.

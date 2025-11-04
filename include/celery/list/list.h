@@ -138,20 +138,7 @@ namespace Celery::List
                     throw Except::OutOfRange();
                 }
 
-                Internal::LinkedListNode<T> *to_remove = tail;
-                tail = tail->prev;
-
-                if (tail)
-                {
-                    tail->next = nullptr;
-                }
-                else
-                {
-                    head = nullptr; // List is now empty
-                }
-
-                Allocator::Deallocate(to_remove);
-                --this->len;
+                RemoveNode(tail);
             }
 
             void PopFront()
@@ -161,20 +148,7 @@ namespace Celery::List
                     throw Except::OutOfRange();
                 }
 
-                Internal::LinkedListNode<T> *to_remove = head;
-                head = head->next;
-
-                if (head)
-                {
-                    head->prev = nullptr;
-                }
-                else
-                {
-                    tail = nullptr; // List is now empty
-                }
-
-                Allocator::Deallocate(to_remove);
-                --this->len;
+                RemoveNode(head);
             }
 
             void Clear()

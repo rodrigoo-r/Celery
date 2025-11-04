@@ -124,6 +124,22 @@ namespace Celery::Base
         }
 
         /**
+         * @brief Remove an element at the specified index.
+         *
+         * Reindexes the internal data to remove the element at `idx`.
+         * Throws `Except::OutOfRange` if `idx` is out of bounds.
+         *
+         * @param idx Index of the element to remove.
+         * @throws Except::OutOfRange When `idx >= len`.
+         */
+        template <class U = Trait::VeryLarge>
+        void Remove(U &&idx)
+        {
+            Utility::Reindex(this->data, this->len, idx);
+            --this->len; // Decrease length after removal
+        }
+
+        /**
          * @brief Remove an element at the specified index using -= operator (rvalue).
          *
          * Reindexes the internal data to remove the element at `idx`.
@@ -136,8 +152,7 @@ namespace Celery::Base
         template <class U = Trait::VeryLarge>
         Indexable &operator-=(U &&idx)
         {
-            Utility::Reindex(this->data, this->len, idx);
-            --this->len; // Decrease length after removal
+            this->Remove(idx);
             return *this;
         }
 

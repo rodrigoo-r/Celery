@@ -20,6 +20,7 @@
 #include <type_traits>
 
 
+#include "celery/except/out_of_range.h"
 #include "celery/trait/default.h"
 
 namespace Celery::Utility
@@ -59,6 +60,11 @@ namespace Celery::Utility
         const Trait::VeryLarge &to_remove
     )
     {
+        if (to_remove >= len)
+        {
+            throw Except::OutOfRange();
+        }
+
         // Edge case: len = 1 and to_remove = 0
         if (len == 1 && to_remove == 0)
         {

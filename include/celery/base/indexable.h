@@ -98,7 +98,7 @@ namespace Celery::Base
          *
          * @return Pointer to the last element in the container.
          */
-        T *Back()
+        T Back()
         {
             return operator[](this->len - 1);
         }

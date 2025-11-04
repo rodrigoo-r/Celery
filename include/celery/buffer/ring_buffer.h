@@ -20,7 +20,6 @@
 
 
 #include "celery/base/iterable.h"
-#include "celery/base/iterator.h"
 #include "celery/base/pushable.h"
 #include "celery/base/removable.h"
 #include "celery/base/sizeable.h"

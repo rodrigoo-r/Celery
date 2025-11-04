@@ -140,6 +140,34 @@ namespace Celery::Base
         }
 
         /**
+         * @brief Remove the first occurrence of a value.
+         *
+         * Searches for the first occurrence of `value` and removes it
+         * by reindexing the internal data. If the value is not found,
+         * no action is taken.
+         *
+         * @param value The value to remove.
+         */
+        template <
+            class U = T,
+            typename = std::enable_if_t<
+                !std::is_same_v<T, Trait::VeryLarge>
+            >
+        >
+        void Remove(const U &value)
+        {
+            for (Trait::VeryLarge i = 0; i < this->len; ++i)
+            {
+                if (this->data[i] == value)
+                {
+                    Utility::Reindex(this->data, this->len, i);
+                    --this->len; // Decrease length after removal
+                    return; // Remove only the first occurrence
+                }
+            }
+        }
+
+        /**
          * @brief Remove an element at the specified index using -= operator (rvalue).
          *
          * Reindexes the internal data to remove the element at `idx`.
@@ -153,6 +181,28 @@ namespace Celery::Base
         Indexable &operator-=(U &&idx)
         {
             this->Remove(idx);
+            return *this;
+        }
+
+        /**
+         * @brief Remove the first occurrence of a value using -= operator.
+         *
+         * Searches for the first occurrence of `value` and removes it
+         * by reindexing the internal data. If the value is not found,
+         * no action is taken.
+         *
+         * @param value The value to remove.
+         * @return Reference to this container after removal.
+         */
+        template <
+            class U = T,
+            typename = std::enable_if_t<
+                !std::is_same_v<T, Trait::VeryLarge>
+            >
+        >
+        Indexable &operator-=(const U &value)
+        {
+            this->Remove(value);
             return *this;
         }
 

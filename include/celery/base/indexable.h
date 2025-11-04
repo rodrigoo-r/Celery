@@ -133,7 +133,7 @@ namespace Celery::Base
          * @throws Except::OutOfRange When `idx >= len`.
          */
         template <class U = Trait::VeryLarge>
-        void Remove(U &&idx)
+        void RemoveAt(U &&idx)
         {
             Utility::Reindex(this->data, this->len, idx);
             --this->len; // Decrease length after removal
@@ -177,10 +177,12 @@ namespace Celery::Base
          * @return Reference to this container after removal.
          * @throws Except::OutOfRange When `idx >= len`.
          */
-        template <class U = Trait::VeryLarge>
+        template <
+            class U = Trait::VeryLarge
+        >
         Indexable &operator-=(U &&idx)
         {
-            this->Remove(idx);
+            this->RemoveAt(idx);
             return *this;
         }
 

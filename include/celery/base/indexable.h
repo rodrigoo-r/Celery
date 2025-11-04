@@ -124,39 +124,6 @@ namespace Celery::Base
         }
 
         /**
-         * @brief Append an element to the container using += operator.
-         *
-         * Pure virtual; must be implemented by subclasses to define
-         * how elements are added.
-         *
-         * @param value Element to append.
-         * @return Reference to this container after appending.
-         */
-        virtual Indexable &operator+=(const T &value) = 0;
-
-        /**
-         * @brief Append an element to the container using += operator.
-         *
-         * Pure virtual; must be implemented by subclasses to define
-         * how elements are added.
-         *
-         * @param value Element to append.
-         * @return Reference to this container after appending.
-         */
-        virtual Indexable &operator+=(T &value) = 0;
-
-        /**
-         * @brief Append an element to the container using += operator.
-         *
-         * Pure virtual; must be implemented by subclasses to define
-         * how elements are added.
-         *
-         * @param value Element to append.
-         * @return Reference to this container after appending.
-         */
-        virtual Indexable &operator+=(T &&value) = 0;
-
-        /**
          * @brief Remove an element at the specified index using -= operator.
          *
          * Reindexes the internal data to remove the element at `idx`.

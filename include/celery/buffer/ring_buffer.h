@@ -67,10 +67,14 @@ namespace Celery::Buffer
         class RingBuffer :
             public Base::Sizeable,
             public Base::Pushable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
-            public Base::Removable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
+            public Base::BufferedRemovable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
             public Base::BufferedIterable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
         {
-            // Make Base::BufferedIterable a friend to access protected members
+            // Make Base::BufferedRemovable and Base::BufferedIterable friends to access protected members
+            friend class Base::BufferedRemovable<
+                RingBuffer<T, Capacity, UseHeap, Allocator>,
+                T
+            >;
             friend class Base::BufferedIterable<
                 RingBuffer<T, Capacity, UseHeap, Allocator>,
                 T

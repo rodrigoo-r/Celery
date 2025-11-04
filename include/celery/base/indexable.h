@@ -20,7 +20,6 @@
 #include "celery/except/out_of_range.h"
 #include "celery/trait/default.h"
 #include "celery/util/reindex.h"
-#include "iterable.h"
 #include "sizeable.h"
 
 namespace Celery::Base
@@ -101,26 +100,6 @@ namespace Celery::Base
         T Back()
         {
             return operator[](this->len - 1);
-        }
-
-        /**
-         * @brief Get an iterable for range-based for loops.
-         *
-         * @return Iterable starting at the beginning of the container.
-         */
-        Iterable<T> begin()
-        {
-            return Iterable<T>(this->data);
-        }
-
-        /**
-         * @brief Get an iterable representing the end of the container.
-         *
-         * @return Iterable pointing one past the last element.
-         */
-        Iterable<T> end()
-        {
-            return Iterable<T>(this->data + this->len);
         }
 
         /**

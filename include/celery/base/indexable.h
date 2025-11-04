@@ -124,20 +124,6 @@ namespace Celery::Base
         }
 
         /**
-         * @brief Remove an element by value.
-         *
-         * Forwards to `Remove` to delete the first occurrence
-         * of `ref` from the container.
-         *
-         * @param ref The value to remove.
-         */
-        template <class U = T>
-        void Erase(U &&ref)
-        {
-            Remove(ref);
-        }
-
-        /**
          * @brief Virtual default destructor.
          *
          * Declared `override` to ensure proper polymorphic destruction through

@@ -20,6 +20,7 @@
 
 
 #include "celery/base/indexable.h"
+#include "celery/base/pushable.h"
 #include "celery/base/resizable.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"
@@ -68,7 +69,10 @@ namespace Celery::Array
                 >
             >
         >
-        class Vector : public Base::Indexable<T>, public Base::Resizable
+        class Vector :
+            public Base::Indexable<T>,
+            public Base::Resizable,
+            public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
         {
             /**
              * @brief Initialize internal storage with the configured initial capacity.
@@ -142,21 +146,6 @@ namespace Celery::Array
                         other.len
                     );
                 }
-                return *this;
-            }
-
-            /**
-             * @brief Append an element to the vector using += operator.
-             *
-             * Forwards to EmplaceBack to add \p value to the end of the vector.
-             *
-             * @param value Element to append.
-             * @return Reference to this vector.
-             */
-            template <class U = T>
-            Vector &operator+=(U &&value)
-            {
-                EmplaceBack(value);
                 return *this;
             }
 

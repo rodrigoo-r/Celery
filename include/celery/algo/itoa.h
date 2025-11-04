@@ -96,7 +96,7 @@ namespace Celery::Algorithm
         }
 
         // Work with absolute value for digit extraction
-        AbsValueType &abs_value = value;
+        AbsValueType abs_value = value;
 
         // Change only for signed types
         if constexpr (std::is_signed_v<ValueType>)

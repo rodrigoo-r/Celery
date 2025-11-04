@@ -36,6 +36,7 @@ namespace Celery::Base
     template <typename Derived, typename T>
     class BufferedIterable
     {
+    public:
         /**
          * @brief Return iterator to beginning of stored elements.
          *

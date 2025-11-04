@@ -21,6 +21,7 @@
 
 #include "celery/base/indexable.h"
 #include "celery/base/pushable.h"
+#include "celery/base/removable.h"
 #include "celery/base/resizable.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"
@@ -72,7 +73,8 @@ namespace Celery::Array
         class Vector :
             public Base::Indexable<T>,
             public Base::Resizable,
-            public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
+            public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
+            public Base::Removable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
         {
             /**
              * @brief Initialize internal storage with the configured initial capacity.

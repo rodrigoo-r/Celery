@@ -21,6 +21,7 @@
 
 #include "celery/base/iterable.h"
 #include "celery/base/pushable.h"
+#include "celery/base/removable.h"
 #include "celery/base/sizeable.h"
 #include "celery/except/out_of_range.h"
 #include "celery/memory/system.h"
@@ -64,7 +65,8 @@ namespace Celery::Buffer
         >
         class RingBuffer :
             public Base::Sizeable,
-            public Base::Pushable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
+            public Base::Pushable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
+            public Base::Removable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
         {
             // Data storage type
             using DataType = std::conditional_t<UseHeap, T *, T[Capacity]>;

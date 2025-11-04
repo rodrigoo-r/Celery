@@ -20,6 +20,7 @@
 
 
 #include "celery/base/iterable.h"
+#include "celery/base/pushable.h"
 #include "celery/base/sizeable.h"
 #include "celery/except/out_of_range.h"
 #include "celery/memory/system.h"
@@ -61,7 +62,9 @@ namespace Celery::Buffer
                 >
             >
         >
-        class RingBuffer : public Base::Sizeable
+        class RingBuffer :
+            public Base::Sizeable,
+            public Base::Pushable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
         {
             // Data storage type
             using DataType = std::conditional_t<UseHeap, T *, T[Capacity]>;
@@ -232,48 +235,6 @@ namespace Celery::Buffer
                 }
 
                 return buffer[index];
-            }
-
-            /**
-             * @brief Append an element to the buffer using += operator.
-             *
-             * Forwards to \p Write to add \p value to the end of the buffer.
-             *
-             * @param value Element to append.
-             * @return Reference to this RingBuffer.
-             */
-            RingBuffer &operator+=(const T &value)
-            {
-                Write(value);
-                return *this;
-            }
-
-            /**
-             * @brief Append an element to the buffer using += operator (rvalue).
-             *
-             * Forwards to \p Write to add \p value to the end of the buffer.
-             *
-             * @param value Element to append.
-             * @return Reference to this RingBuffer.
-             */
-            RingBuffer &operator+=(T &&value)
-            {
-                Write(std::move(value));
-                return *this;
-            }
-
-            /**
-             * @brief Append an element to the buffer using += operator (non-const lvalue).
-             *
-             * Forwards to \p Write to add \p value to the end of the buffer.
-             *
-             * @param value Element to append.
-             * @return Reference to this RingBuffer.
-             */
-            RingBuffer &operator+=(T &value)
-            {
-                Write(std::move(value));
-                return *this;
             }
 
             /**

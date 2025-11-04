@@ -16,76 +16,49 @@
 */
 
 #pragma once
+#include "iterator.h"
 
 namespace Celery::Base
 {
     /**
-     * @brief Lightweight iterable wrapper for raw buffers.
+     * @brief CRTP mixin that provides begin()/end() iterators for buffered containers.
      *
-     * Template parameter `It` represents the iterator or pointer type
-     * used to traverse a contiguous buffer.
+     * This class assumes the derived class has `data` and `len` members
+     * representing a contiguous buffer of elements of type `T`.
      *
-     * @tparam It Iterator or pointer type for the underlying buffer.
+     * @tparam Derived The final type that inherits from BufferedIterable\<Derived, T\>.
+     *         Must have:
+     *         - T* data: pointer to the start of the element buffer.
+     *         - Trait::VeryLarge len: number of valid elements in the buffer.
+     *
+     * @tparam T The element type stored in the buffer.
      */
-    template<typename It>
-    class Iterable
+    template <typename Derived, typename T>
+    class BufferedIterable
     {
         /**
-         * @brief Pointer to the current position within the buffer.
+         * @brief Return iterator to beginning of stored elements.
          *
-         * This points to an element of the underlying contiguous storage
-         * and is advanced by operator++.
+         * @return Base::Iterable<T> Iterator pointing to start of data.
          */
-        It *buffer; // The buffer to iterate over
-
-    public:
-        /**
-         * @brief Construct an Iterable starting at \p buf.
-         *
-         * @param buf Pointer to the initial element in the buffer.
-         */
-        Iterable(It *buf) : buffer(buf)
-        {}
-
-        /**
-         * @brief Dereference the iterable.
-         *
-         * Returns the current iterator/value at the internal buffer pointer.
-         * The exact semantics depend on the template parameter `It`.
-         *
-         * @return The current iterator or value.
-         */
-        It operator*()
+        BufferedIterator<T> begin() const
         {
-            return *buffer;
+            return Base::BufferedIterator<T>(
+                static_cast<const Derived*>(this)->data
+            );
         }
 
         /**
-         * @brief Pre-increment the iterable to the next element.
+         * @brief Return iterator to one-past-last stored element.
          *
-         * Advances the internal buffer pointer and returns a reference to
-         * this iterable to allow chaining.
-         *
-         * @return Reference to this iterable after increment.
+         * @return Base::Iterable<T> Iterator pointing to end of stored data.
          */
-        Iterable& operator++()
+        BufferedIterator<T> end() const
         {
-            ++buffer;
-            return *this;
-        }
-
-        /**
-         * @brief Compare two iterables for inequality.
-         *
-         * Two iterables are considered different if their internal buffer
-         * pointers do not point to the same position.
-         *
-         * @param other Another iterable to compare with.
-         * @return true if the iterables are at different positions.
-         */
-        bool operator!=(const Iterable& other) const
-        {
-            return buffer != other.buffer;
+            return Base::BufferedIterator<T>(
+                static_cast<const Derived*>(this)->data +
+                    static_cast<const Derived*>(this)->len
+            );
         }
     };
 }

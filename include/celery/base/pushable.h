@@ -20,14 +20,108 @@
 
 namespace Celery::Base
 {
+    /**
+     * @brief CRTP mixin that provides push/remove operator overloads forwarding to the derived container.
+     *
+     * @tparam Derived The final type that inherits from Pushable\<Derived, T\>. Must implement:
+     *         - void EmplaceBack(T&&) or equivalent overloads for push-back behavior used by operator+=
+     *         - void Remove(const T&) or compatible overload used by operator-=
+     *
+     * @tparam T The element type the container holds.
+     *
+     * @note This class uses static_cast\<Derived*\>(this) to forward calls to the derived type
+     *       (CRTP). It does not provide storage or semantic guarantees itself.
+     */
     template <typename Derived, typename T>
-    class Pushable {
+    class Pushable
+    {
     public:
+        /**
+         * @brief Append a value to the container by forwarding to the derived class's EmplaceBack.
+         *
+         * This operator accepts any argument convertible to T and perfect-forwards it to the
+         * Derived::EmplaceBack(...) method. The default template parameter U = T allows
+         * usage with lvalues and rvalues.
+         *
+         * @tparam U Type of the supplied value (deduced). Defaults to T.
+         * @param value The value to append (forwarded).
+         * @return Reference to the derived container to allow chaining.
+         *
+         * Example:
+         * @code
+         * myContainer += value;
+         * @endcode
+         */
         template <class U = T>
-        Derived &operator+=(U &&value) {
+        Derived &operator+=(U &&value)
+        {
             // Forward to the derived class's EmplaceBack method
             static_cast<Derived*>(this)->EmplaceBack(std::forward<U>(value));
             return static_cast<Derived&>(*this);
+        }
+
+        /**
+         * @brief Remove an element (or perform a front-removal semantics) by forwarding to Derived::Remove.
+         *
+         * This operator uses SFINAE to constrain U so that its decayed type matches the decayed T.
+         * That avoids accidental overload resolution with incompatible types.
+         *
+         * @tparam U Type of the supplied value (deduced). Defaults to T.
+         * @param value The value to remove or identify which element to remove (forwarded).
+         * @return Reference to the derived container to allow chaining.
+         *
+         * @note The precise semantics of Remove(...) (e.g., removing the first matching element,
+         *       removing by value, or popping front) are determined by the Derived type's implementation.
+         */
+        template <
+            class U = T,
+            // SFINAE to ensure U is the same type as T
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
+        Derived &operator-=(U &&value)
+        {
+            // Forward to the derived class's EmplaceFront method
+            static_cast<Derived*>(this)->Remove(std::forward<U>(value));
+            return static_cast<Derived&>(*this);
+        }
+    };
+
+    /**
+     * @brief CRTP mixin that provides a default PushBack implementation using EmplaceBack.
+     *
+     * This class extends Pushable and provides a default implementation of PushBack
+     * that simply forwards to EmplaceBack. This is useful for containers that only
+     * implement EmplaceBack and want to support PushBack semantics.
+     *
+     * @tparam Derived The final type that inherits from DirectlyPushable\<Derived, T\>.
+     *         Must implement:
+     *         - void EmplaceBack(T&&) or equivalent overloads for push-back behavior.
+     *
+     * @tparam T The element type the container holds.
+     */
+    template <typename Derived, typename T>
+    class DirectlyPushable :
+        public Pushable<Derived, T>
+    {
+        /**
+         * @brief Append a value to the container by forwarding to EmplaceBack.
+         *
+         * This method provides a default PushBack implementation that forwards
+         * to the Derived::EmplaceBack(...) method. The default template parameter
+         * U = T allows usage with lvalues and rvalues.
+         *
+         * @tparam U Type of the supplied value (deduced). Defaults to T.
+         * @param value The value to append (forwarded).
+         */
+        template <class U = T>
+        void PushBack(U &&value)
+        {
+            static_cast<Derived*>(this)->EmplaceBack(std::forward<U>(value));
         }
     };
 }

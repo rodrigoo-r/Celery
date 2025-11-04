@@ -124,38 +124,6 @@ namespace Celery::Base
         }
 
         /**
-         * @brief Remove an element at the specified index using -= operator.
-         *
-         * Reindexes the internal data to remove the element at `idx`.
-         * Throws `Except::OutOfRange` if `idx` is out of bounds.
-         *
-         * @param idx Index of the element to remove.
-         * @return Reference to this container after removal.
-         * @throws Except::OutOfRange When `idx >= len`.
-         */
-        Indexable &operator-=(const Trait::VeryLarge &idx)
-        {
-            Utility::Reindex(this->data, this->len, idx);
-            return *this;
-        }
-
-        /**
-         * @brief Remove an element at the specified index using -= operator (const).
-         *
-         * Reindexes the internal data to remove the element at `idx`.
-         * Throws `Except::OutOfRange` if `idx` is out of bounds.
-         *
-         * @param idx Index of the element to remove.
-         * @return Reference to this container after removal.
-         * @throws Except::OutOfRange When `idx >= len`.
-         */
-        Indexable &operator-=(Trait::VeryLarge &idx)
-        {
-            Utility::Reindex(this->data, this->len, idx);
-            return *this;
-        }
-
-        /**
          * @brief Remove an element at the specified index using -= operator (rvalue).
          *
          * Reindexes the internal data to remove the element at `idx`.
@@ -165,9 +133,11 @@ namespace Celery::Base
          * @return Reference to this container after removal.
          * @throws Except::OutOfRange When `idx >= len`.
          */
-        Indexable &operator-=(Trait::VeryLarge &&idx)
+        template <class U = Trait::VeryLarge>
+        Indexable &operator-=(U &&idx)
         {
             Utility::Reindex(this->data, this->len, idx);
+            --this->len; // Decrease length after removal
             return *this;
         }
 

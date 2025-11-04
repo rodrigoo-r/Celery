@@ -92,4 +92,92 @@ namespace Celery::Base
             static_cast<Derived*>(this)->Remove(std::forward<U>(value));
         }
     };
+
+    /**
+     * @brief CRTP mixin that provides buffered removal implementations.
+     *
+     * This class extends Removable and provides default implementations
+     * for removing elements by index, by value, or by pointer. It assumes
+     * that the derived class has `data` and `len` members representing
+     * the internal storage and current length.
+     *
+     * @tparam Derived The final type that inherits from BufferedRemovable\<Derived, T\>.
+     *         Must have `data` and `len` members.
+     *
+     * @tparam T The element type the container holds.
+     */
+    template <class Derived, typename T>
+    class BufferedRemovable :
+        public Removable<Derived, T>
+    {
+    public:
+        /**
+         * @brief Remove an element at the specified index.
+         *
+         * Reindexes the internal data to remove the element at `idx`.
+         * Throws `Except::OutOfRange` if `idx` is out of bounds.
+         *
+         * @param idx Index of the element to remove.
+         * @throws Except::OutOfRange When `idx >= len`.
+         */
+        template <class U = Trait::VeryLarge>
+        void RemoveAt(U &&idx)
+        {
+            const auto data = static_cast<Derived*>(this)->data;
+            const auto len = static_cast<Derived*>(this)->len;
+            Utility::Reindex(data, len, idx);
+            --this->len; // Decrease length after removal
+        }
+
+        /**
+         * @brief Remove the first occurrence of a value.
+         *
+         * Searches for the first occurrence of `value` and removes it
+         * by reindexing the internal data. If the value is not found,
+         * no action is taken.
+         *
+         * @param value The value to remove.
+         */
+        template <
+            class U = T,
+            typename = std::enable_if_t<
+                !std::is_same_v<T, Trait::VeryLarge>
+            >
+        >
+        void Remove(const U &value)
+        {
+            auto data = static_cast<Derived*>(this)->data;
+            auto len = static_cast<Derived*>(this)->len;
+
+            for (Trait::VeryLarge i = 0; i < len; ++i)
+            {
+                if (this->data[i] == value)
+                {
+                    Utility::Reindex(data, len, i);
+                    --static_cast<Derived*>(this)->len; // Decrease length after removal
+                    return; // Remove only the first occurrence
+                }
+            }
+        }
+
+        /**
+         * @brief Remove an element by pointer.
+         *
+         * Calculates the index of the element pointed to by `ptr`
+         * and removes it by reindexing. Throws `Except::OutOfRange`
+         * if the pointer is out of bounds.
+         *
+         * @param ptr Pointer to the element to remove.
+         * @throws Except::OutOfRange When `ptr` is out of bounds.
+         */
+        template <class U = T>
+        void Erase(U *&&ptr)
+        {
+            auto data = static_cast<Derived*>(this)->data;
+
+            // Calculate index from pointer
+            const auto index = static_cast<Trait::VeryLarge>(ptr - data);
+            RemoveAt(index);
+        }
+    };
 }

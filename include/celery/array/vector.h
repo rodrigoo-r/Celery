@@ -74,7 +74,7 @@ namespace Celery::Array
             public Base::Indexable<T>,
             public Base::Resizable,
             public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
-            public Base::Removable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
+            public Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
         {
             /**
              * @brief Initialize internal storage with the configured initial capacity.

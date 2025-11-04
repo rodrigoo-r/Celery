@@ -77,7 +77,7 @@ namespace Celery::Buffer
              * When \p UseHeap is true, this is a pointer returned by \p Allocator::Allocate.
              * When \p UseHeap is false, this is an inline array of \p Capacity elements.
              */
-            DataType buffer;
+            DataType data;
 
         protected:
             /**
@@ -108,7 +108,7 @@ namespace Celery::Buffer
                 // Allocate heap storage if needed
                 if constexpr (UseHeap)
                 {
-                    buffer = Allocator::Allocate(Capacity);
+                    data = Allocator::Allocate(Capacity);
                 }
             }
 
@@ -138,7 +138,7 @@ namespace Celery::Buffer
                 if (len >= Capacity)
                 {
                     // Handle full buffer
-                    HandleBatch(buffer, len);
+                    HandleBatch(data, len);
 
                     // Wrap around
                     len = 0;
@@ -148,12 +148,12 @@ namespace Celery::Buffer
                 if constexpr (std::is_trivially_copyable_v<T>)
                 {
                     // Construct the object directly for trivially copyable types
-                    buffer[len++] = T(std::forward<Args>(args)...);
+                    data[len++] = T(std::forward<Args>(args)...);
                 }
                 else
                 {
                     // Use placement new for non-trivially copyable types
-                    new (&buffer[len++]) T(std::forward<Args>(args)...);
+                    new (&data[len++]) T(std::forward<Args>(args)...);
                 }
             }
 
@@ -179,10 +179,10 @@ namespace Celery::Buffer
              * EmplaceBack for each element. This will follow the ring buffer's wrap-around
              * and overwrite behavior when the capacity is exceeded.
              *
-             * @param data Pointer to the source elements (must point to at least \p count elements).
+             * @param ptr Pointer to the source elements (must point to at least \p count elements).
              * @param count Number of elements to insert from \p data.
              */
-            void Batch(const T *data, const size_t count)
+            void Batch(const T *ptr, const size_t count)
             {
                 // Use memset if trivially copyable
                 if constexpr (std::is_trivially_copyable_v<T>)
@@ -198,13 +198,13 @@ namespace Celery::Buffer
                         if (available == 0)
                         {
                             // Handle full buffer
-                            HandleBatch(buffer, len);
+                            HandleBatch(data, len);
                             len = 0; // Wrap around
                             available = len;
                         }
 
                         const auto to_copy = (remaining < available) ? remaining : available;
-                        memcpy(&buffer[len], data + (count - remaining), sizeof(T) * to_copy);
+                        memcpy(&data[len], ptr + (count - remaining), sizeof(T) * to_copy);
                         len += to_copy;
                         remaining -= to_copy;
                     }
@@ -214,7 +214,7 @@ namespace Celery::Buffer
                     // Emplace each element individually
                     for (size_t i = 0; i < count; ++i)
                     {
-                        EmplaceBack(data[i]);
+                        EmplaceBack(ptr[i]);
                     }
                 }
             }
@@ -236,7 +236,7 @@ namespace Celery::Buffer
                     throw Except::OutOfRange();
                 }
 
-                return buffer[index];
+                return data[index];
             }
 
             /**
@@ -286,14 +286,14 @@ namespace Celery::Buffer
              *
              * @return Base::Iterable<T> Iterator pointing to start of data.
              */
-            Base::Iterable<T> begin() const { return Base::Iterable<T>(buffer); }
+            Base::Iterable<T> begin() const { return Base::Iterable<T>(data); }
 
             /**
              * @brief Return iterator to one-past-last stored element.
              *
              * @return Base::Iterable<T> Iterator pointing to end of stored data.
              */
-            Base::Iterable<T> end() const { return Base::Iterable<T>(buffer + len); }
+            Base::Iterable<T> end() const { return Base::Iterable<T>(data + len); }
 
             /**
              * @brief Get raw pointer to the underlying storage.
@@ -308,7 +308,7 @@ namespace Celery::Buffer
              */
             [[nodiscard]] T *Ptr() const noexcept
             {
-                return buffer;
+                return data;
             }
 
             /**
@@ -324,14 +324,14 @@ namespace Celery::Buffer
                 {
                     for (size_t i = 0; i < len; ++i)
                     {
-                        buffer[i].~T();
+                        data[i].~T();
                     }
                 }
 
                 // Deallocate heap storage if used
                 if constexpr (UseHeap)
                 {
-                    Allocator::Deallocate(buffer);
+                    Allocator::Deallocate(data);
                 }
             }
         };

@@ -168,47 +168,6 @@ namespace Celery::Base
         }
 
         /**
-         * @brief Remove an element at the specified index using -= operator (rvalue).
-         *
-         * Reindexes the internal data to remove the element at `idx`.
-         * Throws `Except::OutOfRange` if `idx` is out of bounds.
-         *
-         * @param idx Index of the element to remove.
-         * @return Reference to this container after removal.
-         * @throws Except::OutOfRange When `idx >= len`.
-         */
-        template <
-            class U = Trait::VeryLarge
-        >
-        Indexable &operator-=(U &&idx)
-        {
-            this->RemoveAt(idx);
-            return *this;
-        }
-
-        /**
-         * @brief Remove the first occurrence of a value using -= operator.
-         *
-         * Searches for the first occurrence of `value` and removes it
-         * by reindexing the internal data. If the value is not found,
-         * no action is taken.
-         *
-         * @param value The value to remove.
-         * @return Reference to this container after removal.
-         */
-        template <
-            class U = T,
-            typename = std::enable_if_t<
-                !std::is_same_v<T, Trait::VeryLarge>
-            >
-        >
-        Indexable &operator-=(const U &value)
-        {
-            this->Remove(value);
-            return *this;
-        }
-
-        /**
          * @brief Virtual default destructor.
          *
          * Declared `override` to ensure proper polymorphic destruction through

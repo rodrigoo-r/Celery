@@ -123,8 +123,8 @@ namespace Celery::Base
         template <class U = Trait::VeryLarge>
         void RemoveAt(U &&idx)
         {
-            const auto data = static_cast<Derived*>(this)->data;
-            const auto len = static_cast<Derived*>(this)->len;
+            auto &data = static_cast<Derived*>(this)->data;
+            auto &len = static_cast<Derived*>(this)->len;
             Utility::Reindex(data, len, idx);
             --this->len; // Decrease length after removal
         }
@@ -146,12 +146,12 @@ namespace Celery::Base
         >
         void Remove(const U &value)
         {
-            auto data = static_cast<Derived*>(this)->data;
-            auto len = static_cast<Derived*>(this)->len;
+            auto &data = static_cast<Derived*>(this)->data;
+            auto &len = static_cast<Derived*>(this)->len;
 
             for (Trait::VeryLarge i = 0; i < len; ++i)
             {
-                if (this->data[i] == value)
+                if (data[i] == value)
                 {
                     Utility::Reindex(data, len, i);
                     --static_cast<Derived*>(this)->len; // Decrease length after removal
@@ -173,7 +173,7 @@ namespace Celery::Base
         template <class U = T>
         void Erase(U *&&ptr)
         {
-            auto data = static_cast<Derived*>(this)->data;
+            auto &data = static_cast<Derived*>(this)->data;
 
             // Calculate index from pointer
             const auto index = static_cast<Trait::VeryLarge>(ptr - data);

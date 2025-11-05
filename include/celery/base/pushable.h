@@ -77,6 +77,7 @@ namespace Celery::Base
     class DirectlyPushable :
         public Pushable<Derived, T>
     {
+    public:
         /**
          * @brief Append a value to the container by forwarding to EmplaceBack.
          *

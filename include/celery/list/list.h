@@ -79,11 +79,7 @@ namespace Celery::List
              * @throws Except::OutOfRange If `node` is nullptr.
              */
             template <bool Aggressive = false>
-            std::conditional_t<
-                Aggressive,
-                void,
-                T
-            > RemoveNode(Internal::LinkedListNode<T> *node)
+            void RemoveNode(Internal::LinkedListNode<T> *node)
             {
                 if (!node)
                 {
@@ -111,20 +107,19 @@ namespace Celery::List
 
                 // Decrease size
                 --this->len;
+                if (this->len == 0)
+                {
+                    head = tail = nullptr; // List is now empty
+                }
 
                 // Move the data out before deallocation
                 if constexpr (Aggressive)
                 {
                     // Aggressively deallocate without returning data
-                    Allocator::DeallocateRaw(node);
-                    return;
+                    Allocator::Deallocate(node);
                 } else
                 {
-                    T value = std::move(node->data);
-                    Allocator::Deallocate(node);
-
-                    // Transfer ownership to caller
-                    return value;
+                    Allocator::DeallocateRaw(node);
                 }
             }
 
@@ -262,7 +257,17 @@ namespace Celery::List
                     throw Except::OutOfRange();
                 }
 
-                return std::move(RemoveNode<Aggressive>(tail));
+                if constexpr (Aggressive)
+                {
+                    RemoveNode<Aggressive>(tail);
+                    return;
+                } else
+                {
+                    // Get the data from the tail node and remove it
+                    T value = std::move(tail->data);
+                    RemoveNode(tail);
+                    return value;
+                }
             }
 
             /**
@@ -287,7 +292,18 @@ namespace Celery::List
                     throw Except::OutOfRange();
                 }
 
-                return std::move(RemoveNode<Aggressive>(head));
+                // Remove the head node
+                if constexpr (Aggressive)
+                {
+                    RemoveNode<Aggressive>(head);
+                    return;
+                } else
+                {
+                    // Get the data from the head node and remove it
+                    T value = std::move(head->data);
+                    RemoveNode(head);
+                    return value;
+                }
             }
 
             /**

@@ -186,6 +186,45 @@ namespace Celery::List
             }
 
             /**
+             * @brief Access the element at the specified index.
+             *
+             * Traverses the list from the head to locate the node at position `index`
+             * and returns a reference to its data.
+             *
+             * @tparam U Unsigned integral index type (defaults to Trait::Uint).
+             * @param index Index of the element to access (0-based).
+             *
+             * @throws Except::OutOfRange If `index` is greater than or equal to the current size.
+             *
+             * Complexity: linear in `index` (worst-case linear in list size).
+             *
+             * @return Reference to the element at the specified index.
+             */
+            template <
+                class U = Trait::Uint,
+                typename = std::enable_if_t<
+                    std::is_integral_v<U>
+                >
+            >
+            T &operator[](U &&index)
+            {
+                // Check bounds
+                if (index >= this->len)
+                {
+                    throw Except::OutOfRange();
+                }
+
+                // Traverse to the node at index
+                Internal::LinkedListNode<T> *current = head;
+                for (Trait::Uint i = 0; i < index; ++i)
+                {
+                    current = current->next;
+                }
+
+                return current->data;
+            }
+
+            /**
              * @brief Remove and return the last element of the list.
              *
              * @throws Except::OutOfRange If the list is empty.

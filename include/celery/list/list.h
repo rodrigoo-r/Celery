@@ -340,8 +340,6 @@ namespace Celery::List
                 {
                     PopFront();
                 }
-
-                this->len = 0;
             }
 
             /**

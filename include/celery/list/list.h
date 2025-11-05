@@ -278,6 +278,44 @@ namespace Celery::List
             }
 
             /**
+             * @brief Access the first element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             *
+             * @return Reference to the first element.
+             */
+            T &Front()
+            {
+                if (!head)
+                {
+                    throw Except::OutOfRange();
+                }
+
+                return head->data;
+            }
+
+            /**
+             * @brief Access the last element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             *
+             * @return Reference to the last element.
+             */
+            T &Back()
+            {
+                if (!tail)
+                {
+                    throw Except::OutOfRange();
+                }
+
+                return tail->data;
+            }
+
+            /**
              * @brief Remove the last element of the list.
              *
              * @throws Except::OutOfRange If the list is empty.

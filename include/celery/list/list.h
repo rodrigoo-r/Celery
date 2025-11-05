@@ -16,6 +16,7 @@
 */
 
 #pragma once
+#include "celery/except/out_of_range.h"
 #include "celery/base/sizeable.h"
 #include "celery/memory/system.h"
 #include "iterator.h"

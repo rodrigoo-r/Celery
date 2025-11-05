@@ -55,7 +55,7 @@ namespace Celery::Buffer
             typename Allocator = Celery::Pmr::ArrayAllocator<T>,
             // SFINAE to ensure Capacity > 0
             typename = std::enable_if_t<(Capacity > 0)>,
-            // SFINAE to ensure Allocator is a valid
+            // SFINAE to ensure Allocator is valid
             typename = std::enable_if_t<
                 std::is_base_of_v<
                     Celery::Pmr::ArrayAllocator<T>,

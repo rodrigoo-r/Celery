@@ -78,7 +78,12 @@ namespace Celery::List
              *
              * @throws Except::OutOfRange If `node` is nullptr.
              */
-            T RemoveNode(Internal::LinkedListNode<T> *node)
+            template <bool Aggressive = false>
+            std::conditional_t<
+                Aggressive,
+                void,
+                T
+            > RemoveNode(Internal::LinkedListNode<T> *node)
             {
                 if (!node)
                 {
@@ -104,13 +109,23 @@ namespace Celery::List
                     tail = node->prev; // Update tail if needed
                 }
 
-                // Move the data out before deallocation
-                T value = std::move(node->data);
-                Allocator::Deallocate(node);
+                // Decrease size
                 --this->len;
 
-                // Transfer ownership to caller
-                return value;
+                // Move the data out before deallocation
+                if constexpr (Aggressive)
+                {
+                    // Aggressively deallocate without returning data
+                    Allocator::DeallocateRaw(node);
+                    return;
+                } else
+                {
+                    T value = std::move(node->data);
+                    Allocator::Deallocate(node);
+
+                    // Transfer ownership to caller
+                    return value;
+                }
             }
 
         public:
@@ -235,14 +250,19 @@ namespace Celery::List
              * @return The removed element.
              * @note Ownership of the returned element is transferred to the caller.
              */
-            T PopBackMove()
+            template <bool Aggressive = false>
+            std::conditional_t<
+                Aggressive,
+                void,
+                T
+            > PopBackMove()
             {
                 if (!tail)
                 {
                     throw Except::OutOfRange();
                 }
 
-                return std::move(RemoveNode(tail));
+                return std::move(RemoveNode<Aggressive>(tail));
             }
 
             /**
@@ -255,14 +275,19 @@ namespace Celery::List
              * @return The removed element.
              * @note Ownership of the returned element is transferred to the caller.
              */
-            T PopFrontMove()
+            template <bool Aggressive = false>
+            std::conditional_t<
+                Aggressive,
+                void,
+                T
+            > PopFrontMove()
             {
                 if (!head)
                 {
                     throw Except::OutOfRange();
                 }
 
-                return std::move(RemoveNode(head));
+                return std::move(RemoveNode<Aggressive>(head));
             }
 
             /**
@@ -272,9 +297,23 @@ namespace Celery::List
              *
              * Complexity: constant time.
              */
+            template <bool Aggressive = false>
             void PopFront()
             {
-                PopFrontMove();
+                PopFrontMove<Aggressive>();
+            }
+
+            /**
+             * @brief Remove the last element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             */
+            template <bool Aggressive = false>
+            void PopBack()
+            {
+                PopBackMove<Aggressive>();
             }
 
             /**
@@ -316,18 +355,6 @@ namespace Celery::List
             }
 
             /**
-             * @brief Remove the last element of the list.
-             *
-             * @throws Except::OutOfRange If the list is empty.
-             *
-             * Complexity: constant time.
-             */
-            void PopBack()
-            {
-                PopBackMove();
-            }
-
-            /**
              * @brief Remove all elements from the list.
              *
              * After this call the list is empty and size is zero.
@@ -339,6 +366,23 @@ namespace Celery::List
                 while (this->len > 0)
                 {
                     PopFront();
+                }
+            }
+
+            /**
+             * @brief Aggressively clear the list without calling destructors.
+             *
+             * This method removes all elements from the list without invoking
+             * their destructors. Use with caution as it may lead to resource leaks
+             * if T manages resources that require cleanup.
+             *
+             * Complexity: linear.
+             */
+            void AggressiveClear()
+            {
+                while (this->len > 0)
+                {
+                    PopFront<true>();
                 }
             }
 

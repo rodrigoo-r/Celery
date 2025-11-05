@@ -69,6 +69,21 @@ namespace Celery::Pmr
                 ptr->~T(); // Call the destructor
             }
 
+            DeallocateRaw(ptr); // Free the memory
+        }
+
+        /**
+         * @brief Deallocate raw memory without calling the destructor.
+         *
+         * Releases memory allocated by Allocate using the global ::operator delete
+         * without invoking the destructor. This is useful when the caller has
+         * already destroyed the object or when T is trivially destructible.
+         * Passing a null pointer is safe.
+         *
+         * @param ptr Pointer to memory returned by Allocate (may be nullptr).
+         */
+        static inline void DeallocateRaw(T *ptr)
+        {
             ::operator delete(ptr); // Free the memory
         }
     };

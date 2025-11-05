@@ -77,7 +77,7 @@ namespace Celery::List
              *
              * @throws Except::OutOfRange If `node` is nullptr.
              */
-            void RemoveNode(Internal::LinkedListNode<T> *node)
+            T RemoveNode(Internal::LinkedListNode<T> *node)
             {
                 if (!node)
                 {
@@ -103,8 +103,13 @@ namespace Celery::List
                     tail = node->prev; // Update tail if needed
                 }
 
+                // Move the data out before deallocation
+                T value = std::move(node->data);
                 Allocator::Deallocate(node);
                 --this->len;
+
+                // Transfer ownership to caller
+                return value;
             }
 
         public:
@@ -181,20 +186,43 @@ namespace Celery::List
             }
 
             /**
-             * @brief Remove the last element of the list.
+             * @brief Remove and return the last element of the list.
              *
              * @throws Except::OutOfRange If the list is empty.
              *
              * Complexity: constant time.
+             *
+             * @return The removed element.
+             * @note Ownership of the returned element is transferred to the caller.
              */
-            void PopBack()
+            T PopBackMove()
             {
                 if (!tail)
                 {
                     throw Except::OutOfRange();
                 }
 
-                RemoveNode(tail);
+                return std::move(RemoveNode(tail));
+            }
+
+            /**
+             * @brief Remove and return the first element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             *
+             * @return The removed element.
+             * @note Ownership of the returned element is transferred to the caller.
+             */
+            T PopFrontMove()
+            {
+                if (!head)
+                {
+                    throw Except::OutOfRange();
+                }
+
+                return std::move(RemoveNode(head));
             }
 
             /**
@@ -206,12 +234,19 @@ namespace Celery::List
              */
             void PopFront()
             {
-                if (!head)
-                {
-                    throw Except::OutOfRange();
-                }
+                PopFrontMove();
+            }
 
-                RemoveNode(head);
+            /**
+             * @brief Remove the last element of the list.
+             *
+             * @throws Except::OutOfRange If the list is empty.
+             *
+             * Complexity: constant time.
+             */
+            void PopBack()
+            {
+                PopBackMove();
             }
 
             /**

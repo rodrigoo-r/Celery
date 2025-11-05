@@ -258,8 +258,7 @@ namespace Celery::List
             template <
                 class U = Trait::Uint,
                 typename = std::enable_if_t<
-                    std::is_integral_v<U> &&
-                    std::is_unsigned_v<U>
+                    std::is_integral_v<U>
                 >
             >
             void RemoveAt(U &&idx)

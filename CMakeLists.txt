@@ -5,9 +5,6 @@
 cmake_minimum_required(VERSION 4.0)
 project(Celery)
 
-# Enables optimizations, only use for release builds
-set(RELEASE_MODE ON)
-
 # Set C++20
 set(CMAKE_CXX_STANDARD 20)
 

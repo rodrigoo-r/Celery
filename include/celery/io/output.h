@@ -63,7 +63,7 @@ namespace Celery::Io
         {
             // Use ToString method
             Str::String str = arg.ToString();
-            Stdout::Write(str.Ptr(), str.Len());
+            IStdout.Batch(str.Ptr(), str.Len());
         }
         else if constexpr  (std::is_same_v<std::remove_cv_t<std::remove_reference_t<T>>, char>)
         {

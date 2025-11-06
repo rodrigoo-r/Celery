@@ -39,7 +39,7 @@ namespace Celery::Base
          *
          * @returns Reference to the managed object.
          */
-        T &operator*() const
+        T &operator*()
         {
             return *static_cast<Derived*>(this)->data;
         }
@@ -49,7 +49,7 @@ namespace Celery::Base
          *
          * @returns Pointer to the managed object.
          */
-        T *operator->() const
+        T *operator->()
         {
             return static_cast<Derived*>(this)->data;
         }

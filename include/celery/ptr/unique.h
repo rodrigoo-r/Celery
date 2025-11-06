@@ -135,6 +135,6 @@ namespace Celery::Ptr
     {
         T *obj = Allocator::Allocate();
         // SFINAE checks are done by Unique, so we can safely ignore them here
-        return Pmr::Unique<T, Allocator>(obj);
+        return { obj };
     }
 }

@@ -102,15 +102,24 @@ namespace Celery::Ptr
 
         public:
             /**
-             * @brief Constructs a new Shared pointer managing a new T instance.
+             * @brief Constructs a Shared object from a raw pointer.
              *
-             * Forwards constructor arguments to T's constructor.
+             * This constructor takes ownership of a raw pointer and sets up
+             * reference counting for shared ownership semantics. It assumes
+             * that the pointer was allocated through the appropriate Allocator.
              *
-             * @tparam Args Variadic template parameter pack for T's constructor arguments.
-             * @param args Constructor arguments forwarded to T's constructor.
+             * @tparam T Type of the managed object.
+             *
+             * @param ptr Pointer to the object to manage. Must be allocated via Allocator.
+             *
+             * @note If T is an array type, compilation will fail with a static assertion,
+             *       as using Shared<T[]> is discouraged. Use Shared<Array::Vector<T>>
+             *       or another suitable container instead.
+             *
+             * @warning The constructor initializes the reference count to 1. Make sure
+             *          not to pass an already managed pointer to avoid double-free errors.
              */
-            template<typename... Args>
-            Shared(Args &&...args)
+            Shared(T *ptr)
             {
                 if constexpr (std::is_array_v<T>)
                 {
@@ -122,8 +131,9 @@ namespace Celery::Ptr
                     );
                 }
 
+                // Here, we asume ptr is a valid pointer allocated via Allocator
                 // Allocate the object
-                this->data = Allocator::Allocate(std::forward<Args>(args)...);
+                this->data = ptr;
 
                 // Allocate and initialize the reference count
                 ref_count = RefCountAllocator::Allocate();
@@ -208,4 +218,52 @@ namespace Celery::Ptr
 
     template<typename T>
     using Concurrent = Pmr::Shared<T, true>;
+
+    /**
+     * @brief Create a non-thread-safe Shared pointer with default PMR allocators.
+     *
+     * Allocates and constructs an object of type T using the specified
+     * Allocator, then wraps it in a Shared pointer with non-thread-safe
+     * reference counting.
+     *
+     * @tparam T Type of the object to create.
+     * @tparam Allocator Allocator type used to allocate the object.
+     * @tparam RefCountAllocator Allocator type used to allocate the reference count.
+     * @return Shared<T> A Shared pointer managing the newly created object.
+     */
+    template <
+        typename T,
+        typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
+        typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<Trait::VeryLarge>
+    >
+    Shared<T> MakeShared()
+    {
+        T *obj = Allocator::Allocate();
+        // SFINAE checks are done by Shared, so we can safely ignore them here
+        return Pmr::Shared<T, false, Allocator, RefCountAllocator>(obj);
+    }
+
+    /**
+     * @brief Create a thread-safe Concurrent Shared pointer with default PMR allocators.
+     *
+     * Allocates and constructs an object of type T using the specified
+     * Allocator, then wraps it in a Shared pointer with thread-safe
+     * reference counting.
+     *
+     * @tparam T Type of the object to create.
+     * @tparam Allocator Allocator type used to allocate the object.
+     * @tparam RefCountAllocator Allocator type used to allocate the reference count.
+     * @return Concurrent<T> A Concurrent Shared pointer managing the newly created object.
+     */
+    template <
+        typename T,
+        typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
+        typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<std::atomic<Trait::VeryLarge>>
+    >
+    Concurrent<T> MakeConcurrent()
+    {
+        T *obj = Allocator::Allocate();
+        // SFINAE checks are done by Shared, so we can safely ignore them here
+        return Pmr::Shared<T, true, Allocator, RefCountAllocator>(obj);
+    }
 }

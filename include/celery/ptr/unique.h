@@ -57,18 +57,14 @@ namespace Celery::Ptr
 
         public:
             /**
-             * @brief Constructs a Unique pointer by allocating a new T instance.
+             * @brief Construct a Unique pointer that takes ownership of the provided raw pointer.
              *
-             * Forwards the provided arguments to T's constructor.
+             * @param ptr Raw pointer to the dynamically allocated object.
              *
-             * @tparam Args Variadic template parameter pack for constructor arguments.
-             * @param args Constructor arguments forwarded to T's constructor.
-             *
-             * @note If T is an array type (T[]), a static_assert will trigger
-             *       to discourage its usage. Consider using a container instead.
+             * @note The Unique pointer assumes ownership of the provided pointer
+             *       and will deallocate it using the specified Allocator when destroyed.
              */
-            template<typename... Args>
-            Unique(Args &&...args)
+            Unique(T *ptr)
             {
                 if constexpr (std::is_array_v<T>)
                 {
@@ -81,7 +77,7 @@ namespace Celery::Ptr
                 }
 
                 // Allocate the object
-                this->data = Allocator::Allocate(std::forward<Args>(args)...);
+                this->data = ptr;
             }
 
             /**
@@ -120,4 +116,25 @@ namespace Celery::Ptr
 
     template<typename T>
     using Unique = Pmr::Unique<T>;
+
+    /**
+     * @brief Create a Unique pointer with default PMR allocator.
+     *
+     * Allocates and constructs an object of type T using the specified
+     * Allocator, then wraps it in a Unique pointer.
+     *
+     * @tparam T Type of the object to create.
+     * @tparam Allocator Allocator type used to allocate the object.
+     * @return Unique<T> A Unique pointer managing the newly created object.
+     */
+    template<
+        typename T,
+        typename Allocator = Celery::Pmr::MonotonicAllocator<T>
+    >
+    Pmr::Unique<T, Allocator> MakeUnique()
+    {
+        T *obj = Allocator::Allocate();
+        // SFINAE checks are done by Unique, so we can safely ignore them here
+        return Pmr::Unique<T, Allocator>(obj);
+    }
 }

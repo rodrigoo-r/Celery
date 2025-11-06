@@ -21,9 +21,9 @@ common programming tasks, focusing on performance and usability.
 The only official way to install Celery is via CMake.
 To include Celery in your CMake project, add the following lines to your `CMakeLists.txt`:
 
-**NOTE: Please make sure you use C++ 20 or higher.
-Supporting Legacy features is not (and will never be)
-a priority for this library.**
+> **Note:** Celery requires **C++20 or higher.**  
+> Supporting legacy standards is **not (and never will be)** a priority.  
+> The goal is clean, modern, high-performance code — not backward compatibility.
 
 ```cmake
 include(FetchContent)

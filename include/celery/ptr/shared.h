@@ -58,10 +58,9 @@ namespace Celery::Ptr
             >
         >
         class Shared
+            : public Base::Bufferable<T>
         {
         protected:
-            T *ptr; // Pointer to the managed object
-
             std::conditional_t<
                 ThreadSafe,
                 std::atomic<Trait::VeryLarge>,
@@ -91,7 +90,7 @@ namespace Celery::Ptr
                 }
 
                 // Allocate the object
-                ptr = Allocator::Allocate(std::forward<Args>(args)...);
+                this->data = Allocator::Allocate(std::forward<Args>(args)...);
 
                 // Allocate and initialize the reference count
                 ref_count = RefCountAllocator::Allocate();
@@ -112,8 +111,12 @@ namespace Celery::Ptr
              *
              * @param other The Shared pointer to copy from.
              */
-            Shared(const Shared &other) : ptr(other.ptr), ref_count(other.ref_count)
+            Shared(const Shared &other) :
+                ref_count(other.ref_count)
             {
+                // Copy the managed pointer
+                this->data = other.data;
+
                 // Increment reference count
                 if constexpr (ThreadSafe)
                 {
@@ -129,8 +132,10 @@ namespace Celery::Ptr
              *
              * @param other The Shared pointer to move from.
              */
-            Shared(Shared &&other) : ptr(other.ptr), ref_count(other.ref_count)
+            Shared(Shared &&other) :
+                ref_count(other.ref_count)
             {
+                this->data = other.data;
                 other.ptr = nullptr;
                 other.ref_count = nullptr;
             }
@@ -142,7 +147,7 @@ namespace Celery::Ptr
              */
             T &operator*() const
             {
-                return *ptr;
+                return *this->data;
             }
 
             /**
@@ -152,7 +157,7 @@ namespace Celery::Ptr
              */
             T *operator->() const
             {
-                return ptr;
+                return this->data;
             }
 
             /**
@@ -175,9 +180,9 @@ namespace Celery::Ptr
                     // If count reaches zero, deallocate
                     if (count == 0)
                     {
-                        Allocator::Deallocate(ptr);
+                        Allocator::Deallocate(this->data);
                         RefCountAllocator::Deallocate(ref_count);
-                        ptr = nullptr;
+                        this->data = nullptr;
                         ref_count = nullptr;
                     }
                 }

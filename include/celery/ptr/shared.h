@@ -16,6 +16,7 @@
 */
 
 #pragma once
+#include "celery/base/dereferenceable.h"
 #include "celery/memory/monotonic.h"
 
 namespace Celery::Ptr
@@ -69,8 +70,17 @@ namespace Celery::Ptr
                 >
             >
         >
-        class Shared
-            : public Base::Bufferable<T>
+        class Shared :
+            public Base::Bufferable<T>,
+            public Base::Dereferenceable<
+                Shared<
+                    T,
+                    ThreadSafe,
+                    Allocator,
+                    RefCountAllocator
+                >,
+                T
+            >
         {
         protected:
             std::conditional_t<
@@ -150,26 +160,6 @@ namespace Celery::Ptr
                 this->data = other.data;
                 other.ptr = nullptr;
                 other.ref_count = nullptr;
-            }
-
-            /**
-             * @brief Dereference operator to access the managed object.
-             *
-             * @returns Reference to the managed object.
-             */
-            T &operator*() const
-            {
-                return *this->data;
-            }
-
-            /**
-             * @brief Arrow operator to access members of the managed object.
-             *
-             * @returns Pointer to the managed object.
-             */
-            T *operator->() const
-            {
-                return this->data;
             }
 
             /**

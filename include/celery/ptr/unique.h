@@ -52,6 +52,9 @@ namespace Celery::Ptr
             public Base::Bufferable<T>,
             public Base::Dereferenceable<Unique<T, Allocator>, T>
         {
+            // Make Dereferenceable a friend to access protected members
+            friend class Base::Dereferenceable<Unique<T, Allocator>, T>;
+
         public:
             /**
              * @brief Constructs a Unique pointer by allocating a new T instance.

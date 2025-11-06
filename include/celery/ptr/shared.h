@@ -82,6 +82,17 @@ namespace Celery::Ptr
                 T
             >
         {
+            // Make Dereferenceable a friend to access protected members
+            friend class Base::Dereferenceable<
+                Shared<
+                    T,
+                    ThreadSafe,
+                    Allocator,
+                    RefCountAllocator
+                >,
+                T
+            >;
+
         protected:
             std::conditional_t<
                 ThreadSafe,

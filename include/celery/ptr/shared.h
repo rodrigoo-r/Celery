@@ -52,8 +52,20 @@ namespace Celery::Ptr
             // SFINAE to ensure Allocator is valid
             typename = std::enable_if_t<
                 std::is_base_of_v<
-                    Celery::Pmr::MonotonicAllocator<T>,
+                    Celery::Pmr::Allocator<T>,
                     Allocator
+                >
+            >,
+            typename = std::enable_if_t<
+                std::is_base_of_v<
+                    Celery::Pmr::Allocator<
+                        std::conditional_t<
+                            ThreadSafe,
+                            std::atomic<Trait::VeryLarge>,
+                            Trait::VeryLarge
+                        >
+                    >,
+                    RefCountAllocator
                 >
             >
         >

@@ -236,11 +236,11 @@ namespace Celery::Ptr
         typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
         typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<Trait::VeryLarge>
     >
-    Shared<T> MakeShared()
+    Pmr::Shared<T, false, Allocator, RefCountAllocator> MakeShared()
     {
         T *obj = Allocator::Allocate();
         // SFINAE checks are done by Shared, so we can safely ignore them here
-        return Pmr::Shared<T, false, Allocator, RefCountAllocator>(obj);
+        return { obj };
     }
 
     /**
@@ -260,10 +260,10 @@ namespace Celery::Ptr
         typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
         typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<std::atomic<Trait::VeryLarge>>
     >
-    Concurrent<T> MakeConcurrent()
+    Pmr::Shared<T, true, Allocator, RefCountAllocator> MakeConcurrent()
     {
         T *obj = Allocator::Allocate();
         // SFINAE checks are done by Shared, so we can safely ignore them here
-        return Pmr::Shared<T, true, Allocator, RefCountAllocator>(obj);
+        return { obj };
     }
 }

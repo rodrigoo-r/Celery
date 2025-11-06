@@ -33,6 +33,7 @@ namespace Celery::Base
     template <typename Derived, typename T>
     class Dereferenceable
     {
+    public:
         /**
          * @brief Dereference operator to access the managed object.
          *

@@ -27,6 +27,7 @@ namespace Celery::Base
      *       and inequality comparisons. By default, these methods are
      *       deleted and must be specialized for specific types.
      */
+    template <typename T>
     struct EqualityCompare
     {
         /**
@@ -40,7 +41,15 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <typename U>
+        template <
+            typename U = T,
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
         static bool Eq(U &&a, U &&b) = delete;
 
         /**
@@ -54,7 +63,15 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <typename U>
+        template <
+            typename U = T,
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
         static bool Neq(U &&a, U &&b) = delete;
     };
 
@@ -66,6 +83,7 @@ namespace Celery::Base
      *       greater-than-or-equal comparisons. By default, these methods
      *       are deleted and must be specialized for specific types.
      */
+    template <typename T>
     struct ArithmeticCompare
     {
         /**
@@ -79,7 +97,15 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <typename U>
+        template <
+            typename U = T,
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
         static bool Lt(U &&a, U &&b) = delete;
 
         /**
@@ -93,7 +119,15 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <typename U>
+        template <
+            typename U = T,
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
         static bool Gt(U &&a, U &&b) = delete;
 
         /**
@@ -107,7 +141,15 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <typename U>
+        template <
+            typename U = T,
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
         static bool Lte(U &&a, U &&b) = delete;
 
         /**
@@ -121,7 +163,15 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <typename U>
+        template <
+            typename U = T,
+            typename = std::enable_if_t<
+                std::is_same_v<
+                    std::decay_t<T>,
+                    std::decay_t<U>
+                >
+            >
+        >
         static bool Gte(U &&a, U &&b) = delete;
     };
 
@@ -136,11 +186,11 @@ namespace Celery::Base
     concept EqualityComparable = requires(T &&a, T &&b)
     {
         {
-            EqualityCompare::Eq(std::forward<T>(a), std::forward<T>(b))
+            EqualityCompare<T>::Eq(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
 
         {
-            EqualityCompare::Neq(std::forward<T>(a), std::forward<T>(b))
+            EqualityCompare<T>::Neq(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
     };
 
@@ -155,19 +205,19 @@ namespace Celery::Base
     concept ArithmeticComparable = requires(T &&a, T &&b)
     {
         {
-            ArithmeticCompare::Lt(std::forward<T>(a), std::forward<T>(b))
+            ArithmeticCompare<T>::Lt(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
 
         {
-            ArithmeticCompare::Gt(std::forward<T>(a), std::forward<T>(b))
+            ArithmeticCompare<T>::Gt(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
 
         {
-            ArithmeticCompare::Lte(std::forward<T>(a), std::forward<T>(b))
+            ArithmeticCompare<T>::Lte(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
 
         {
-            ArithmeticCompare::Gte(std::forward<T>(a), std::forward<T>(b))
+            ArithmeticCompare<T>::Gte(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
     };
 

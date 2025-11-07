@@ -16,6 +16,10 @@
 */
 
 #pragma once
+#include <atomic>
+
+
+#include "celery/base/bufferable.h"
 #include "celery/base/dereferenceable.h"
 #include "celery/memory/monotonic.h"
 
@@ -57,18 +61,7 @@ namespace Celery::Ptr
                     Allocator
                 >
             >,
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::Allocator<
-                        std::conditional_t<
-                            ThreadSafe,
-                            std::atomic<Trait::VeryLarge>,
-                            Trait::VeryLarge
-                        >
-                    >,
-                    RefCountAllocator
-                >
-            >
+            typename = Trait::EnsureAllocator<Allocator>
         >
         class Shared :
             public Base::Bufferable<T>,

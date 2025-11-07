@@ -31,13 +31,34 @@ namespace Celery::Trait
      * @tparam T The type to process.
      */
     template <typename T>
-    using GetBase = std::decay_t<
-        std::remove_reference_t<
-            std::remove_const_t<
-                std::remove_cv_t<
-                    T
-                >
-            >
-        >
+    using GetBase = std::decay_t<T>;
+
+    /**
+     * @brief Compile-time boolean to check if two types share the same base type.
+     *
+     * This variable template evaluates to true if the base types
+     * of T and U (after removing references and const qualifiers)
+     * are the same; otherwise, it evaluates to false.
+     *
+     * @tparam T First type to compare.
+     * @tparam U Second type to compare.
+     */
+    template <typename T, typename U>
+    constexpr bool EnsureSameBase = std::is_same_v<
+        GetBase<T>,
+        GetBase<U>
     >;
+
+    /**
+     * @brief SFINAE helper to enable functions only if two types share the same base type.
+     *
+     * This alias template resolves to `std::enable_if` when
+     * `EnsureSameBase<T, U>` is true, allowing function templates
+     * to be conditionally enabled based on type compatibility.
+     *
+     * @tparam T First type to compare.
+     * @tparam U Second type to compare.
+     */
+    template <typename T, typename U>
+    using EnsureSame = std::enable_if<EnsureSameBase<T, U>>;
 }

@@ -31,9 +31,13 @@ namespace Celery::Trait
      * @tparam T The type to process.
      */
     template <typename T>
-    using GetBase = std::remove_reference<
-        std::remove_const<
-            std::decay<T>
+    using GetBase = std::decay_t<
+        std::remove_reference_t<
+            std::remove_const_t<
+                std::remove_cv_t<
+                    T
+                >
+            >
         >
     >;
 }

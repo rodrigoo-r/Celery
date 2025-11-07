@@ -95,7 +95,7 @@ namespace Celery::Trait
     template <typename T>
     using EnsureArrayAllocator = std::enable_if<
         std::is_base_of_v<
-            Pmr::ArrayAllocator<typename T::value_type>,
+            Pmr::ArrayAllocator<T>,
             T
         >
     >;

@@ -30,7 +30,7 @@ namespace Celery::Serialize
      * @tparam T Integral type to specialize for.
      */
     template<std::integral T>
-    struct Display
+    struct Display<T>
     {
         /*
          *  @brief Output a raw representation of an integral type to the provided stream.

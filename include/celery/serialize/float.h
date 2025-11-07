@@ -30,7 +30,7 @@ namespace Celery::Serialize
      * @tparam T Floating-point type to specialize for.
      */
     template<std::floating_point T>
-    struct Display
+    struct Display<T>
     {
         /*
          *  @brief Output a raw representation of a floating-point type to the provided stream.

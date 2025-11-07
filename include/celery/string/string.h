@@ -62,12 +62,7 @@ namespace Celery::Str
             Trait::Uint InitialCapacity = Trait::InitialCapacity,
             typename Allocator = Celery::Pmr::ArrayAllocator<char>,
             // --- SFINAE Checks --- //
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::ArrayAllocator<char>,
-                    Allocator
-                >
-            >
+            typename = Trait::EnsureArrayAllocator<Allocator>
         >
         class String :
             public Array::Pmr::Vector<char, GrowthFactor, InitialCapacity, Allocator>

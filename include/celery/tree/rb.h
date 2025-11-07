@@ -186,7 +186,7 @@ namespace Celery::Tree
             typename T,
             typename Allocator = Celery::Pmr::MonotonicAllocator<RedBlackNode<T>>,
             // SFINAE to ensure Allocator is a valid allocator
-            typename = std::enable_if<
+            typename = std::enable_if_t<
                 std::is_base_of_v<
                     Celery::Pmr::Allocator<RedBlackNode<T>>,
                     Allocator

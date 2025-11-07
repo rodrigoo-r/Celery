@@ -77,7 +77,7 @@ namespace Celery::Trait
     template <typename T>
     using EnsureAllocator = std::enable_if<
         std::is_base_of_v<
-            Pmr::Allocator<typename T::value_type>,
+            Pmr::Allocator<T>,
             T
         >
     >;

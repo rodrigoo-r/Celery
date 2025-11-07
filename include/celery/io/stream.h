@@ -65,7 +65,7 @@ namespace Celery::Io
         };
     }
 
-    template<typename Desc = Stdout, unsigned int Capacity = 1024>
+    template<typename Desc = Stdout, unsigned int Capacity = 2048>
     using OStream = Pmr::OStream<Desc, Capacity>;
 
     // Default output stream

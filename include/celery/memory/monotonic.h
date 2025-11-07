@@ -16,7 +16,6 @@
 */
 
 #pragma once
-#include "celery/array/vector.h"
 #include "celery/list/list.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"

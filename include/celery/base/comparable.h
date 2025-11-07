@@ -21,29 +21,162 @@
 namespace Celery::Base
 {
     /**
-     * @brief Primary template for Compare struct.
+     * @brief CRTP mixin that provides equality comparison operations.
      *
-     * Specializations of this struct should provide a callable
-     * operator() that takes an instance of T and returns a size_t
-     * representing the comparison result.
-     *
-     * @tparam T The type to be compared.
+     * @note This class provides static methods Eq and Neq for equality
+     *       and inequality comparisons. By default, these methods are
+     *       deleted and must be specialized for specific types.
      */
-    template <typename T>
-    struct Compare;
+    struct EqualityCompare
+    {
+        /**
+         * @brief Compare two objects of type T for equality.
+         *
+         * @tparam U Type of the supplied values (deduced). Defaults to T.
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a and b are equal, false otherwise.
+         *
+         * @note This function is deleted by default. Specializations
+         *       must provide an implementation.
+         */
+        template <typename U>
+        static bool Eq(U &&a, U &&b) = delete;
+
+        /**
+         * @brief Compare two objects of type T for inequality.
+         *
+         * @tparam U Type of the supplied values (deduced). Defaults to T.
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a and b are not equal, false otherwise.
+         *
+         * @note This function is deleted by default. Specializations
+         *       must provide an implementation.
+         */
+        template <typename U>
+        static bool Neq(U &&a, U &&b) = delete;
+    };
 
     /**
-     * @brief Concept to check if a type T has a valid Compare specialization.
+     * @brief CRTP mixin that provides arithmetic comparison operations.
      *
-     * A type T satisfies the Comparable concept if there exists a
-     * Compare<T> specialization that can be invoked with an instance
-     * of T and returns a size_t convertible result.
+     * @note This class provides static methods Lt, Gt, Lte, and Gte for
+     *       less-than, greater-than, less-than-or-equal, and
+     *       greater-than-or-equal comparisons. By default, these methods
+     *       are deleted and must be specialized for specific types.
+     */
+    struct ArithmeticCompare
+    {
+        /**
+         * @brief Compare two objects of type T for less-than.
+         *
+         * @tparam U Type of the supplied values (deduced). Defaults to T.
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is less than b, false otherwise.
+         *
+         * @note This function is deleted by default. Specializations
+         *       must provide an implementation.
+         */
+        template <typename U>
+        static bool Lt(U &&a, U &&b) = delete;
+
+        /**
+         * @brief Compare two objects of type T for greater-than.
+         *
+         * @tparam U Type of the supplied values (deduced). Defaults to T.
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is greater than b, false otherwise.
+         *
+         * @note This function is deleted by default. Specializations
+         *       must provide an implementation.
+         */
+        template <typename U>
+        static bool Gt(U &&a, U &&b) = delete;
+
+        /**
+         * @brief Compare two objects of type T for less-than-or-equal.
+         *
+         * @tparam U Type of the supplied values (deduced). Defaults to T.
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is less than or equal to b, false otherwise.
+         *
+         * @note This function is deleted by default. Specializations
+         *       must provide an implementation.
+         */
+        template <typename U>
+        static bool Lte(U &&a, U &&b) = delete;
+
+        /**
+         * @brief Compare two objects of type T for greater-than-or-equal.
+         *
+         * @tparam U Type of the supplied values (deduced). Defaults to T.
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is greater than or equal to b, false otherwise.
+         *
+         * @note This function is deleted by default. Specializations
+         *       must provide an implementation.
+         */
+        template <typename U>
+        static bool Gte(U &&a, U &&b) = delete;
+    };
+
+    /**
+     * @brief Concept that checks if a type T supports equality comparison.
      *
-     * @tparam T The type to be checked for comparability.
+     * A type T is considered EqualityComparable if it provides
+     * static methods Eq and Neq in the EqualityCompare struct
+     * that return bool when called with two T objects.
      */
     template <typename T>
-    concept Comparable = requires(T&& t) {
-            { Compare<std::remove_cvref_t<T>>{}(std::forward<T>(t)) }
-            -> std::convertible_to<std::size_t>;
+    concept EqualityComparable = requires(T &&a, T &&b)
+    {
+        {
+            EqualityCompare::Eq(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            EqualityCompare::Neq(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
     };
+
+    /**
+     * @brief Concept that checks if a type T supports arithmetic comparison.
+     *
+     * A type T is considered ArithmeticComparable if it provides
+     * static methods Lt, Gt, Lte, and Gte in the ArithmeticCompare struct
+     * that return bool when called with two T objects.
+     */
+    template <typename T>
+    concept ArithmeticComparable = requires(T &&a, T &&b)
+    {
+        {
+            ArithmeticCompare::Lt(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            ArithmeticCompare::Gt(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            ArithmeticCompare::Lte(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            ArithmeticCompare::Gte(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+    };
+
+    /**
+     * @brief Concept that checks if a type T supports both equality and arithmetic comparison.
+     *
+     * A type T is considered Comparable if it satisfies both
+     * the EqualityComparable and ArithmeticComparable concepts.
+     */
+    template <typename T>
+    concept Comparable = EqualityComparable<T> && ArithmeticComparable<T>;
 }

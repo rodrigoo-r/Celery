@@ -26,6 +26,7 @@
 #include "celery/base/resizable.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"
+#include "celery/trait/type.h"
 #include "celery/util/copy.h"
 
 #pragma once
@@ -64,12 +65,7 @@ namespace Celery::Array
             typename = std::enable_if_t<
                 std::is_destructible_v<T>
             >,
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::ArrayAllocator<T>,
-                    Allocator
-                >
-            >
+            typename = Trait::EnsureArrayAllocator<Allocator>
         >
         class Vector :
             public Base::Indexable<T>,

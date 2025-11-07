@@ -63,19 +63,19 @@ namespace Celery::Buffer
                 >
             >
         >
-        class RingBuffer :
+        class Ring :
             public Base::Sizeable,
-            public Base::Pushable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
-            public Base::BufferedRemovable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>,
-            public Base::BufferedIterable<RingBuffer<T, Capacity, UseHeap, Allocator>, T>
+            public Base::Pushable<Ring<T, Capacity, UseHeap, Allocator>, T>,
+            public Base::BufferedRemovable<Ring<T, Capacity, UseHeap, Allocator>, T>,
+            public Base::BufferedIterable<Ring<T, Capacity, UseHeap, Allocator>, T>
         {
             // Make Base::BufferedRemovable and Base::BufferedIterable friends to access protected members
             friend class Base::BufferedRemovable<
-                RingBuffer<T, Capacity, UseHeap, Allocator>,
+                Ring<T, Capacity, UseHeap, Allocator>,
                 T
             >;
             friend class Base::BufferedIterable<
-                RingBuffer<T, Capacity, UseHeap, Allocator>,
+                Ring<T, Capacity, UseHeap, Allocator>,
                 T
             >;
 
@@ -114,7 +114,7 @@ namespace Celery::Buffer
              * If heap storage is selected via the template parameter \p UseHeap,
              * the constructor will allocate storage using \p Allocator::Allocate.
              */
-            RingBuffer() : Sizeable()
+            Ring() : Sizeable()
             {
                 // Allocate heap storage if needed
                 if constexpr (UseHeap)
@@ -323,7 +323,7 @@ namespace Celery::Buffer
              * If heap storage was used, deallocates the storage using
              * \p Allocator::Deallocate.
              */
-            ~RingBuffer() override
+            ~Ring() override
             {
                 // Call destructors if necessary
                 if constexpr (!std::is_trivially_destructible_v<T>)
@@ -350,5 +350,5 @@ namespace Celery::Buffer
      * @tparam Capacity Buffer capacity (default 50).
      */
     template<typename T, unsigned int Capacity = 50>
-    using RingBuffer = Pmr::RingBuffer<T, Capacity>;
+    using RingBuffer = Pmr::Ring<T, Capacity>;
 } // namespace Celery::Buffer

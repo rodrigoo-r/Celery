@@ -70,6 +70,6 @@ namespace Celery::Io
 
     // Default output stream
     // @deprecated, use Celery::Io::Print instead
-    inline OStream<> IStdout;
-    inline OStream<Stderr> IStderr;
+    inline thread_local OStream<> IStdout;
+    inline thread_local OStream<Stderr> IStderr;
 }

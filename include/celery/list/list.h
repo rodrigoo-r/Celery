@@ -19,8 +19,9 @@
 #include "celery/except/out_of_range.h"
 #include "celery/base/sizeable.h"
 #include "celery/memory/system.h"
-#include "iterator.h"
-#include "node.h"
+#include "celery/list/iterator.h"
+#include "celery/list/node.h"
+#include "celery/trait/type.h"
 
 namespace Celery::List
 {
@@ -408,7 +409,10 @@ namespace Celery::List
              * @tparam U Type of the value being inserted (deduced).
              * @param value Value to insert (forwarded).
              */
-            template <class U = T>
+            template <
+                class U = T,
+                typename = Trait::EnsureSame<T, U>
+            >
             void PushFront(U &&value)
             {
                 EmplaceFront(std::forward<U>(value));

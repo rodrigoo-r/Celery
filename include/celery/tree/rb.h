@@ -546,12 +546,7 @@ namespace Celery::Tree
              */
             template<
                 class U = T,
-                typename = std::enable_if<
-                    std::is_same_v<
-                        std::decay_t<T>,
-                        std::decay_t<U>
-                    >
-                >
+                typename = Trait::EnsureSame<T, U>
             >
             void Remove(const U &value)
             {

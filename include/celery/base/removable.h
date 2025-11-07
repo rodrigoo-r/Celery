@@ -54,12 +54,7 @@ namespace Celery::Base
         template <
             class U = T,
             // SFINAE to ensure U is the same type as T
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
+            typename = Trait::EnsureSame<T, U>
         >
         Derived &operator-=(U &&value)
         {

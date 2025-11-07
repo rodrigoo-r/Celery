@@ -18,6 +18,8 @@
 #pragma once
 #include <utility>
 
+#include "celery/trait/type.h"
+
 namespace Celery::Base
 {
     /**
@@ -51,7 +53,10 @@ namespace Celery::Base
          * myContainer += value;
          * @endcode
          */
-        template <class U = T>
+        template <
+            class U = T,
+            typename = Trait::EnsureSame<T, U>
+        >
         Derived &operator+=(U &&value)
         {
             // Forward to the derived class's EmplaceBack method
@@ -88,7 +93,10 @@ namespace Celery::Base
          * @tparam U Type of the supplied value (deduced). Defaults to T.
          * @param value The value to append (forwarded).
          */
-        template <class U = T>
+        template <
+            class U = T,
+            typename = Trait::EnsureSame<T, U>
+        >
         void PushBack(U &&value)
         {
             static_cast<Derived*>(this)->EmplaceBack(std::forward<U>(value));

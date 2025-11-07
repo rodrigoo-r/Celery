@@ -281,7 +281,10 @@ namespace Celery::Array
              *
              * @param value Rvalue reference to the element to push.
              */
-            template <class U = T>
+            template <
+                class U = T,
+                typename = Trait::EnsureSame<T, U>
+            >
             void PushBack(U &&value)
             {
                 if constexpr (!std::is_trivially_constructible_v<T>)

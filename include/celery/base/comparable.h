@@ -21,6 +21,38 @@
 namespace Celery::Base
 {
     /**
+     * @brief Concept to check if a type T supports default equality comparison.
+     *
+     * This concept requires that the type T has valid `operator==` and
+     * `operator!=` that return a type convertible to bool.
+     *
+     * @tparam T The type to check for equality comparability.
+     */
+    template <typename T>
+    concept DefaultEqualityComparable = requires(T a, T b)
+    {
+        { a == b } -> std::convertible_to<bool>;
+        { a != b } -> std::convertible_to<bool>;
+    };
+
+    /**
+     * @brief Concept to check if a type T supports default arithmetic comparison.
+     *
+     * This concept requires that the type T has valid `operator<`, `operator>`,
+     * `operator<=`, and `operator>=` that return a type convertible to bool.
+     *
+     * @tparam T The type to check for arithmetic comparability.
+     */
+    template <typename T>
+    concept DefaultArithmeticComparable = requires(T a, T b)
+    {
+        { a < b } -> std::convertible_to<bool>;
+        { a > b } -> std::convertible_to<bool>;
+        { a <= b } -> std::convertible_to<bool>;
+        { a >= b } -> std::convertible_to<bool>;
+    };
+
+    /**
      * @brief CRTP mixin that provides equality comparison operations.
      *
      * @note This class provides static methods Eq and Neq for equality
@@ -31,48 +63,50 @@ namespace Celery::Base
     struct EqualityCompare
     {
         /**
-         * @brief Compare two objects of type T for equality.
+         * @brief Compare two objects of type T for equality using default operators.
          *
-         * @tparam U Type of the supplied values (deduced). Defaults to T.
          * @param a First object to compare.
          * @param b Second object to compare.
+         * @return true if a and b are equal, false otherwise.
+         */
+        static bool Eq(const T& a, const T& b)
+            requires DefaultEqualityComparable<T>
+        {
+            return a == b;
+        }
+
+        /**
+         * @brief Compare two objects of type T for inequality using default operators.
+         *
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a and b are not equal, false otherwise.
+         */
+        static bool Neq(const T& a, const T& b)
+            requires DefaultEqualityComparable<T>
+        {
+            return a != b;
+        }
+
+        /**
+         * @brief Compare two objects of type T for equality.
+         *
          * @return true if a and b are equal, false otherwise.
          *
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <
-            typename U = T,
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        static bool Eq(U &&a, U &&b) = delete;
+        static bool Eq(const T&, const T&) = delete;
 
         /**
          * @brief Compare two objects of type T for inequality.
          *
-         * @tparam U Type of the supplied values (deduced). Defaults to T.
-         * @param a First object to compare.
-         * @param b Second object to compare.
          * @return true if a and b are not equal, false otherwise.
          *
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <
-            typename U = T,
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        static bool Neq(U &&a, U &&b) = delete;
+        static bool Neq(const T&, const T&) = delete;
     };
 
     /**
@@ -87,92 +121,81 @@ namespace Celery::Base
     struct ArithmeticCompare
     {
         /**
-         * @brief Compare two objects of type T for less-than.
+         * @brief Compare two objects of type T for less-than using default operators.
          *
-         * @tparam U Type of the supplied values (deduced). Defaults to T.
          * @param a First object to compare.
          * @param b Second object to compare.
          * @return true if a is less than b, false otherwise.
+         */
+        static bool Lt(const T& a, const T& b)
+            requires DefaultArithmeticComparable<T>
+        {
+            return a < b;
+        }
+
+        /**
+         * @brief Compare two objects of type T for greater-than using default operators.
+         *
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is greater than b, false otherwise.
+         */
+        static bool Gt(const T& a, const T& b)
+            requires DefaultArithmeticComparable<T>
+        {
+            return a > b;
+        }
+
+        /**
+         * @brief Compare two objects of type T for less-than-or-equal using default operators.
+         *
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is less than or equal to b, false otherwise.
+         */
+        static bool Lte(const T& a, const T& b)
+            requires DefaultArithmeticComparable<T>
+        {
+            return a <= b;
+        }
+
+        static bool Gte(const T& a, const T& b)
+            requires DefaultArithmeticComparable<T>
+        {
+            return a >= b;
+        }
+
+        /**
+         * @brief Compare two objects of type T for less-than.
          *
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <
-            typename U = T,
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        static bool Lt(U &&a, U &&b) = delete;
+        static bool Lt(const T&, const T&) = delete;
 
         /**
          * @brief Compare two objects of type T for greater-than.
          *
-         * @tparam U Type of the supplied values (deduced). Defaults to T.
-         * @param a First object to compare.
-         * @param b Second object to compare.
-         * @return true if a is greater than b, false otherwise.
-         *
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <
-            typename U = T,
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        static bool Gt(U &&a, U &&b) = delete;
+        static bool Gt(const T&, const T&) = delete;
 
         /**
          * @brief Compare two objects of type T for less-than-or-equal.
          *
-         * @tparam U Type of the supplied values (deduced). Defaults to T.
-         * @param a First object to compare.
-         * @param b Second object to compare.
-         * @return true if a is less than or equal to b, false otherwise.
-         *
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <
-            typename U = T,
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        static bool Lte(U &&a, U &&b) = delete;
+        static bool Lte(const T&, const T&) = delete;
 
         /**
          * @brief Compare two objects of type T for greater-than-or-equal.
          *
-         * @tparam U Type of the supplied values (deduced). Defaults to T.
-         * @param a First object to compare.
-         * @param b Second object to compare.
-         * @return true if a is greater than or equal to b, false otherwise.
-         *
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        template <
-            typename U = T,
-            typename = std::enable_if_t<
-                std::is_same_v<
-                    std::decay_t<T>,
-                    std::decay_t<U>
-                >
-            >
-        >
-        static bool Gte(U &&a, U &&b) = delete;
+        static bool Gte(const T&, const T&) = delete;
     };
 
     /**

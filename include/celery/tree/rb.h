@@ -198,7 +198,7 @@ namespace Celery::Tree
         class RedBlack :
             public Base::Sizeable,
             public Base::Removable<RedBlack<T, Allocator>, T>,
-            public Base::Pushable<RedBlack<T, Allocator>, T>
+            public Base::DirectlyPushable<RedBlack<T, Allocator>, T>
         {
         protected:
             using NodeType = RedBlackNode<T> *;

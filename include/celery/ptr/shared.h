@@ -55,12 +55,7 @@ namespace Celery::Ptr
                 >
             >,
             // SFINAE to ensure Allocator is valid
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::Allocator<T>,
-                    Allocator
-                >
-            >,
+            typename = Trait::EnsureAllocator<RefCountAllocator>,
             typename = Trait::EnsureAllocator<Allocator>
         >
         class Shared :

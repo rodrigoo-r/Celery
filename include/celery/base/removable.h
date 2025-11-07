@@ -18,6 +18,9 @@
 #pragma once
 #include <type_traits>
 
+#include "celery/trait/default.h"
+#include "celery/util/reindex.h"
+
 namespace Celery::Base
 {
     /**

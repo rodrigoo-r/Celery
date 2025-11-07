@@ -229,4 +229,41 @@ namespace Celery::Base
      */
     template <typename T>
     concept Comparable = EqualityComparable<T> && ArithmeticComparable<T>;
+
+    /**
+     * @brief Concept that checks if a type T has a specialization of EqualityCompare.
+     *
+     * A type T is considered to have an EqualityCompare specialization
+     * if the static method Eq is defined and returns bool when called
+     * with two T objects.
+     */
+    template <typename T>
+    concept HasEqualityEspecialization =
+        requires(T a, T b) {
+            { EqualityCompare<T>::Eq(a, b) } ->
+                std::convertible_to<bool>;
+        };
+
+    /**
+     * @brief Concept that checks if a type T has a specialization of ArithmeticCompare.
+     *
+     * A type T is considered to have an ArithmeticCompare specialization
+     * if the static method Lt is defined and returns bool when called
+     * with two T objects.
+     */
+    template <typename T>
+    concept HasArithmeticEspecialization =
+        requires(T a, T b) {
+            { ArithmeticCompare<T>::Lt(a, b) } ->
+                std::convertible_to<bool>;
+        };
+
+    /**
+     * @brief Concept that checks if a type T has specializations of both EqualityCompare and ArithmeticCompare.
+     *
+     * A type T is considered to have both specializations if it satisfies
+     * the HasEqualityEspecialization and HasArithmeticEspecialization concepts.
+     */    template <typename T>
+    concept HasComparableEspecialization =
+        HasEqualityEspecialization<T> && HasArithmeticEspecialization<T>;
 }

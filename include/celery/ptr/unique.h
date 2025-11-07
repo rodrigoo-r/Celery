@@ -16,6 +16,7 @@
 */
 
 #pragma once
+#include "celery/base/bufferable.h"
 #include "celery/base/dereferenceable.h"
 #include "celery/memory/monotonic.h"
 
@@ -41,12 +42,7 @@ namespace Celery::Ptr
             typename T,
             typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
             // SFINAE to ensure Allocator is valid
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::Allocator<T>,
-                    Allocator
-                >
-            >
+            typename = Trait::EnsureAllocator<Allocator>
         >
         class Unique :
             public Base::Bufferable<T>,

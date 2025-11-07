@@ -18,6 +18,8 @@
 #pragma once
 #include <type_traits>
 
+#include "celery/memory/monotonic.h"
+
 namespace Celery::Trait
 {
     /**
@@ -61,4 +63,40 @@ namespace Celery::Trait
      */
     template <typename T, typename U>
     using EnsureSame = std::enable_if<EnsureSameBase<T, U>>;
+
+    /**
+     * @brief SFINAE helper to enable functions only for types derived from Pmr::Allocator.
+     *
+     * This alias template resolves to `std::enable_if` when T
+     * is derived from `Pmr::Allocator<typename T::value_type>`,
+     * allowing function templates to be conditionally enabled
+     * for allocator types.
+     *
+     * @tparam T The type to check.
+     */
+    template <typename T>
+    using EnsureAllocator = std::enable_if<
+        std::is_base_of_v<
+            Pmr::Allocator<typename T::value_type>,
+            T
+        >
+    >;
+
+    /**
+     * @brief SFINAE helper to enable functions only for types derived from Pmr::ArrayAllocator.
+     *
+     * This alias template resolves to `std::enable_if` when T
+     * is derived from `Pmr::ArrayAllocator<typename T::value_type>`,
+     * allowing function templates to be conditionally enabled
+     * for array allocator types.
+     *
+     * @tparam T The type to check.
+     */
+    template <typename T>
+    using EnsureArrayAllocator = std::enable_if<
+        std::is_base_of_v<
+            Pmr::ArrayAllocator<typename T::value_type>,
+            T
+        >
+    >;
 }

@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "celery/buffer/ring_buffer.h"
+#include "../array/ring.h"
 #include "std.h"
 
 namespace Celery::Io

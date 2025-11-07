@@ -44,17 +44,7 @@ namespace Celery::Serialize
          *
          * @note This method must be specialized for each type T.
          */
-        static inline Str::String ToString(const T &)
-        {
-            static_assert(
-                sizeof(T) == 0,
-                "Display<T>::ToString is not specialized for this type T. "
-                "Please provide a specialization to enable serialization."
-            );
-
-            // Placeholder line to keep compiler happy
-            return "";
-        }
+        static inline Str::String ToString(const T &) = delete;
 
         /*
          *  @brief Output a raw representation of the object to the provided stream.
@@ -64,14 +54,7 @@ namespace Celery::Serialize
          *
          * @note This method must be specialized for each type T.
          */
-        static inline void Raw(const T &, Io::Pmr::OStream<> &)
-        {
-            static_assert(
-                sizeof(T) == 0,
-                "Display<T>::Raw is not specialized for this type T. "
-                "Please provide a specialization to enable raw display."
-            );
-        }
+        static inline void Raw(const T &, Io::Pmr::OStream<> &) = delete;
     };
 
     /**

@@ -25,7 +25,7 @@ namespace Celery::Io
     {
         template<
             typename Desc = Stdout,
-            unsigned int Capacity = 1024,
+            unsigned int Capacity = 2048,
             bool UseHeap = Capacity >= 1024,
             typename Allocator = Celery::Pmr::ArrayAllocator<char>,
             // SFINAE to check that the Descriptor is valid
@@ -36,7 +36,8 @@ namespace Celery::Io
                 >
             >
         >
-        class OStream : public Buffer::Pmr::Ring<char, Capacity, UseHeap, Allocator>
+        class OStream :
+            public Buffer::Pmr::Ring<char, Capacity, UseHeap, Allocator>
         {
             void WriteStream(char *data, size_t count)
             {

@@ -49,12 +49,7 @@ namespace Celery::List
             typename = std::enable_if_t<
                 std::is_copy_constructible_v<T>
             >,
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::Allocator<Internal::LinkedListNode<T>>,
-                    Allocator
-                >
-            >
+            typename = Trait::EnsureAllocator<Allocator>
         >
         class LinkedList :
             public Base::Sizeable,

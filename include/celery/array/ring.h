@@ -25,6 +25,7 @@
 #include "celery/base/sizeable.h"
 #include "celery/except/out_of_range.h"
 #include "celery/memory/system.h"
+#include "celery/trait/type.h"
 
 namespace Celery::Buffer
 {
@@ -56,12 +57,7 @@ namespace Celery::Buffer
             // SFINAE to ensure Capacity > 0
             typename = std::enable_if_t<(Capacity > 0)>,
             // SFINAE to ensure Allocator is valid
-            typename = std::enable_if_t<
-                std::is_base_of_v<
-                    Celery::Pmr::ArrayAllocator<T>,
-                    Allocator
-                >
-            >
+            typename = Trait::EnsureArrayAllocator<Allocator>
         >
         class Ring :
             public Base::Sizeable,
@@ -176,7 +172,10 @@ namespace Celery::Buffer
              * @tparam U Type of the value being written.
              * @param val Value to write into the buffer.
              */
-            template<class U>
+            template<
+                class U,
+                typename = Trait::EnsureSame<T, U>
+            >
             void Write(U &&val)
             {
                 // Forward to emplace_back

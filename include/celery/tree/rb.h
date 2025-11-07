@@ -472,7 +472,7 @@ namespace Celery::Tree
 
                 // Ensure T is comparable at compile-time.
                 static_assert(
-                    Celery::Base::HasComparableEspecialization<T>,
+                    Base::Comparable<T>,
                     "RedBlack tree requires comparable type T. "
                     "Please specialize Celery::Base::Comparable for your type."
                 );

@@ -32,9 +32,7 @@ namespace Celery::Tree
          * This structure contains pointers for parent and children
          * and a boolean indicating the color (true = red, false = black).
          */
-        template<
-            class T
-        >
+        template<typename T>
         struct RedBlackNode
         {
             T data;                         ///< The data stored in the node.

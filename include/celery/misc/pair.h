@@ -53,7 +53,7 @@ namespace Celery::Misc
             typename = Trait::EnsureSame<U, Fst>,
             typename = Trait::EnsureSame<V, Snd>
         >
-        Pair(U &&first, U &&second)
+        Pair(U &&first, V &&second)
         {
             // Placement new to construct the elements in the aligned storage
             new (fst) Fst(first);

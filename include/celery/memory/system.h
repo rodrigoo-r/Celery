@@ -106,7 +106,13 @@ namespace Celery::Pmr
         static inline T *Allocate(const size_t count)
         {
             // Allocate raw memory for count T objects
-            T *ptr = static_cast<T *>(::operator new(sizeof(T) * count));
+            auto ptr = static_cast<T*>(
+                ::operator new(
+                    sizeof(T) * count,
+                    static_cast<std::align_val_t>(alignof(T))
+                )
+            );
+
             if (ptr == nullptr)
             {
                 throw Except::BadAlloc(); // Allocation failed
@@ -127,7 +133,7 @@ namespace Celery::Pmr
          */
         static inline void Deallocate(T *ptr)
         {
-            ::operator delete(ptr);
+            ::operator delete(ptr, static_cast<std::align_val_t>(alignof(T)));
         }
     };
 }

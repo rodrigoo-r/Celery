@@ -69,6 +69,34 @@ namespace Celery::Trait
     using EnsureSame = std::enable_if<EnsureSameBase<T, U>>;
 
     /**
+     * @brief Compile-time boolean to check if U inherits from T.
+     *
+     * This variable template evaluates to true if U is derived
+     * from T; otherwise, it evaluates to false.
+     *
+     * @tparam T Base type.
+     * @tparam U Derived type.
+     */
+    template <typename T, typename U>
+    constexpr bool EnsureInheritsBase = std::is_base_of_v<
+        T,
+        U
+    >;
+
+    /**
+     * @brief SFINAE helper to enable functions only if U inherits from T.
+     *
+     * This alias template resolves to `std::enable_if` when
+     * `EnsureInheritsBase<T, U>` is true, allowing function templates
+     * to be conditionally enabled based on inheritance relationships.
+     *
+     * @tparam T Base type.
+     * @tparam U Derived type.
+     */
+    template <typename T, typename U>
+    using EnsureInherits =std::enable_if<EnsureInheritsBase<T, U>>;
+
+    /**
      * @brief SFINAE helper to enable functions only for types derived from Pmr::Allocator.
      *
      * This alias template resolves to `std::enable_if` when T

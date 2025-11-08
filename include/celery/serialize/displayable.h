@@ -44,7 +44,11 @@ namespace Celery::Serialize
          *
          * @note This method must be specialized for each type T.
          */
-        static inline Str::String ToString(T &&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static inline Str::String ToString(U &&) = delete;
 
         /*
          *  @brief Output a raw representation of the object to the provided stream.
@@ -54,7 +58,11 @@ namespace Celery::Serialize
          *
          * @note This method must be specialized for each type T.
          */
-        static inline void Raw(T &&, Io::Pmr::OStream<> &) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static inline void Raw(U &&, Io::Pmr::OStream<> &) = delete;
     };
 
     /**

@@ -123,6 +123,53 @@ namespace Celery::List
 
         public:
             /**
+             * @brief Default constructor initializes an empty list.
+             */
+            LinkedList() = default;
+
+            /**
+             * @brief Copy constructor.
+             *
+             * Allocates new nodes and copies elements from \p other
+             * into this list.
+             *
+             * @param other The LinkedList to copy from.
+             */
+            LinkedList(const LinkedList &other)
+            {
+                // Copy elements from other
+                for (
+                    Internal::LinkedListNode<T> *current = other.head;
+                    current != nullptr;
+                    current = current->next
+                )
+                {
+                    EmplaceBack(current->data);
+                }
+            }
+
+            /**
+             * @brief Move constructor.
+             *
+             * Transfers ownership of nodes from \p other to this list,
+             * leaving \p other in a valid but empty state.
+             *
+             * @param other The LinkedList to move from.
+             */
+            LinkedList(LinkedList &&other)
+            noexcept {
+                // Transfer ownership of nodes
+                head = other.head;
+                tail = other.tail;
+                this->len = other.len;
+
+                // Invalidate the other list
+                other.head = nullptr;
+                other.tail = nullptr;
+                other.len = 0;
+            }
+
+            /**
              * @brief Construct and append a new element at the end of the list.
              *
              * Forwards arguments to the node allocator which constructs the element in-place.

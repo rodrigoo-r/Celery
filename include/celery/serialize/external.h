@@ -30,7 +30,7 @@ namespace Celery::Serialize
          * @param obj The Celery::Str::External to output.
          * @param stream The output stream to write to.
          */
-        static inline void Raw(Str::String &obj, Io::Pmr::OStream<> &stream)
+        static inline void Raw(Str::String &&obj, Io::Pmr::OStream<> &stream)
         {
             stream.Batch(obj.Ptr(), obj.Len());
         }

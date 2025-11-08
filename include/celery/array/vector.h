@@ -219,6 +219,11 @@ namespace Celery::Array
                         new_data,
                         this->len
                     );
+
+                    // Destroy old elements before freeing
+                    if constexpr (!std::is_trivially_destructible_v<T>)
+                        for (Trait::VeryLarge i = 0; i < this->len; ++i)
+                            this->data[i].~T();
                 }
 
                 // Deallocate old data

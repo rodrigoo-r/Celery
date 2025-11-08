@@ -40,7 +40,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(Celery)
-target_link_libraries(${PROJECT_NAME} PRIVATE Celery::celery)
+target_link_libraries(${PROJECT_NAME} PRIVATE Celery::Celery)
 ```
 
 You may also be able to build it from source by cloning the repository

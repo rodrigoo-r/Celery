@@ -14,7 +14,7 @@ by the C++ Standard Template Library (STL).
 It aims to offer efficient and easy-to-use alternatives for
 common programming tasks, focusing on performance and usability.
 
-Celery aims to be a modern, high-performance alternative predecessor
+Celery aims to be a modern, high-performance alternative successor
 of [Zelix STL](https://github.com/zelix-lang/STL.git), as the latter
 was not designed with strong emphasis on readability and maintainability,
 which are key aspects of Celery's design philosophy.

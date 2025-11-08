@@ -23,12 +23,24 @@ namespace Celery::Io
 {
     namespace Pmr
     {
+        /**
+         * @brief Output stream implementation using Celery's ring buffer.
+         *
+         * This class provides a high-performance buffered output stream
+         * that writes data to a user-specified descriptor (e.g. stdout or stderr)
+         * using Celery’s PMR (Polymorphic Memory Resource) allocators.
+         *
+         * @tparam Desc        Output descriptor type (must derive from Descriptor)
+         * @tparam Capacity    Buffer capacity (in bytes)
+         * @tparam UseHeap     Whether to allocate the buffer on the heap (defaults true if Capacity >= 1024)
+         * @tparam Allocator   Allocator type (defaults to Celery::Pmr::ArrayAllocator<char>)
+         * @tparam             (SFINAE) Ensures Desc derives from Descriptor
+         */
         template<
             typename Desc = Stdout,
             unsigned int Capacity = 2048,
             bool UseHeap = Capacity >= 1024,
             typename Allocator = Celery::Pmr::ArrayAllocator<char>,
-            // SFINAE to check that the Descriptor is valid
             typename = std::enable_if_t<
                 std::is_base_of_v<
                     Descriptor,
@@ -39,53 +51,100 @@ namespace Celery::Io
         class OStream :
             public Buffer::Pmr::Ring<char, Capacity, UseHeap, Allocator>
         {
+            /**
+             * @brief Writes a block of data directly to the descriptor.
+             *
+             * @param data  Pointer to the data to be written.
+             * @param count Number of bytes to write.
+             */
             void WriteStream(char *data, size_t count)
             {
                 Desc::Write(data, count);
             }
 
         protected:
+            /**
+             * @brief Handles a batch of buffered data when full or flushed.
+             *
+             * This overrides the base ring buffer behavior to write
+             * data through the descriptor when the buffer is ready.
+             *
+             * @param data  Pointer to the buffered data.
+             * @param count Number of bytes to write.
+             */
             void HandleBatch(char *data, size_t count) override
             {
-                // Write the batch to the descriptor
                 this->WriteStream(data, count);
             }
 
         public:
+            /** @brief Default constructor. */
             OStream() = default;
 
+            /**
+             * @brief Copy constructor.
+             *
+             * Copies the buffered data from another OStream instance
+             * and writes it to this instance's descriptor.
+             *
+             * @param other The other OStream to copy from.
+             */
             OStream(const OStream &other)
             {
-                // Copy buffered data from other
                 this->WriteStream(other.Ptr(), other.Len());
             }
 
-            OStream(OStream &&other)
-            noexcept {
-                // Move buffered data from other
+            /**
+             * @brief Move constructor.
+             *
+             * Moves buffered data from another OStream and clears the source.
+             *
+             * @param other The OStream to move from.
+             */
+            OStream(OStream &&other) noexcept
+            {
                 this->WriteStream(other.Ptr(), other.Len());
                 other.Clear();
             }
 
+            /**
+             * @brief Flushes the buffer to the output descriptor.
+             *
+             * Writes all buffered data and clears the buffer.
+             */
             void Flush()
             {
                 this->WriteStream(this->Ptr(), this->Len());
                 this->Clear();
             }
 
+            /**
+             * @brief Destructor.
+             *
+             * Ensures that any remaining buffered data is written
+             * before the stream is destroyed.
+             */
             ~OStream() override
             {
-                // Write buffered data to the descriptor
                 this->WriteStream(this->Ptr(), this->Len());
             }
         };
     }
 
+    /**
+     * @brief Alias for Celery::Io::Pmr::OStream with default allocator settings.
+     *
+     * @tparam Desc      Output descriptor (default: Stdout)
+     * @tparam Capacity  Buffer capacity (default: 2048)
+     */
     template<typename Desc = Stdout, unsigned int Capacity = 2048>
     using OStream = Pmr::OStream<Desc, Capacity>;
 
-    // Default output stream
-    // @deprecated, use Celery::Io::Print instead
+    /**
+     * @brief Thread-local default output streams.
+     *
+     * @deprecated Use Celery::Io::Print instead.
+     */
     inline thread_local OStream<> IStdout;
     inline thread_local OStream<Stderr> IStderr;
 }

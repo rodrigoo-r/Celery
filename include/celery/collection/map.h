@@ -281,6 +281,9 @@ namespace Celery::Collection
             Trait::Uint CleanupGrowthInitialCapacity = Trait::InitialCapacity,
             typename Allocator = Celery::Pmr::MonotonicAllocator<
                 Tree::Pmr::RedBlackNode<Misc::Pair<Key, Value>>
+            >,
+            typename CleanupAllocator = Celery::Pmr::ArrayAllocator<
+                Tree::Pmr::RedBlackNode<Misc::Pair<Key, Value>> *
             >
         >
         class Map :
@@ -290,7 +293,8 @@ namespace Celery::Collection
                 ArithCompare,
                 CleanupGrowthFactor,
                 CleanupGrowthInitialCapacity,
-                Allocator
+                Allocator,
+                CleanupAllocator
             >
         {
         protected:

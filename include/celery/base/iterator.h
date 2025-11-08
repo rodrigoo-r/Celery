@@ -55,7 +55,7 @@ namespace Celery::Base
          *
          * @return The current iterator or value.
          */
-        It operator*()
+        It &operator*()
         {
             return *buffer;
         }

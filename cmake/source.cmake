@@ -2,8 +2,8 @@
 # Fetches and includes all source files for the project.
 # ============================================================================ #
 
-file(GLOB_RECURSE ALL_CPP "${CMAKE_SOURCE_DIR}/*.cpp")
-file(GLOB_RECURSE ALL_H   "${CMAKE_SOURCE_DIR}/*.h")
+file(GLOB_RECURSE ALL_CPP "${CMAKE_SOURCE_DIR}/include/celery/*.cpp")
+file(GLOB_RECURSE ALL_H   "${CMAKE_SOURCE_DIR}/include/celery/*.h")
 set(ALL_FILES ${ALL_CPP} ${ALL_H})
 
 # Exclude generated build files

@@ -79,9 +79,10 @@ namespace Celery::Serialize
      * that can be called with a const T& and an Io::Pmr::OStream<> &.
      */
     template<typename T>
-    concept RawDisplayable = requires(T &&value)
+    concept RawDisplayable =
+        requires(T &&value, Io::Pmr::OStream<> &stream)
     {
-        { Display<T>::Raw(std::forward<T>(value)) };
+        { Display<T>::Raw(std::forward<T>(value), stream) };
     };
 
     /**

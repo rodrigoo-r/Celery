@@ -87,7 +87,7 @@ namespace Celery::Base
          *
          * @return Pointer to the first element in the container.
          */
-        T Front()
+        T &Front()
         {
             return operator[](0);
         }
@@ -97,7 +97,7 @@ namespace Celery::Base
          *
          * @return Pointer to the last element in the container.
          */
-        T Back()
+        T &Back()
         {
             return operator[](this->len - 1);
         }

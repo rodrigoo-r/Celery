@@ -275,18 +275,22 @@ namespace Celery::Collection
         template<
             typename Key,
             typename Value,
+            typename EqCompare = MapEqualityCompare<Key, Value>,
+            typename ArithCompare = MapArithmeticCompare<Key, Value>,
+            Trait::Decimal CleanupGrowthFactor = Trait::GrowthFactor,
+            Trait::Uint CleanupGrowthInitialCapacity = Trait::InitialCapacity,
             typename Allocator = Celery::Pmr::MonotonicAllocator<
                 Tree::Pmr::RedBlackNode<Misc::Pair<Key, Value>>
-            >,
-            typename EqCompare = MapEqualityCompare<Key, Value>,
-            typename ArithCompare = MapArithmeticCompare<Key, Value>
+            >
         >
         class Map :
             public Tree::Pmr::RedBlack<
                 Misc::Pair<Key, Value>,
-                Allocator,
                 EqCompare,
-                ArithCompare
+                ArithCompare,
+                CleanupGrowthFactor,
+                CleanupGrowthInitialCapacity,
+                Allocator
             >
         {
         protected:
@@ -355,6 +359,15 @@ namespace Celery::Collection
                 return nullptr; // Not found
             }
         public:
+            using RedBlackBase = Tree::Pmr::RedBlack<
+                Misc::Pair<Key, Value>,
+                EqCompare,
+                ArithCompare,
+                CleanupGrowthFactor,
+                CleanupGrowthInitialCapacity,
+                Allocator
+            >;
+
             /*
              * @brief Inserts a key-value pair into the map by emplacing them.
              *

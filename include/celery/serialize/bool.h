@@ -36,7 +36,11 @@ namespace Celery::Serialize
          * @param obj The bool to output.
          * @param stream The output stream to write to.
          */
-        static inline void Raw(bool &&obj, Io::Pmr::OStream<> &stream)
+        template<
+            class U = bool,
+            typename = Trait::EnsureSame<U, bool>
+        >
+        static inline void Raw(U &&obj, Io::Pmr::OStream<> &stream)
         {
             // Boolean type
             const char *bool_str = obj ? "true" : "false";

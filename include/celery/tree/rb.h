@@ -455,6 +455,37 @@ namespace Celery::Tree
                 }
             }
 
+            /**
+             * @brief Locate the first node with value equal to `value`.
+             *
+             * Traverses the tree using equality and ordering comparisons
+             * to find the node containing `value`. Returns nullptr if not found.
+             *
+             * @param value Value to locate.
+             * @return Pointer to node containing value, or nullptr if not found.
+             */
+            NodeType Locate(const T &value)
+            {
+                NodeType current = root;
+                while (current != nullptr)
+                {
+                    if (Base::EqualityCompare<T>::Eq(current->data, value))
+                    {
+                        return current;
+                    }
+
+                    if (Base::ArithmeticCompare<T>::Lt(value, current->data))
+                    {
+                        current = current->left;
+                    }
+                    else
+                    {
+                        current = current->right;
+                    }
+                }
+                return nullptr; // Not found
+            }
+
         public:
             /**
              * @brief Construct an empty Red-Black tree.
@@ -641,6 +672,25 @@ namespace Celery::Tree
                 while (node->left)
                     node = node->left;
                 return { node };
+            }
+
+            /**
+             * @brief Check if tree contains a value equal to `value`.
+             *
+             * SFINAE ensures the provided `U` matches `T` decay-wise. Uses Locate
+             * to find the node and returns true if found, false otherwise.
+             *
+             * @tparam U Decay-compatible type for value lookup.
+             * @param value Value to check for containment.
+             * @return true if value is in tree, false otherwise.
+             */
+            template <
+                class U = T,
+                typename = Trait::EnsureSame<T, U>
+            >
+            bool Contains(U &&value)
+            {
+                return Locate(value) != nullptr;
             }
 
             /**

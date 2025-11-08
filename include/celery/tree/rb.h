@@ -666,7 +666,7 @@ namespace Celery::Tree
                 class U = T,
                 typename = Trait::EnsureSame<T, U>
             >
-            void Remove(const U &value)
+            void Remove(U &&value)
             {
                 RemoveBase(Locate(value)); // Locate and remove the node.
             }

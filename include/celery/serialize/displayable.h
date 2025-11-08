@@ -44,7 +44,7 @@ namespace Celery::Serialize
          *
          * @note This method must be specialized for each type T.
          */
-        static inline Str::String ToString(const T &) = delete;
+        static inline Str::String ToString(T &&) = delete;
 
         /*
          *  @brief Output a raw representation of the object to the provided stream.
@@ -54,7 +54,7 @@ namespace Celery::Serialize
          *
          * @note This method must be specialized for each type T.
          */
-        static inline void Raw(const T &, Io::Pmr::OStream<> &) = delete;
+        static inline void Raw(T &&, Io::Pmr::OStream<> &) = delete;
     };
 
     /**
@@ -65,9 +65,9 @@ namespace Celery::Serialize
      * that returns a Str::String when called with a const T&.
      */
     template<typename T>
-    concept PartlyDisplayable = requires(const T &value)
+    concept PartlyDisplayable = requires(T &&value)
     {
-        { Display<T>::ToString(value) }
+        { Display<T>::ToString(std::forward<T>(value)) }
             -> std::convertible_to<Str::String>;
     };
 
@@ -79,9 +79,9 @@ namespace Celery::Serialize
      * that can be called with a const T& and an Io::Pmr::OStream<> &.
      */
     template<typename T>
-    concept RawDisplayable = requires(const T &value)
+    concept RawDisplayable = requires(T &&value)
     {
-        { Display<T>::Raw(value) };
+        { Display<T>::Raw(std::forward<T>(value)) };
     };
 
     /**

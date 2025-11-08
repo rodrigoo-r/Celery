@@ -31,8 +31,8 @@ namespace Celery::Serialize
          * @param stream The output stream to write to.
          */
         template<
-            class U = Str::String,
-            typename = Trait::EnsureSame<U, Str::String>
+            class U = Str::External,
+            typename = Trait::EnsureSame<U, Str::External>
         >
         static inline void Raw(U &&obj, Io::Pmr::OStream<> &stream)
         {

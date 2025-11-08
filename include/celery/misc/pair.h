@@ -36,6 +36,7 @@ namespace Celery::Misc
         // Storage for the two elements
         alignas(Fst) unsigned char fst[sizeof(Fst)];
         alignas(Snd) unsigned char snd[sizeof(Snd)];
+        bool transferred; // Indicates if resources have been transferred
 
     public:
         /**
@@ -58,6 +59,39 @@ namespace Celery::Misc
             // Placement new to construct the elements in the aligned storage
             new (fst) Fst(first);
             new (snd) Snd(second);
+        }
+
+        /**
+         * @brief Copy constructor for Pair.
+         *
+         * This constructor copies the elements from another Pair instance
+         * into this one using placement new.
+         *
+         * @param other The Pair instance to copy from.
+         */
+        Pair(const Pair &other)
+        {
+            // Placement new to copy-construct the elements
+            new (fst) Fst(other.First());
+            new (snd) Snd(other.Second());
+        }
+
+        /**
+         * @brief Move constructor for Pair.
+         *
+         * This constructor moves the elements from another Pair instance
+         * into this one using placement new.
+         *
+         * @param other The Pair instance to move from.
+         */
+        Pair(Pair &&other) noexcept
+        {
+            // Placement new to move-construct the elements
+            new (fst) Fst(std::move(other.First()));
+            new (snd) Snd(std::move(other.Second()));
+
+            // Mark the other as transferred
+            other.transferred = true;
         }
 
         /**
@@ -87,6 +121,7 @@ namespace Celery::Misc
          */
         ~Pair()
         {
+            if (transferred) return; // Skip if resources were transferred
             reinterpret_cast<Fst *>(fst)->~Fst();
             reinterpret_cast<Snd *>(snd)->~Snd();
         }

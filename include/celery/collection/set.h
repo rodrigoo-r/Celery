@@ -56,9 +56,11 @@ namespace Celery::Collection
             typename Key,
             typename Allocator = Celery::Pmr::MonotonicAllocator<
                 Tree::Pmr::RedBlackNode<Key>
-            >
+            >,
+            typename EqCompare = Base::EqualityCompare<Key>,
+            typename ArithCompare = Base::ArithmeticCompare<Key>
         >
-        using Set = Tree::Pmr::RedBlack<Key, Allocator>;
+        using Set = Tree::Pmr::RedBlack<Key, Allocator, EqCompare, ArithCompare>;
     }
 
     /**

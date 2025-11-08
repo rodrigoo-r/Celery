@@ -477,12 +477,12 @@ namespace Celery::Tree
                 NodeType current = root;
                 while (current != nullptr)
                 {
-                    if (Base::EqualityCompare<T>::Eq(current->data, value))
+                    if (EqCompare::Eq(current->data, value))
                     {
                         return current;
                     }
 
-                    if (Base::ArithmeticCompare<T>::Lt(value, current->data))
+                    if (ArithCompare::Lt(value, current->data))
                     {
                         current = current->left;
                     }
@@ -506,11 +506,11 @@ namespace Celery::Tree
                 while (current != nullptr)
                 {
                     parent = current;
-                    if (Base::ArithmeticCompare<T>::Lt(new_node->data, current->data))
+                    if (ArithCompare::Lt(new_node->data, current->data))
                     {
                         current = current->left;
                     }
-                    else if (Base::ArithmeticCompare<T>::Lt(current->data, new_node->data))
+                    else if (ArithCompare::Lt(current->data, new_node->data))
                     {
                         current = current->right;
                     }
@@ -531,7 +531,7 @@ namespace Celery::Tree
                     root = new_node; // Tree was empty
                     root = new_node; // Duplicate line preserved from original code.
                 }
-                else if (Base::ArithmeticCompare<T>::Lt(new_node->data, parent->data))
+                else if (ArithCompare::Lt(new_node->data, parent->data))
                 {
                     parent->left = new_node;
                 }

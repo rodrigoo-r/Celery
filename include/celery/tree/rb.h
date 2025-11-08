@@ -623,7 +623,10 @@ namespace Celery::Tree
 
                 // Ensure T is comparable at compile-time.
                 static_assert(
-                    Base::Comparable<T>,
+                    Base::Comparable<T> || (
+                        Base::DefaultEqualityComparable<T> &&
+                        Base::DefaultArithmeticComparable<T>
+                    ),
                     "RedBlack tree requires comparable type T. "
                     "Please specialize Celery::Base::Comparable for your type."
                 );

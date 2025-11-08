@@ -107,12 +107,11 @@ namespace Celery::Trait
      * @tparam T The type to check.
      */
     template <typename T>
-    using EnsureAllocator = std::enable_if<
-        std::is_base_of_v<
+    using EnsureAllocator =
+        EnsureInherits<
             Pmr::Allocator<T>,
             T
-        >
-    >;
+        >;
 
     /**
      * @brief SFINAE helper to enable functions only for types derived from Pmr::ArrayAllocator.
@@ -125,10 +124,9 @@ namespace Celery::Trait
      * @tparam T The type to check.
      */
     template <typename T>
-    using EnsureArrayAllocator = std::enable_if<
-        std::is_base_of_v<
+    using EnsureArrayAllocator =
+        EnsureInherits<
             Pmr::ArrayAllocator<T>,
             T
-        >
-    >;
+        >;
 }

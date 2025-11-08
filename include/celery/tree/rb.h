@@ -196,8 +196,8 @@ namespace Celery::Tree
             typename CleanupAllocator = Celery::Pmr::ArrayAllocator<RedBlackNode<T> *>,
             // SFINAE to ensure Allocator is a valid allocator
             typename = Trait::EnsureAllocator<Allocator>,
-            typename = Trait::EnsureCompare<EqCompare>,
-            typename = Trait::EnsureArithmeticCompare<ArithCompare>,
+            typename = Base::EnsureCompare<EqCompare>,
+            typename = Base::EnsureArithmeticCompare<ArithCompare>,
             typename = Trait::EnsureArrayAllocator<CleanupAllocator>
         >
         class RedBlack :

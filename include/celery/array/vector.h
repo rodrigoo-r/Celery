@@ -364,6 +364,7 @@ namespace Celery::Array
 
                 // Deallocate the data
                 Allocator::Deallocate(this->data);
+                this->data = nullptr;
             }
         };
     }

@@ -18,6 +18,7 @@
 #pragma once
 #include <utility>
 
+#include "celery/array/vector.h"
 #include "celery/base/comparable.h"
 #include "celery/memory/monotonic.h"
 
@@ -180,17 +181,24 @@ namespace Celery::Tree
          * Inherits from helper base classes to provide size, push and remove semantics.
          *
          * @tparam T Value type stored in the tree.
+         * @tparam EqCompare Equality comparison functor type.
+         * @tparam ArithCompare Arithmetic comparison functor type.
          * @tparam Allocator Allocator type for node allocation/deallocation.
+         * @tparam CleanupAllocator Allocator type for the iterative queue used in Clear().
          */
         template<
             typename T,
             typename EqCompare = Base::EqualityCompare<T>,
             typename ArithCompare = Base::ArithmeticCompare<T>,
+            Trait::Decimal CleanupGrowthFactor = Trait::GrowthFactor,
+            Trait::Uint CleanupGrowthInitialCapacity = Trait::InitialCapacity,
             typename Allocator = Celery::Pmr::MonotonicAllocator<RedBlackNode<T>>,
+            typename CleanupAllocator = Celery::Pmr::ArrayAllocator<RedBlackNode<T> *>,
             // SFINAE to ensure Allocator is a valid allocator
             typename = Trait::EnsureAllocator<Allocator>,
             typename = Trait::EnsureCompare<EqCompare>,
-            typename = Trait::EnsureArithmeticCompare<ArithCompare>
+            typename = Trait::EnsureArithmeticCompare<ArithCompare>,
+            typename = Trait::EnsureArrayAllocator<CleanupAllocator>
         >
         class RedBlack :
             public Base::Sizeable,
@@ -709,12 +717,53 @@ namespace Celery::Tree
             }
 
             /**
+             * @brief Clear the tree, deallocating all nodes.
+             *
+             * Uses an iterative approach with a queue to avoid recursion limits.
+             * Deallocates each node using Allocator::Deallocate.
+             */
+            void Clear()
+            {
+                // Iterative deletion using a queue to avoid recursion.
+                Array::Pmr::Vector<
+                    NodeType,
+                    CleanupGrowthFactor,
+                    CleanupGrowthInitialCapacity,
+                    CleanupAllocator
+                > queue = { root };
+
+                // Cleanup logic
+                while (!queue.Empty())
+                {
+                    // Get next node to delete
+                    NodeType current = queue.PopBackMove();
+
+                    // Enqueue left and right nodes
+                    if (current->left) queue.EmplaceBack(current->left);
+                    if (current->right) queue.EmplaceBack(current->right);
+
+                    // Deallocate current node
+                    Allocator::Deallocate(current);
+                }
+            }
+
+            /**
              * @brief Return end iterator (null).
              * @return Null iterator representing end.
              */
             RedBlackIterator<T> end()
             {
                 return { nullptr };
+            }
+
+            /**
+             * @brief Destructor: clear the tree and release resources.
+             *
+             * Calls Clear() to deallocate all nodes using the Allocator policy.
+             */
+            ~RedBlack()
+            {
+                Clear();
             }
         };
     }

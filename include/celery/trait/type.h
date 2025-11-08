@@ -18,7 +18,7 @@
 #pragma once
 #include <type_traits>
 
-#include "celery/collection/map.h"
+#include "celery/base/comparable.h"
 #include "celery/memory/system.h"
 
 namespace Celery::Trait

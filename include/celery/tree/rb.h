@@ -721,20 +721,6 @@ namespace Celery::Tree
             }
 
             /**
-             * @brief Return iterator to smallest element (begin).
-             * @return RedBlackIterator<T> pointing to minimum node, or null iterator if empty.
-             */
-            RedBlackIterator<T> begin()
-            {
-                NodeType node = root;
-                if (!node)
-                    return { nullptr };
-                while (node->left)
-                    node = node->left;
-                return { node };
-            }
-
-            /**
              * @brief Check if tree contains a value equal to `value`.
              *
              * SFINAE ensures the provided `U` matches `T` decay-wise. Uses Locate
@@ -786,11 +772,25 @@ namespace Celery::Tree
             }
 
             /**
+             * @brief Return iterator to smallest element (begin).
+             * @return RedBlackIterator<T> pointing to minimum node, or null iterator if empty.
+             */
+            RedBlackIterator<T> begin()
+            const {
+                NodeType node = root;
+                if (!node)
+                    return { nullptr };
+                while (node->left)
+                    node = node->left;
+                return { node };
+            }
+
+            /**
              * @brief Return end iterator (null).
              * @return Null iterator representing end.
              */
             RedBlackIterator<T> end()
-            {
+            const {
                 return { nullptr };
             }
 

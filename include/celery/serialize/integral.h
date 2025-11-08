@@ -38,10 +38,14 @@ namespace Celery::Serialize
          * @param obj The integral value to output.
          * @param stream The output stream to write to.
          */
-        static inline void Raw(T &&obj, Io::Pmr::OStream<> &stream)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static inline void Raw(U &&obj, Io::Pmr::OStream<> &stream)
         {
             // Integral type
-            Algorithm::Itoa(obj, stream);
+            Algorithm::Itoa(std::forward<T>(obj), stream);
         }
     };
 }

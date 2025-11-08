@@ -120,6 +120,55 @@ namespace Celery::Buffer
             }
 
             /**
+             * @brief Copy constructor.
+             *
+             * Allocates storage if needed and copies elements from \p other
+             * into this buffer using the \p Batch method.
+             *
+             * @param other The Ring buffer to copy from.
+             */
+            Ring(const Ring &other)
+            {
+                // Allocate heap storage if needed
+                if constexpr (UseHeap)
+                {
+                    data = Allocator::Allocate(Capacity);
+                }
+
+                // Copy elements from other
+                Batch(other.data, other.len);
+            }
+
+            /**
+             * @brief Move constructor.
+             *
+             * Transfers ownership of resources from \p other to this buffer.
+             * If heap storage is used, the internal pointer is moved and
+             * \p other's pointer is set to nullptr. For inline storage,
+             * elements are moved individually.
+             *
+             * @param other The Ring buffer to move from.
+             */
+            Ring(Ring &&other) noexcept
+            {
+                if constexpr (UseHeap)
+                {
+                    data = other.data;
+                    other.data = nullptr;
+                }
+                else
+                {
+                    // Move inline data
+                    for (size_t i = 0; i < other.len; ++i)
+                    {
+                        data[i] = std::move(other.data[i]);
+                    }
+                }
+                len = other.len;
+                other.len = 0;
+            }
+
+            /**
              * @brief Return the current head index (number of elements stored).
              *
              * @return size_t Current occupied length of the buffer.

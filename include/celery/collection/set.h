@@ -53,14 +53,27 @@ namespace Celery::Collection
          * @see Celery::Pmr::MonotonicAllocator
          */
         template<
-            typename Key,
+            typename T,
+            typename EqCompare = Base::EqualityCompare<T>,
+            typename ArithCompare = Base::ArithmeticCompare<T>,
+            Trait::Decimal CleanupGrowthFactor = Trait::GrowthFactor,
+            Trait::Uint CleanupGrowthInitialCapacity = Trait::InitialCapacity,
             typename Allocator = Celery::Pmr::MonotonicAllocator<
-                Tree::Pmr::RedBlackNode<Key>
+                Tree::Pmr::RedBlackNode<T>
             >,
-            typename EqCompare = Base::EqualityCompare<Key>,
-            typename ArithCompare = Base::ArithmeticCompare<Key>
+            typename CleanupAllocator = Celery::Pmr::ArrayAllocator<
+                Tree::Pmr::RedBlackNode<T> *
+            >
         >
-        using Set = Tree::Pmr::RedBlack<Key, Allocator, EqCompare, ArithCompare>;
+        using Set = Tree::Pmr::RedBlack<
+            T,
+            EqCompare,
+            ArithCompare,
+            CleanupGrowthFactor,
+            CleanupGrowthInitialCapacity,
+            Allocator,
+            CleanupAllocator
+        >;
     }
 
     /**

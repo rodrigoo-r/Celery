@@ -33,7 +33,11 @@ namespace Celery::Trait
      * @tparam T The type to process.
      */
     template <typename T>
-    using GetBase = std::decay_t<T>;
+    using GetBase = std::conditional_t<
+        std::is_array_v<std::remove_reference_t<T>>,
+        std::remove_reference_t<T>,
+        std::decay_t<T>
+    >;
 
     /**
      * @brief Compile-time boolean to check if two types share the same base type.

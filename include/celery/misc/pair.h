@@ -91,4 +91,94 @@ namespace Celery::Misc
             reinterpret_cast<Snd *>(snd)->~Snd();
         }
     };
+
+    /**
+     * @brief Get function to access elements of the Pair by index.
+     *
+     * This function template allows accessing the first or second element
+     * of the Pair using an index (0 for first, 1 for second).
+     *
+     * @tparam I Index of the element to access (0 or 1).
+     * @tparam Fst Type of the first element.
+     * @tparam Snd Type of the second element.
+     * @param p The Pair instance to access.
+     * @return Reference to the requested element.
+     */
+    template <Trait::VeryLarge I, typename Fst, typename Snd>
+    decltype(auto) get(Pair<Fst, Snd>& p)
+    {
+        if constexpr (I == 0)
+            return p.First();
+        else
+            return p.Second();
+    }
+
+    // Const overload
+    template <Trait::VeryLarge I, typename Fst, typename Snd>
+    decltype(auto) get(const Pair<Fst, Snd>& p)
+    {
+        if constexpr (I == 0)
+            return p.First();
+        else
+            return p.Second();
+    }
+
+    // Rvalue overload
+    template <Trait::VeryLarge I, typename Fst, typename Snd>
+    decltype(auto) get(Pair<Fst, Snd>&& p)
+    {
+        if constexpr (I == 0)
+            return std::move(p.First());
+        else
+            return std::move(p.Second());
+    }
+}
+
+// Specialize std::tuple_size and std::tuple_element for Celery::Misc::Pair
+// to enable structured bindings and tuple-like access.
+namespace std
+{
+    /**
+     * @brief Specialization of std::tuple_size for Celery::Misc::Pair.
+     *
+     * This specialization defines the size of the Pair as 2.
+     *
+     * @tparam Fst Type of the first element.
+     * @tparam Snd Type of the second element.
+     */
+    template <typename Fst, typename Snd>
+    struct tuple_size<Celery::Misc::Pair<Fst, Snd>> : std::integral_constant<std::size_t, 2>
+        {};
+
+    /**
+     * @brief Specialization of std::tuple_element for Celery::Misc::Pair.
+     *
+     * This specialization provides access to the types of the elements
+     * in the Pair by index (0 for first, 1 for second).
+     *
+     * @tparam I Index of the element (0 or 1).
+     * @tparam Fst Type of the first element.
+     * @tparam Snd Type of the second element.
+     */
+    template <typename Fst, typename Snd>
+    struct tuple_element<0, Celery::Misc::Pair<Fst, Snd>>
+    {
+        using type = Fst;
+    };
+
+    /**
+     * @brief Specialization of std::tuple_element for Celery::Misc::Pair.
+     *
+     * This specialization provides access to the types of the elements
+     * in the Pair by index (0 for first, 1 for second).
+     *
+     * @tparam I Index of the element (0 or 1).
+     * @tparam Fst Type of the first element.
+     * @tparam Snd Type of the second element.
+     */
+    template <typename Fst, typename Snd>
+    struct tuple_element<1, Celery::Misc::Pair<Fst, Snd>>
+    {
+        using type = Snd;
+    };
 }

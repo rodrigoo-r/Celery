@@ -312,13 +312,15 @@ namespace Celery::Tree
                     else {
                         NodeType uncle = grandparent->left;
 
-                        if (uncle != nullptr && uncle->red) {
+                        if (uncle != nullptr && uncle->red)
+                        {
                             grandparent->red = true;
                             parent->red = false;
                             uncle->red = false;
                             ptr = grandparent;
                         } else {
-                            if (ptr == parent->left) {
+                            if (ptr == parent->left)
+                            {
                                 RotateRight(parent);
                                 ptr = parent;
                                 parent = ptr->parent;
@@ -497,9 +499,15 @@ namespace Celery::Tree
                     {
                         current = current->left;
                     }
-                    else
+                    else if (Base::ArithmeticCompare<T>::Lt(current->data, new_node->data))
                     {
                         current = current->right;
+                    }
+                    else
+                    {
+                        // Prevent duplicates: deallocate and return.
+                        Allocator::Deallocate(new_node);
+                        return;
                     }
                 }
 

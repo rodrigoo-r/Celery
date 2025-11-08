@@ -185,8 +185,12 @@ namespace Celery::Tree
         template<
             typename T,
             typename Allocator = Celery::Pmr::MonotonicAllocator<RedBlackNode<T>>,
+            typename EqCompare = Base::EqualityCompare<T>,
+            typename ArithCompare = Base::ArithmeticCompare<T>,
             // SFINAE to ensure Allocator is a valid allocator
-            typename = Trait::EnsureAllocator<Allocator>
+            typename = Trait::EnsureAllocator<Allocator>,
+            typename = Trait::EnsureCompare<EqCompare>,
+            typename = Trait::EnsureArithmeticCompare<ArithCompare>
         >
         class RedBlack :
             public Base::Sizeable,

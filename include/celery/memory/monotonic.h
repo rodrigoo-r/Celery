@@ -37,9 +37,7 @@ namespace Celery::Pmr
         typename T,
         Trait::Uint PageSize = 256,
         typename BufferAllocator = ArrayAllocator<T>,
-        typename = std::enable_if_t<
-            std::is_base_of_v<ArrayAllocator<T>, BufferAllocator>
-        >
+        typename = Trait::EnsureAllocator<BufferAllocator>
     >
     class BumpPage
     {

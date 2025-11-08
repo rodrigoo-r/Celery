@@ -464,7 +464,11 @@ namespace Celery::Tree
              * @param value Value to locate.
              * @return Pointer to node containing value, or nullptr if not found.
              */
-            NodeType Locate(const T &value)
+            template <
+                class U = T,
+                typename = Trait::EnsureSame<T, U>
+            >
+            NodeType Locate(U &&value)
             {
                 NodeType current = root;
                 while (current != nullptr)
@@ -484,6 +488,59 @@ namespace Celery::Tree
                     }
                 }
                 return nullptr; // Not found
+            }
+
+            template<typename ...Args>
+            NodeType Insert(Args &&...args)
+            {
+                // Allocate and construct a node using allocator policy.
+                NodeType new_node = Allocator::Allocate(std::forward<Args>(args)...);
+                NodeType parent = nullptr;
+                NodeType current = root;
+
+                // Find the correct position to insert the new node (BST insert).
+                while (current != nullptr)
+                {
+                    parent = current;
+                    if (Base::ArithmeticCompare<T>::Lt(new_node->data, current->data))
+                    {
+                        current = current->left;
+                    }
+                    else if (Base::ArithmeticCompare<T>::Lt(current->data, new_node->data))
+                    {
+                        current = current->right;
+                    }
+                    else
+                    {
+                        // Prevent duplicates: deallocate and return.
+                        Allocator::Deallocate(new_node);
+                        return current; // Duplicate found
+                    }
+                }
+
+                // Attach new node to parent and set its parent pointer.
+                new_node->parent = parent;
+
+                // Insert node as root if tree was empty.
+                if (parent == nullptr)
+                {
+                    root = new_node; // Tree was empty
+                    root = new_node; // Duplicate line preserved from original code.
+                }
+                else if (Base::ArithmeticCompare<T>::Lt(new_node->data, parent->data))
+                {
+                    parent->left = new_node;
+                }
+                else
+                {
+                    parent->right = new_node;
+                }
+
+                // Restore red-black properties after insertion.
+                FixInsert(new_node);
+                ++this->len; // Update size counter inherited from Base::Sizeable.
+
+                return new_node; // Return pointer to inserted node.
             }
 
         public:
@@ -517,52 +574,8 @@ namespace Celery::Tree
             template<typename ...Args>
             void EmplaceBack(Args &&...args)
             {
-                // Allocate and construct a node using allocator policy.
-                NodeType new_node = Allocator::Allocate(std::forward<Args>(args)...);
-                NodeType parent = nullptr;
-                NodeType current = root;
-
-                // Find the correct position to insert the new node (BST insert).
-                while (current != nullptr)
-                {
-                    parent = current;
-                    if (Base::ArithmeticCompare<T>::Lt(new_node->data, current->data))
-                    {
-                        current = current->left;
-                    }
-                    else if (Base::ArithmeticCompare<T>::Lt(current->data, new_node->data))
-                    {
-                        current = current->right;
-                    }
-                    else
-                    {
-                        // Prevent duplicates: deallocate and return.
-                        Allocator::Deallocate(new_node);
-                        return;
-                    }
-                }
-
-                // Attach new node to parent and set its parent pointer.
-                new_node->parent = parent;
-
-                // Insert node as root if tree was empty.
-                if (parent == nullptr)
-                {
-                    root = new_node; // Tree was empty
-                    root = new_node; // Duplicate line preserved from original code.
-                }
-                else if (Base::ArithmeticCompare<T>::Lt(new_node->data, parent->data))
-                {
-                    parent->left = new_node;
-                }
-                else
-                {
-                    parent->right = new_node;
-                }
-
-                // Restore red-black properties after insertion.
-                FixInsert(new_node);
-                ++this->len; // Update size counter inherited from Base::Sizeable.
+                // Delegate to internal Insert method.
+                Insert(std::forward<Args>(args)...);
             }
 
             /**
@@ -690,7 +703,7 @@ namespace Celery::Tree
             >
             bool Contains(U &&value)
             {
-                return Locate(value) != nullptr;
+                return Locate(std::forward<U>(value)) != nullptr;
             }
 
             /**

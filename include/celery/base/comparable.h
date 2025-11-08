@@ -69,7 +69,11 @@ namespace Celery::Base
          * @param b Second object to compare.
          * @return true if a and b are equal, false otherwise.
          */
-        static bool Eq(const T& a, const T& b)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Eq(U && a, U &&b)
             requires DefaultEqualityComparable<T>
         {
             return a == b;
@@ -82,7 +86,11 @@ namespace Celery::Base
          * @param b Second object to compare.
          * @return true if a and b are not equal, false otherwise.
          */
-        static bool Neq(const T& a, const T& b)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Neq(U &&a, U &&b)
             requires DefaultEqualityComparable<T>
         {
             return a != b;
@@ -96,7 +104,11 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        static bool Eq(const T&, const T&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Eq(U &&, U &&) = delete;
 
         /**
          * @brief Compare two objects of type T for inequality.
@@ -106,7 +118,11 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        static bool Neq(const T&, const T&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Neq(U &&, U &&) = delete;
     };
 
     /**
@@ -127,7 +143,11 @@ namespace Celery::Base
          * @param b Second object to compare.
          * @return true if a is less than b, false otherwise.
          */
-        static bool Lt(const T& a, const T& b)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Lt(U &&a, U &&b)
             requires DefaultArithmeticComparable<T>
         {
             return a < b;
@@ -140,7 +160,11 @@ namespace Celery::Base
          * @param b Second object to compare.
          * @return true if a is greater than b, false otherwise.
          */
-        static bool Gt(const T& a, const T& b)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Gt(U && a, U &&b)
             requires DefaultArithmeticComparable<T>
         {
             return a > b;
@@ -153,13 +177,21 @@ namespace Celery::Base
          * @param b Second object to compare.
          * @return true if a is less than or equal to b, false otherwise.
          */
-        static bool Lte(const T& a, const T& b)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Lte(U && a, T &&b)
             requires DefaultArithmeticComparable<T>
         {
             return a <= b;
         }
 
-        static bool Gte(const T& a, const T& b)
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Gte(U &&a, U &&b)
             requires DefaultArithmeticComparable<T>
         {
             return a >= b;
@@ -171,7 +203,11 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        static bool Lt(const T&, const T&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Lt(U &&, U &&) = delete;
 
         /**
          * @brief Compare two objects of type T for greater-than.
@@ -179,7 +215,11 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        static bool Gt(const T&, const T&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Gt(U &&, U &&) = delete;
 
         /**
          * @brief Compare two objects of type T for less-than-or-equal.
@@ -187,7 +227,11 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        static bool Lte(const T&, const T&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Lte(U &&, U &&) = delete;
 
         /**
          * @brief Compare two objects of type T for greater-than-or-equal.
@@ -195,7 +239,11 @@ namespace Celery::Base
          * @note This function is deleted by default. Specializations
          *       must provide an implementation.
          */
-        static bool Gte(const T&, const T&) = delete;
+        template<
+            class U = T,
+            typename = Trait::EnsureSame<U, T>
+        >
+        static bool Gte(U &&, U &&) = delete;
     };
 
     /**

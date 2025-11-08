@@ -47,7 +47,13 @@ namespace Celery::Misc
          * @param first The value to initialize the first element.
          * @param second The value to initialize the second element.
          */
-        Pair(const Fst &first, const Snd &second)
+        template<
+            class U = Fst,
+            class V = Snd,
+            typename = Trait::EnsureSame<U, Fst>,
+            typename = Trait::EnsureSame<V, Snd>
+        >
+        Pair(U &&first, U &&second)
         {
             // Placement new to construct the elements in the aligned storage
             new (fst) Fst(first);

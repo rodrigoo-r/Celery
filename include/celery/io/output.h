@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "celery/algo/ftoa.h"
-#include "celery/base/display.h"
+#include "celery/serialize/displayable.h"
+#include "celery/serialize/default.h"
 #include "celery/string/external.h"
 #include "celery/trait/type.h"
 #include "stream.h"
@@ -54,70 +54,30 @@ namespace Celery::Io
     template <typename T>
     void WriteSingle(T &&arg)
     {
-        // Convert to string if possible
-        if constexpr (
-            std::is_base_of_v<
-                Base::Display,
-                Trait::GetBase<T>
-            >
-        )
+        using Decayed = Trait::GetBase<T>;
+
+        // For partly displayable types
+        if constexpr (Serialize::PartlyDisplayable<Decayed>)
         {
             // Use ToString method
-            Str::String str = arg.ToString();
+            Str::String str = Serialize::Display<Decayed>::ToString(arg);
             IStdout.Batch(str.Ptr(), str.Len());
         }
-        else if constexpr (std::is_same_v<Trait::GetBase<T>, char>)
+        // For raw displayable types
+        else if constexpr (Serialize::RawDisplayable<Decayed>)
         {
-            // Single character
-            const char c = static_cast<char>(arg);
-            IStdout.Write(c);
-        }
-        else if constexpr (std::is_same_v<Trait::GetBase<T>, const char *>)
-        {
-            // Direct C-string
-            const char *cstr = static_cast<const char *>(arg);
-            const auto len = strlen(cstr);
-            IStdout.Batch(cstr, len);
-        }
-        else if constexpr (
-            std::is_same_v<Trait::GetBase<T>, Str::String> ||
-            std::is_same_v<Trait::GetBase<T>, Str::External>
-        )
-        {
-            // Convert to Celery String
-            auto str = static_cast<
-                std::conditional_t<
-                    std::is_same_v<Trait::GetBase<T>, Str::String>,
-                    Str::String,
-                    Str::External
-                >
-            >(arg);
-            IStdout.Batch(str.Ptr(), str.Len());
-        }
-        // Handle primitive types
-        else if constexpr (std::is_same_v<Trait::GetBase<T>, bool>)
-        {
-            // Boolean type
-            const char *bool_str = arg ? "true" : "false";
-            IStdout.Batch(bool_str, arg ? 4 : 5); // Length of "true" or "false"
-        }
-        else if constexpr (std::is_integral_v<Trait::GetBase<T>>)
-        {
-            // Integral type
-            Algorithm::Itoa(arg, IStdout);
-        }
-        else if constexpr (std::is_floating_point_v<Trait::GetBase<T>>)
-        {
-            Algorithm::Ftoa(arg, IStdout);
+            // Use Raw method
+            Serialize::Display<Decayed>::Raw(std::forward<T>(arg), IStdout);
         }
         else
         {
+            // Unsupported type
             static_assert(
                 false,
                 "Unsupported type for Print/Println. To "
                 "enable printing for a custom type, "
-                "derive from Celery::Base::Display and "
-                "implement ToString()."
+                "specialize Celery::Serialize::Display<T> "
+                "and implement ToString() or Raw()."
             );
         }
     }

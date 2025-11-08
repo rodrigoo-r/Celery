@@ -124,6 +124,69 @@ namespace Celery::Array
             }
 
             /**
+             * @brief Copy constructor.
+             *
+             * Creates a new vector as a copy of \p other by allocating
+             * sufficient storage and copying each element.
+             *
+             * @param other Source vector to copy from.
+             */
+            Vector(const Vector &other)
+            {
+                this->len = other.len;
+                this->capacity = other.capacity;
+                this->data = Allocator::Allocate(capacity);
+
+                Utility::Copy(other.data, this->data, this->len);
+            }
+
+            /**
+             * @brief Move constructor.
+             *
+             * Transfers ownership of resources from \p other to this vector,
+             * leaving \p other in a valid but empty state.
+             *
+             * @param other Source vector to move from.
+             */
+            Vector(Vector &&other) noexcept
+            {
+                this->len = other.len;
+                this->capacity = other.capacity;
+                this->data = other.data;
+
+                other.data = nullptr;
+                other.len = 0;
+                other.capacity = 0;
+            }
+
+            /**
+             * @brief Move assignment operator.
+             *
+             * Clears current contents, deallocates existing storage,
+             * and transfers ownership of resources from \p other.
+             *
+             * @param other Source vector to move from.
+             * @return Reference to this vector.
+             */
+            Vector &operator=(Vector &&other) noexcept
+            {
+                if (this != &other)
+                {
+                    Clear();
+                    Allocator::Deallocate(this->data);
+
+                    this->len = other.len;
+                    this->capacity = other.capacity;
+                    this->data = other.data;
+
+                    other.data = nullptr;
+                    other.len = 0;
+                    other.capacity = 0;
+                }
+                return *this;
+            }
+
+            /**
              * @brief Copy assignment operator.
              *
              * Clears current contents, ensures sufficient capacity, and copies

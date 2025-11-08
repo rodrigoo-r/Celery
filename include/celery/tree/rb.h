@@ -645,6 +645,43 @@ namespace Celery::Tree
             }
 
             /**
+             * @brief Copy constructor: deep copy from another Red-Black tree.
+             *
+             * Iterates over `other` tree and inserts each element into the new tree
+             * using EmplaceBack, ensuring a deep copy of all nodes.
+             *
+             * @param other Tree to copy from.
+             */
+            RedBlack(const RedBlack &other)
+            {
+                // Copy constructor: perform deep copy of other tree.
+                root = nullptr;
+                for (auto &el : other)
+                {
+                    // Insert each element from other tree.
+                    EmplaceBack(el);
+                }
+            }
+
+            /**
+             * @brief Move constructor: transfer ownership from another Red-Black tree.
+             *
+             * Transfers root pointer and size from `other` to this tree,
+             * leaving `other` in a valid but empty state.
+             *
+             * @param other Tree to move from.
+             */
+            RedBlack(RedBlack &&other) noexcept
+            {
+                // Move constructor: transfer ownership of resources.
+                root = other.root;
+                this->len = other.len;
+
+                other.root = nullptr;
+                other.len = 0;
+            }
+
+            /**
              * @brief Construct a new node in-place and insert it into the tree.
              *
              * Uses Allocator::Allocate to build a new node. The new node is inserted
@@ -724,6 +761,7 @@ namespace Celery::Tree
              */
             void Clear()
             {
+                if (!root) return; // Tree is already empty
                 // Iterative deletion using a queue to avoid recursion.
                 Array::Pmr::Vector<
                     NodeType,

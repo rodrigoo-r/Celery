@@ -35,7 +35,7 @@ namespace Celery::Serialize
          * @param obj The char to convert.
          * @return Str::String The string representation of the char.
          */
-        static inline void Raw(const char &obj, Io::Pmr::OStream<> &stream)
+        static inline void Raw(char &&obj, Io::Pmr::OStream<> &stream)
         {
             // Write the char directly to the stream
             stream += obj;

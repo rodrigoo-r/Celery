@@ -307,4 +307,38 @@ namespace Celery::Base
      */
     template <typename T>
     concept Comparable = EqualityComparable<T> && ArithmeticComparable<T>;
+
+    /**
+     * @brief SFINAE helper to enable functions only for types derived from Base::EqualityCompare.
+     *
+     * This alias template resolves to `std::enable_if` when T
+     * is derived from `Base::EqualityCompare<T>`,
+     * allowing function templates to be conditionally enabled
+     * for equality comparable types.
+     *
+     * @tparam T The type to check.
+     */
+    template <typename T>
+    using EnsureCompare =
+        Trait::EnsureInherits<
+            EqualityCompare<T>,
+            T
+        >;
+
+    /**
+     * @brief SFINAE helper to enable functions only for types derived from Base::ArithmeticCompare.
+     *
+     * This alias template resolves to `std::enable_if` when T
+     * is derived from `Base::ArithmeticCompare<T>`,
+     * allowing function templates to be conditionally enabled
+     * for arithmetic comparable types.
+     *
+     * @tparam T The type to check.
+     */
+    template <typename T>
+    using EnsureArithmeticCompare =
+        Trait::EnsureInherits<
+            ArithmeticCompare<T>,
+            T
+        >;
 }

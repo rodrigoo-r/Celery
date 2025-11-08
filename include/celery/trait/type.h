@@ -18,7 +18,6 @@
 #pragma once
 #include <type_traits>
 
-#include "celery/base/comparable.h"
 #include "celery/memory/system.h"
 
 namespace Celery::Trait
@@ -128,40 +127,6 @@ namespace Celery::Trait
     using EnsureArrayAllocator =
         EnsureInherits<
             Pmr::ArrayAllocator<T>,
-            T
-        >;
-
-    /**
-     * @brief SFINAE helper to enable functions only for types derived from Base::EqualityCompare.
-     *
-     * This alias template resolves to `std::enable_if` when T
-     * is derived from `Base::EqualityCompare<T>`,
-     * allowing function templates to be conditionally enabled
-     * for equality comparable types.
-     *
-     * @tparam T The type to check.
-     */
-    template <typename T>
-    using EnsureCompare =
-        EnsureInherits<
-            Base::EqualityCompare<T>,
-            T
-        >;
-
-    /**
-     * @brief SFINAE helper to enable functions only for types derived from Base::ArithmeticCompare.
-     *
-     * This alias template resolves to `std::enable_if` when T
-     * is derived from `Base::ArithmeticCompare<T>`,
-     * allowing function templates to be conditionally enabled
-     * for arithmetic comparable types.
-     *
-     * @tparam T The type to check.
-     */
-    template <typename T>
-    using EnsureArithmeticCompare =
-        EnsureInherits<
-            Base::ArithmeticCompare<T>,
             T
         >;
 }

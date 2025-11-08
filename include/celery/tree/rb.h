@@ -543,6 +543,74 @@ namespace Celery::Tree
                 return new_node; // Return pointer to inserted node.
             }
 
+            /**
+             * @brief Remove the specified node from the tree.
+             *
+             * Performs standard BST deletion with transplant and minimum replacement,
+             * updates colors, deallocates the node using Allocator::Deallocate, and fixes
+             * tree properties using FixDelete when required.
+             *
+             * If `z` is nullptr, function returns silently.
+             *
+             * @param z Node to remove.
+             */
+            void RemoveBase(NodeType z)
+            {
+                NodeType x, y;
+                if (z == nullptr)
+                {
+                    return; // Value not found, nothing to remove.
+                }
+
+                // Save original node/color for fix-up decisions.
+                y = z;
+                bool y_original_color = y->red;
+                if (z->left == nullptr)
+                {
+                    x = z->right;
+                    Transplant(z, z->right);
+                }
+                else if (z->right == nullptr)
+                {
+                    x = z->left;
+                    Transplant(z, z->left);
+                }
+                else
+                {
+                    // Node has two children: find in-order successor and replace.
+                    y = Minimum(z->right);
+                    y_original_color = y->red;
+                    x = y->right;
+                    if (y->parent == z)
+                    {
+                        if (x != nullptr)
+                        {
+                            x->parent = y;
+                        }
+                    }
+                    else
+                    {
+                        Transplant(y, y->right);
+                        y->right = z->right;
+                        y->right->parent = y;
+                    }
+                    Transplant(z, y);
+                    y->left = z->left;
+                    y->left->parent = y;
+                    y->red = z->red;
+                }
+
+                // Deallocate the removed node via supplied allocator policy.
+                Allocator::Deallocate(z);
+
+                // If the removed node was black, we may have broken properties.
+                if (!y_original_color)
+                {
+                    FixDelete(x);
+                }
+                --this->len; // Update container size.
+            }
+
         public:
             /**
              * @brief Construct an empty Red-Black tree.
@@ -597,80 +665,7 @@ namespace Celery::Tree
             >
             void Remove(const U &value)
             {
-                NodeType z = root;
-                NodeType x, y;
-
-                // Find the node to be deleted by equality.
-                while (z != nullptr)
-                {
-                    if (Base::EqualityCompare<T>::Eq(z->data, value))
-                    {
-                        break;
-                    }
-
-                    // Traverse the tree (use overloaded operators for ordering).
-                    if (value < z->data)
-                    {
-                        z = z->left;
-                    }
-                    else
-                    {
-                        z = z->right;
-                    }
-                }
-
-                if (z == nullptr)
-                {
-                    return; // Value not found, nothing to remove.
-                }
-
-                // Save original node/color for fix-up decisions.
-                y = z;
-                bool y_original_color = y->red;
-                if (z->left == nullptr)
-                {
-                    x = z->right;
-                    Transplant(z, z->right);
-                }
-                else if (z->right == nullptr)
-                {
-                    x = z->left;
-                    Transplant(z, z->left);
-                }
-                else
-                {
-                    // Node has two children: find in-order successor and replace.
-                    y = Minimum(z->right);
-                    y_original_color = y->red;
-                    x = y->right;
-                    if (y->parent == z)
-                    {
-                        if (x != nullptr)
-                        {
-                            x->parent = y;
-                        }
-                    }
-                    else
-                    {
-                        Transplant(y, y->right);
-                        y->right = z->right;
-                        y->right->parent = y;
-                    }
-                    Transplant(z, y);
-                    y->left = z->left;
-                    y->left->parent = y;
-                    y->red = z->red;
-                }
-
-                // Deallocate the removed node via supplied allocator policy.
-                Allocator::Deallocate(z);
-
-                // If the removed node was black, we may have broken properties.
-                if (!y_original_color)
-                {
-                    FixDelete(x);
-                }
-                --this->len; // Update container size.
+                RemoveBase(Locate(value)); // Locate and remove the node.
             }
 
             /**

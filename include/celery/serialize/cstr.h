@@ -35,7 +35,7 @@ namespace Celery::Serialize
          * @param obj The C-style string to output.
          * @param stream The output stream to write to.
          */
-        static inline void Raw(const char *&obj, Io::Pmr::OStream<> &stream)
+        static inline void Raw(char *&&obj, Io::Pmr::OStream<> &stream)
         {
             // Write the C-style string to the stream
             const char *cstr = static_cast<const char *>(obj);

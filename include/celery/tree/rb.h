@@ -668,7 +668,7 @@ namespace Celery::Tree
             >
             void Remove(U &&value)
             {
-                RemoveBase(Locate(value)); // Locate and remove the node.
+                RemoveBase(Locate(std::forward<U>(value))); // Locate and remove the node.
             }
 
             /**

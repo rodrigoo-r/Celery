@@ -23,6 +23,242 @@
 namespace Celery::Collection
 {
     /*
+     * @brief Specialization of EqualityCompare for Misc::Pair.
+     *
+     * This specialization provides equality comparison operations
+     * for the Misc::Pair container by comparing only the Key component.
+     *
+     * @tparam Key Type of the key in the pair.
+     * @tparam Value Type of the value in the pair.
+     */
+    template<typename Key, typename Value>
+    struct MapEqualityCompare :
+        Base::EqualityCompare<Misc::Pair<Key, Value>>
+    {
+        using Element = Misc::Pair<Key, Value>;
+
+        /*
+         * @brief Compare two Pair elements for equality based on their keys.
+         *
+         * @param a First Pair element to compare.
+         * @param b Second Pair element to compare.
+         * @return true if the keys of a and b are equal, false otherwise.
+         */
+        template<
+            class U = Element,
+            typename = Trait::EnsureSame<U, Element>
+        >
+        static bool Eq(U&& a, U&& b)
+        {
+            // Detect if operator== exists for Key
+            if constexpr (Base::Comparable<Key> || Base::DefaultEqualityComparable<Key>)
+            {
+                return Base::EqualityCompare<Key>::Eq(
+                    std::forward<Key>(a.First()),
+                    std::forward<Key>(b.First())
+                );
+            } else
+            {
+                static_assert(
+                    false,
+                    "Key type must support operator== or be Comparable for Pair comparison."
+                );
+
+                // Unreachable, but required to satisfy all control paths
+                return false;
+            }
+        }
+
+        /*
+         * @brief Compare two Pair elements for inequality based on their keys.
+         *
+         * @param a First Pair element to compare.
+         * @param b Second Pair element to compare.
+         * @return true if the keys of a and b are not equal, false otherwise.
+         */
+        template<
+            class U = Element,
+            typename = Trait::EnsureSame<U, Element>
+        >
+        static bool Neq(U&& a, U&& b)
+        {
+            // Detect if operator!= exists for Key
+            if constexpr (Base::Comparable<Key> || Base::DefaultEqualityComparable<Key>)
+            {
+                return Base::EqualityCompare<Key>::Neq(
+                    std::forward<Key>(a.First()),
+                    std::forward<Key>(b.First())
+                );
+            } else
+            {
+                static_assert(
+                    false,
+                    "Key type must support operator!= or be Comparable for Pair comparison."
+                );
+
+                // Unreachable, but required to satisfy all control paths
+                return false;
+            }
+        }
+    };
+
+    /*
+     * @brief Specialization of ArithmeticCompare for Misc::Pair.
+     *
+     * This specialization provides arithmetic comparison operations
+     * for the Misc::Pair container by comparing only the Key component.
+     *
+     * @tparam Key Type of the key in the pair.
+     * @tparam Value Type of the value in the pair.
+     */
+    template<typename Key, typename Value>
+    struct MapArithmeticCompare :
+        Base::ArithmeticCompare<Misc::Pair<Key, Value>>
+    {
+        using Element = Misc::Pair<Key, Value>;
+
+        /*
+         * @brief Compare two Pair objects for less-than based on their keys.
+         *
+         * This method compares the `First` elements (keys) of the two Pair objects
+         * using the ArithmeticCompare specialization for the Key type.
+         *
+         * @param a First Pair object to compare.
+         * @param b Second Pair object to compare.
+         * @return true if the key of `a` is less than the key of `b`, false otherwise.
+         */
+        template<
+            class U = Element,
+            typename = Trait::EnsureSame<U, Element>
+        >
+        static bool Lt(U&& a, U&& b)
+        {
+            // Detect if operator< exists for Key
+            if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
+            {
+                return Base::ArithmeticCompare<Key>::Lt(
+                    std::forward<Key>(a.First()),
+                    std::forward<Key>(b.First())
+                );
+            } else
+            {
+                static_assert(
+                    false,
+                    "Key type must support operator< or be Comparable for Pair comparison."
+                );
+
+                // Unreachable, but required to satisfy all control paths
+                return false;
+            }
+        }
+
+        /*
+         * @brief Compare two Pair objects for less-than-or-equal based on their keys.
+         *
+         * This method compares the `First` elements (keys) of the two Pair objects
+         * using the ArithmeticCompare specialization for the Key type.
+         *
+         * @param a First Pair object to compare.
+         * @param b Second Pair object to compare.
+         * @return true if the key of `a` is less than or equal to the key of `b`, false otherwise.
+         */
+        template<
+            class U = Element,
+            typename = Trait::EnsureSame<U, Element>
+        >
+        static bool Gt(U&& a, U&& b)
+        {
+            // Detect if operator> exists for Key
+            if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
+            {
+                return Base::ArithmeticCompare<Key>::Gt(
+                    std::forward<Key>(a.First()),
+                    std::forward<Key>(b.First())
+                );
+            } else
+            {
+                static_assert(
+                    false,
+                    "Key type must support operator> or be Comparable for Pair comparison."
+                );
+
+                // Unreachable, but required to satisfy all control paths
+                return false;
+            }
+        }
+
+        /*
+         * @brief Compare two Pair objects for greater-than based on their keys.
+         *
+         * This method compares the `First` elements (keys) of the two Pair objects
+         * using the ArithmeticCompare specialization for the Key type.
+         *
+         * @param a First Pair object to compare.
+         * @param b Second Pair object to compare.
+         * @return true if the key of `a` is greater than the key of `b`, false otherwise.
+         */
+        template<
+            class U = Element,
+            typename = Trait::EnsureSame<U, Element>
+        >
+        static bool Gte(U&& a, U&& b)
+        {
+            // Detect if operator>= exists for Key
+            if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
+            {
+                return Base::ArithmeticCompare<Key>::Gt(
+                    std::forward<Key>(a.First()),
+                    std::forward<Key>(b.First())
+                );
+            } else
+            {
+                static_assert(
+                    false,
+                    "Key type must support operator>= or be Comparable for Pair comparison."
+                );
+
+                // Unreachable, but required to satisfy all control paths
+                return false;
+            }
+        }
+
+        /*
+         * @brief Compare two Pair objects for less-than-or-equal based on their keys.
+         *
+         * This method compares the `First` elements (keys) of the two Pair objects
+         * using the ArithmeticCompare specialization for the Key type.
+         *
+         * @param a First Pair object to compare.
+         * @param b Second Pair object to compare.
+         * @return true if the key of `a` is less than or equal to the key of `b`, false otherwise.
+         */
+        template<
+            class U = Element,
+            typename = Trait::EnsureSame<U, Element>
+        >
+        static bool Lte(U&& a, U&& b)
+        {
+            // Detect if operator<= exists for Key
+            if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
+            {
+                return Base::ArithmeticCompare<Key>::Lte(
+                    std::forward<Key>(a.First()),
+                    std::forward<Key>(b.First())
+                );
+            } else
+            {
+                static_assert(
+                    false,
+                    "Key type must support operator<= or be Comparable for Pair comparison."
+                );
+
+                // Unreachable, but required to satisfy all control paths
+                return false;
+            }
+        }
+    };
+
+    /*
      * @brief PMR-enabled Map container.
      *
      * This class implements a Map using a Red-Black Tree as the underlying
@@ -41,10 +277,17 @@ namespace Celery::Collection
             typename Value,
             typename Allocator = Celery::Pmr::MonotonicAllocator<
                 Tree::Pmr::RedBlackNode<Misc::Pair<Key, Value>>
-            >
+            >,
+            typename EqCompare = MapEqualityCompare<Key, Value>,
+            typename ArithCompare = MapArithmeticCompare<Key, Value>
         >
         class Map :
-            public Tree::Pmr::RedBlack<Misc::Pair<Key, Value>, Allocator>
+            public Tree::Pmr::RedBlack<
+                Misc::Pair<Key, Value>,
+                Allocator,
+                EqCompare,
+                ArithCompare
+            >
         {
         protected:
             using PairType = Misc::Pair<Key, Value>;
@@ -253,241 +496,4 @@ namespace Celery::Collection
      */
     template<typename Key, typename Value>
     using Map = Pmr::Map<Key, Value>;
-}
-
-namespace Celery::Base
-{
-    /*
-     * @brief Specialization of EqualityCompare for Misc::Pair.
-     *
-     * This specialization provides equality comparison operations
-     * for the Misc::Pair container by comparing only the Key component.
-     *
-     * @tparam Key Type of the key in the pair.
-     * @tparam Value Type of the value in the pair.
-     */
-    template<typename Key, typename Value>
-    struct EqualityCompare<Misc::Pair<Key, Value>>
-    {
-        using Element = Misc::Pair<Key, Value>;
-
-        /*
-         * @brief Compare two Pair elements for equality based on their keys.
-         *
-         * @param a First Pair element to compare.
-         * @param b Second Pair element to compare.
-         * @return true if the keys of a and b are equal, false otherwise.
-         */
-        template<
-            class U = Element,
-            typename = Trait::EnsureSame<U, Element>
-        >
-        static bool Eq(U&& a, U&& b)
-        {
-            // Detect if operator== exists for Key
-            if constexpr (Comparable<Key> || DefaultEqualityComparable<Key>)
-            {
-                return EqualityCompare<Key>::Eq(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
-                );
-            } else
-            {
-                static_assert(
-                    false,
-                    "Key type must support operator== or be Comparable for Pair comparison."
-                );
-
-                // Unreachable, but required to satisfy all control paths
-                return false;
-            }
-        }
-
-        /*
-         * @brief Compare two Pair elements for inequality based on their keys.
-         *
-         * @param a First Pair element to compare.
-         * @param b Second Pair element to compare.
-         * @return true if the keys of a and b are not equal, false otherwise.
-         */
-        template<
-            class U = Element,
-            typename = Trait::EnsureSame<U, Element>
-        >
-        static bool Neq(U&& a, U&& b)
-        {
-            // Detect if operator!= exists for Key
-            if constexpr (Comparable<Key> || DefaultEqualityComparable<Key>)
-            {
-                return EqualityCompare<Key>::Neq(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
-                );
-            } else
-            {
-                static_assert(
-                    false,
-                    "Key type must support operator!= or be Comparable for Pair comparison."
-                );
-
-                // Unreachable, but required to satisfy all control paths
-                return false;
-            }
-        }
-    };
-
-    /*
-     * @brief Specialization of ArithmeticCompare for Misc::Pair.
-     *
-     * This specialization provides arithmetic comparison operations
-     * for the Misc::Pair container by comparing only the Key component.
-     *
-     * @tparam Key Type of the key in the pair.
-     * @tparam Value Type of the value in the pair.
-     */
-    template<typename Key, typename Value>
-    struct ArithmeticCompare<Misc::Pair<Key, Value>>
-    {
-        using Element = Misc::Pair<Key, Value>;
-
-        /*
-         * @brief Compare two Pair objects for less-than based on their keys.
-         *
-         * This method compares the `First` elements (keys) of the two Pair objects
-         * using the ArithmeticCompare specialization for the Key type.
-         *
-         * @param a First Pair object to compare.
-         * @param b Second Pair object to compare.
-         * @return true if the key of `a` is less than the key of `b`, false otherwise.
-         */
-        template<
-            class U = Element,
-            typename = Trait::EnsureSame<U, Element>
-        >
-        static bool Lt(U&& a, U&& b)
-        {
-            // Detect if operator< exists for Key
-            if constexpr (ArithmeticComparable<Key> || DefaultArithmeticComparable<Key>)
-            {
-                return ArithmeticCompare<Key>::Lt(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
-                );
-            } else
-            {
-                static_assert(
-                    false,
-                    "Key type must support operator< or be Comparable for Pair comparison."
-                );
-
-                // Unreachable, but required to satisfy all control paths
-                return false;
-            }
-        }
-
-        /*
-         * @brief Compare two Pair objects for less-than-or-equal based on their keys.
-         *
-         * This method compares the `First` elements (keys) of the two Pair objects
-         * using the ArithmeticCompare specialization for the Key type.
-         *
-         * @param a First Pair object to compare.
-         * @param b Second Pair object to compare.
-         * @return true if the key of `a` is less than or equal to the key of `b`, false otherwise.
-         */
-        template<
-            class U = Element,
-            typename = Trait::EnsureSame<U, Element>
-        >
-        static bool Gt(U&& a, U&& b)
-        {
-            // Detect if operator> exists for Key
-            if constexpr (ArithmeticComparable<Key> || DefaultArithmeticComparable<Key>)
-            {
-                return ArithmeticCompare<Key>::Gt(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
-                );
-            } else
-            {
-                static_assert(
-                    false,
-                    "Key type must support operator> or be Comparable for Pair comparison."
-                );
-
-                // Unreachable, but required to satisfy all control paths
-                return false;
-            }
-        }
-
-        /*
-         * @brief Compare two Pair objects for greater-than based on their keys.
-         *
-         * This method compares the `First` elements (keys) of the two Pair objects
-         * using the ArithmeticCompare specialization for the Key type.
-         *
-         * @param a First Pair object to compare.
-         * @param b Second Pair object to compare.
-         * @return true if the key of `a` is greater than the key of `b`, false otherwise.
-         */
-        template<
-            class U = Element,
-            typename = Trait::EnsureSame<U, Element>
-        >
-        static bool Gte(U&& a, U&& b)
-        {
-            // Detect if operator>= exists for Key
-            if constexpr (ArithmeticComparable<Key> || DefaultArithmeticComparable<Key>)
-            {
-                return ArithmeticCompare<Key>::Gt(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
-                );
-            } else
-            {
-                static_assert(
-                    false,
-                    "Key type must support operator>= or be Comparable for Pair comparison."
-                );
-
-                // Unreachable, but required to satisfy all control paths
-                return false;
-            }
-        }
-
-        /*
-         * @brief Compare two Pair objects for less-than-or-equal based on their keys.
-         *
-         * This method compares the `First` elements (keys) of the two Pair objects
-         * using the ArithmeticCompare specialization for the Key type.
-         *
-         * @param a First Pair object to compare.
-         * @param b Second Pair object to compare.
-         * @return true if the key of `a` is less than or equal to the key of `b`, false otherwise.
-         */
-        template<
-            class U = Element,
-            typename = Trait::EnsureSame<U, Element>
-        >
-        static bool Lte(U&& a, U&& b)
-        {
-            // Detect if operator<= exists for Key
-            if constexpr (ArithmeticComparable<Key> || DefaultArithmeticComparable<Key>)
-            {
-                return ArithmeticCompare<Key>::Lte(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
-                );
-            } else
-            {
-                static_assert(
-                    false,
-                    "Key type must support operator<= or be Comparable for Pair comparison."
-                );
-
-                // Unreachable, but required to satisfy all control paths
-                return false;
-            }
-        }
-    };
 }

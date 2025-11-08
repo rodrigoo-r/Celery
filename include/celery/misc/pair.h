@@ -72,8 +72,8 @@ namespace Celery::Misc
         Pair(const Pair &other)
         {
             // Placement new to copy-construct the elements
-            new (fst) Fst(other.First());
-            new (snd) Snd(other.Second());
+            new (fst) Fst(other.fst);
+            new (snd) Snd(other.snd);
         }
 
         /**

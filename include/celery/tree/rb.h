@@ -333,7 +333,7 @@ namespace Celery::Tree
                 }
 
                 // Ensure root is black after fixes.
-                root->red = false;
+                if (root) root->red = false;
             }
 
             /**
@@ -410,7 +410,7 @@ namespace Celery::Tree
                 }
 
                 // Ensure the root is always black.
-                root->red = false;
+                if (root) root->red = false;
             }
 
             /**

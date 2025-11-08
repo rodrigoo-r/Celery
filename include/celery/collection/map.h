@@ -359,14 +359,15 @@ namespace Celery::Collection
                 return nullptr; // Not found
             }
         public:
-            using RedBlackBase = Tree::Pmr::RedBlack<
+            // Inherit constructors from RedBlack base class
+            using Tree::Pmr::RedBlack<
                 Misc::Pair<Key, Value>,
                 EqCompare,
                 ArithCompare,
                 CleanupGrowthFactor,
                 CleanupGrowthInitialCapacity,
                 Allocator
-            >;
+            >::RedBlack;
 
             /*
              * @brief Inserts a key-value pair into the map by emplacing them.

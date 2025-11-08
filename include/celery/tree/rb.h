@@ -762,7 +762,7 @@ namespace Celery::Tree
              * Calls Clear() to deallocate all nodes using the Allocator policy.
              */
             ~RedBlack()
-            {
+            override {
                 Clear();
             }
         };

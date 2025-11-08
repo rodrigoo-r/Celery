@@ -52,6 +52,21 @@ namespace Celery::Io
             }
 
         public:
+            OStream() = default;
+
+            OStream(const OStream &other)
+            {
+                // Copy buffered data from other
+                this->WriteStream(other.Ptr(), other.Len());
+            }
+
+            OStream(OStream &&other)
+            noexcept {
+                // Move buffered data from other
+                this->WriteStream(other.Ptr(), other.Len());
+                other.Clear();
+            }
+
             void Flush()
             {
                 this->WriteStream(this->Ptr(), this->Len());

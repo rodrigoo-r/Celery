@@ -187,6 +187,13 @@ namespace Celery::Base
             return a <= b;
         }
 
+        /**
+         * @brief Compare two objects of type T for greater-than-or-equal using default operators.
+         *
+         * @param a First object to compare.
+         * @param b Second object to compare.
+         * @return true if a is greater than or equal to b, false otherwise.
+         */
         template<
             class U = T,
             typename = Trait::EnsureSame<U, T>

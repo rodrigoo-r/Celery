@@ -180,10 +180,6 @@ namespace Celery::Buffer
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
-                }
-
-                if (this->len != 0)
-                {
                     Clear(); // Clear current contents
                 }
 

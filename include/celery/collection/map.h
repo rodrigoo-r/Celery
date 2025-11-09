@@ -143,8 +143,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Lt(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
+                    std::forward<Key>(a),
+                    std::forward<Key>(b)
                 );
             } else
             {
@@ -180,8 +180,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Gt(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
+                    std::forward<Key>(a),
+                    std::forward<Key>(b)
                 );
             } else
             {
@@ -217,8 +217,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Gt(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
+                    std::forward<Key>(a),
+                    std::forward<Key>(b)
                 );
             } else
             {

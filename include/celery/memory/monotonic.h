@@ -184,7 +184,7 @@ namespace Celery::Pmr
          */
         void Deallocate(T *ptr)
         {
-            //free_list.EmplaceBack(ptr);
+            free_list.EmplaceBack(ptr);
         }
 
         /**

@@ -134,7 +134,7 @@ namespace Celery::Misc
          */
         Pair(const Pair &other)
         {
-            ConstructFrom(other);
+            ConstructFrom<true>(other);
         }
 
         /**
@@ -147,7 +147,7 @@ namespace Celery::Misc
          */
         Pair(Pair &&other) noexcept
         {
-            ConstructFrom(other);
+            ConstructFrom<true>(other);
         }
 
         /**

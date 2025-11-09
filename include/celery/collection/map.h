@@ -346,11 +346,11 @@ namespace Celery::Collection
                 NodeType current = this->root;
                 while (current != nullptr)
                 {
-                    if (ArithCompare::Lt(key, current->data.First()))
+                    if (ArithCompare::Lt(std::forward<U>(key), current->data.First()))
                     {
                         current = current->left;
                     }
-                    else if (ArithCompare::Gt(key, current->data.First()))
+                    else if (ArithCompare::Gt(std::forward<U>(key), current->data.First()))
                     {
                         current = current->right;
                     }

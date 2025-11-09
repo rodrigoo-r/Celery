@@ -41,6 +41,7 @@ namespace Celery::Collection
          *
          * @tparam Key Key type.
          * @tparam Value Mapped value type.
+         * @tparam MaxLoadFactor Maximum load factor before resizing.
          * @tparam BucketGrowthFactor Growth factor used by the outer buckets vector.
          * @tparam BucketInitialCapacity Initial number of buckets.
          * @tparam BucketCleanupGrowthFactor Growth factor for inner bucket maps.
@@ -57,6 +58,7 @@ namespace Celery::Collection
         template<
             typename Key,
             typename Value,
+            Trait::Decimal MaxLoadFactor = Trait::MaxLoadFactor,
             Trait::Decimal BucketGrowthFactor = Trait::GrowthFactor,
             Trait::Uint BucketInitialCapacity = Trait::InitialCapacity,
             Trait::Decimal BucketCleanupGrowthFactor = Trait::GrowthFactor,
@@ -95,6 +97,7 @@ namespace Celery::Collection
                 HashMap<
                     Key,
                     Value,
+                    MaxLoadFactor,
                     BucketGrowthFactor,
                     BucketInitialCapacity,
                     BucketCleanupGrowthFactor,
@@ -111,6 +114,7 @@ namespace Celery::Collection
                 HashMap<
                     Key,
                     Value,
+                    MaxLoadFactor,
                     BucketGrowthFactor,
                     BucketInitialCapacity,
                     BucketCleanupGrowthFactor,
@@ -145,8 +149,8 @@ namespace Celery::Collection
                 Allocator
             > buckets;
 
-            // Current load factor
-            Trait::Decimal load_factor = 0.0;
+            // Current alive buckets
+            Trait::Uint alive_buckets = 0;
         public:
             /**
              * @brief Default constructor.
@@ -156,11 +160,8 @@ namespace Celery::Collection
              */
             HashMap()
             {
-                // Set initial capacity
-                capacity = BucketInitialCapacity;
-
                 // Initialize buckets
-                for (Trait::Uint i = 0; i < capacity; ++i)
+                for (Trait::Uint i = 0; i < BucketInitialCapacity; ++i)
                 {
                     buckets.EmplaceBack();
                 }
@@ -186,12 +187,29 @@ namespace Celery::Collection
             >
             void Insert(U &&key, V &&value)
             {
+                // Resize if load factor exceeded
+                if (this->len >= capacity * MaxLoadFactor)
+                {
+                    const auto new_capacity = static_cast<Trait::VeryLarge>(
+                        capacity * BucketGrowthFactor
+                    );
+
+                    Resize(new_capacity);
+                }
+
                 // Hash the value
                 const Trait::Uint hash = Hash::Get(std::forward<U>(key));
                 auto index = hash % capacity;
+                auto &bucket = buckets[index];
+
+                // Increment alive buckets if this bucket was empty
+                if (bucket.Empty())
+                {
+                    ++alive_buckets;
+                }
 
                 // Insert into the appropriate bucket
-                buckets[index].Emplace(
+                bucket.Emplace(
                     std::forward<U>(key),
                     std::forward<V>(value)
                 );
@@ -237,9 +255,18 @@ namespace Celery::Collection
                 // Hash the key
                 const Trait::Uint hash = Hash::Get(key);
                 auto index = hash % capacity;
+                auto &bucket = buckets[index];
 
                 // Remove from the appropriate bucket
-                buckets[index].Remove(std::forward<U>(key));
+                bucket.Remove(std::forward<U>(key));
+
+                // Decrement alive buckets if this bucket is now empty
+                if (bucket.Empty())
+                {
+                    --alive_buckets;
+                }
+
+                // Decrement length
                 --this->len;
             }
 
@@ -259,17 +286,54 @@ namespace Celery::Collection
             }
 
             /**
-             * @brief Resize the outer bucket count.
+             * @brief Resize the hash map to a new capacity.
              *
-             * Rehashing and redistribution of elements should be implemented here.
-             * Currently a TODO placeholder; callers expecting a resize operation
-             * should be aware this is not yet implemented.
+             * Resizes the outer buckets vector to the specified new capacity.
+             * Rehashes all existing elements into the new buckets.
+             * Downsizing is not supported; if new_capacity is less than or equal
+             * to the current capacity, no action is taken.
              *
-             * @param new_capacity New number of buckets to set.
+             * @param new_capacity New capacity for the hash map.
              */
             void Resize(Trait::VeryLarge new_capacity) override
             {
-                // TODO!
+                if (new_capacity <= capacity)
+                {
+                    return; // No downsizing supported
+                }
+
+                // Resize the buckets vector
+                buckets.Resize(new_capacity);
+                capacity = new_capacity;
+
+                // For each bucket, rehash its elements
+                Array::Pmr::Vector<Misc::Pair<Key, Value>> to_rehash;
+
+                // Rehash existing elements into new buckets
+                for (auto &el : buckets)
+                {
+                    // Move elements to temporary storage
+                    for (auto &pair : el)
+                    {
+                        to_rehash.EmplaceBack(
+                            Misc::Pair<Key, Value>(
+                                std::move(pair.First()),
+                                std::move(pair.Second())
+                            )
+                        );
+                    }
+
+                    el.Clear(); // Clear the bucket after moving
+                }
+
+                // Insert back into resized buckets
+                for (auto &pair : to_rehash)
+                {
+                    Insert(
+                        std::move(pair.First()),
+                        std::move(pair.Second())
+                    );
+                }
             }
 
             /**

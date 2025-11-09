@@ -91,7 +91,6 @@ namespace Celery::Collection
             typename = Trait::EnsureAllocator<Allocator>
         >
         class HashMap :
-            public Base::Resizable,
             public Base::Sizeable,
             public Base::DirectlyPushable<
                 HashMap<
@@ -187,6 +186,8 @@ namespace Celery::Collection
             >
             void Insert(U &&key, V &&value)
             {
+                auto capacity = buckets.Size();
+
                 // Resize if load factor exceeded
                 if (this->len >= capacity * MaxLoadFactor)
                 {
@@ -254,7 +255,7 @@ namespace Celery::Collection
             {
                 // Hash the key
                 const Trait::Uint hash = Hash::Get(key);
-                auto index = hash % capacity;
+                auto index = hash % buckets.Size();
                 auto &bucket = buckets[index];
 
                 // Remove from the appropriate bucket
@@ -278,7 +279,7 @@ namespace Celery::Collection
             void Clear()
             {
                 // Clear all buckets
-                for (Trait::Uint i = 0; i < capacity; ++i)
+                for (Trait::Uint i = 0; i < buckets.Size(); ++i)
                 {
                     buckets[i].Clear();
                 }
@@ -295,8 +296,9 @@ namespace Celery::Collection
              *
              * @param new_capacity New capacity for the hash map.
              */
-            void Resize(Trait::VeryLarge new_capacity) override
+            void Resize(Trait::VeryLarge new_capacity)
             {
+                auto capacity = buckets.Size();
                 if (new_capacity <= capacity)
                 {
                     return; // No downsizing supported
@@ -324,6 +326,15 @@ namespace Celery::Collection
                     }
 
                     el.Clear(); // Clear the bucket after moving
+                }
+
+                // Clear alive buckets count
+                alive_buckets = 0;
+
+                // Create the missing buckets in the vector
+                for (auto i = buckets.Size(); i < new_capacity; ++i)
+                {
+                    buckets.EmplaceBack();
                 }
 
                 // Insert back into resized buckets
@@ -355,7 +366,7 @@ namespace Celery::Collection
             {
                 // Hash the key
                 const Trait::Uint hash = Hash::Get(key);
-                auto index = hash % capacity;
+                auto index = hash % buckets.Size();
 
                 // Locate in the appropriate bucket
                 return buckets[index].operator[](key);

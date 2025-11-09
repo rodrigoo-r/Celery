@@ -38,6 +38,37 @@ namespace Celery::Misc
         alignas(Snd) unsigned char snd[sizeof(Snd)];
         bool transferred; // Indicates if resources have been transferred
 
+        /**
+         * @brief Helper method to copy-construct from another Pair.
+         *
+         * Copies the elements from the other Pair into this one.
+         *
+         * @param other The other Pair to copy from.
+         */
+        void ConstructFrom(const Pair &other)
+        {
+            if (this == &other) return; // Self-assignment check
+
+            new (fst) Fst(*reinterpret_cast<const Fst*>(other.fst));
+            new (snd) Snd(*reinterpret_cast<const Snd*>(other.snd));
+        }
+
+        /**
+         * @brief Helper method to move-construct from another Pair.
+         *
+         * Moves the elements from the other Pair into this one.
+         *
+         * @param other The other Pair to move from.
+         */
+        void ConstructFrom(Pair &&other)
+        {
+            if (this == &other) return; // Self-assignment check
+
+            new (fst) Fst(std::move(other.First()));
+            new (snd) Snd(std::move(other.Second()));
+            other.transferred = true; // Mark the other as transferred
+        }
+
     public:
         /**
          * @brief Constructs a Pair with the given first and second elements.
@@ -71,9 +102,7 @@ namespace Celery::Misc
          */
         Pair(const Pair &other)
         {
-            // Placement new to copy-construct the elements
-            new (fst) Fst(*reinterpret_cast<const Fst*>(other.fst));
-            new (snd) Snd(*reinterpret_cast<const Snd*>(other.snd));
+            ConstructFrom(other);
         }
 
         /**
@@ -86,12 +115,37 @@ namespace Celery::Misc
          */
         Pair(Pair &&other) noexcept
         {
-            // Placement new to move-construct the elements
-            new (fst) Fst(std::move(other.First()));
-            new (snd) Snd(std::move(other.Second()));
+            ConstructFrom(other);
+        }
 
-            // Mark the other as transferred
-            other.transferred = true;
+        /**
+         * @brief Copy assignment operator for Pair.
+         *
+         * This operator copies the elements from another Pair instance
+         * into this one, destroying any existing elements.
+         *
+         * @param other The Pair instance to copy from.
+         * @return Reference to this Pair after assignment.
+         */
+        Pair &operator=(const Pair &other)
+        {
+            ConstructFrom(other);
+            return *this;
+        }
+
+        /**
+         * @brief Move assignment operator for Pair.
+         *
+         * This operator moves the elements from another Pair instance
+         * into this one, destroying any existing elements.
+         *
+         * @param other The Pair instance to move from.
+         * @return Reference to this Pair after assignment.
+         */
+        Pair &operator=(Pair &&other) noexcept
+        {
+            ConstructFrom(other);
+            return *this;
         }
 
         /**

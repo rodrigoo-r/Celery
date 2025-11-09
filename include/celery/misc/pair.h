@@ -45,9 +45,21 @@ namespace Celery::Misc
          *
          * @param other The other Pair to copy from.
          */
+        template <bool IsConstruct = false>
         void ConstructFrom(const Pair &other)
         {
-            if (this == &other) return; // Self-assignment check
+            // Avoid self-assignment during assignment operations
+            if constexpr (!IsConstruct)
+            {
+                if (this == &other) return; // Self-assignment check
+            }
+
+            // Destroy existing elements
+            if (!transferred)
+            {
+                reinterpret_cast<Fst *>(fst)->~Fst();
+                reinterpret_cast<Snd *>(snd)->~Snd();
+            }
 
             new (fst) Fst(*reinterpret_cast<const Fst*>(other.fst));
             new (snd) Snd(*reinterpret_cast<const Snd*>(other.snd));
@@ -60,9 +72,29 @@ namespace Celery::Misc
          *
          * @param other The other Pair to move from.
          */
+        template <bool IsConstruct = false>
         void ConstructFrom(Pair &&other)
         {
-            if (this == &other) return; // Self-assignment check
+            // Avoid self-assignment during assignment operations
+            if constexpr (!IsConstruct)
+            {
+                if (this == &other) return; // Self-assignment check
+            }
+
+            // Destroy existing elements
+            if (!transferred)
+            {
+                reinterpret_cast<Fst *>(fst)->~Fst();
+                reinterpret_cast<Snd *>(snd)->~Snd();
+            }
+
+            if (other.transferred)
+            {
+                // If the other has already transferred, we need to copy
+                new (fst) Fst(*reinterpret_cast<const Fst*>(other.fst));
+                new (snd) Snd(*reinterpret_cast<const Snd*>(other.snd));
+                return;
+            }
 
             new (fst) Fst(std::move(other.First()));
             new (snd) Snd(std::move(other.Second()));

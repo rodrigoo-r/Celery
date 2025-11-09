@@ -99,9 +99,10 @@ namespace Celery::Array
              *
              * @param init_list Initial values to insert.
              */
+            template<bool IsConstruct = false>
             void ConstructFrom(std::initializer_list<T> init_list)
             {
-                this->Init();
+                Clear(); // Clear current contents
 
                 // Insert each element from the initializer list
                 for (const auto &elem : init_list)
@@ -124,9 +125,9 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
+                    Clear(); // Clear current contents
                 }
 
-                Clear(); // Clear current contents
                 this->len = other.len;
                 this->capacity = other.capacity;
                 this->data = Allocator::Allocate(capacity);
@@ -149,9 +150,9 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
+                  Clear(); // Clear current contents
                 }
 
-                Clear(); // Clear current contents
                 this->len = other.len;
                 this->capacity = other.capacity;
                 this->data = other.data;

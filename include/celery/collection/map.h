@@ -19,6 +19,7 @@
 #include "celery/memory/monotonic.h"
 #include "celery/misc/pair.h"
 #include "celery/tree/rb.h"
+#include <utility>
 
 namespace Celery::Collection
 {
@@ -56,8 +57,8 @@ namespace Celery::Collection
             if constexpr (Base::Comparable<Key> || Base::DefaultEqualityComparable<Key>)
             {
                 return Base::EqualityCompare<Key>::Eq(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
+                    a.First(),
+                    b.First()
                 );
             } else
             {
@@ -90,8 +91,8 @@ namespace Celery::Collection
             if constexpr (Base::Comparable<Key> || Base::DefaultEqualityComparable<Key>)
             {
                 return Base::EqualityCompare<Key>::Neq(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
+                    a.First(),
+                    b.First()
                 );
             } else
             {
@@ -143,8 +144,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Lt(
-                    std::forward<Key>(a),
-                    std::forward<Key>(b)
+                    a.First(),
+                    b.First()
                 );
             } else
             {
@@ -180,8 +181,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Gt(
-                    std::forward<Key>(a),
-                    std::forward<Key>(b)
+                    a.First(),
+                    b.first()
                 );
             } else
             {
@@ -217,8 +218,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Gt(
-                    std::forward<Key>(a),
-                    std::forward<Key>(b)
+                    a.First(),
+                    b.First()
                 );
             } else
             {
@@ -254,8 +255,8 @@ namespace Celery::Collection
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
             {
                 return Base::ArithmeticCompare<Key>::Lte(
-                    std::forward<Key>(a.First()),
-                    std::forward<Key>(b.First())
+                    a.First(),
+                    b.First()
                 );
             } else
             {
@@ -289,6 +290,7 @@ namespace Celery::Collection
             typename Value,
             typename EqCompare = MapEqualityCompare<Key, Value>,
             typename ArithCompare = MapArithmeticCompare<Key, Value>,
+            typename KeyCompare = Base::ArithmeticCompare<Key>,
             Trait::Decimal CleanupGrowthFactor = Trait::GrowthFactor,
             Trait::Uint CleanupGrowthInitialCapacity = Trait::InitialCapacity,
             typename Allocator = Celery::Pmr::MonotonicAllocator<
@@ -296,7 +298,8 @@ namespace Celery::Collection
             >,
             typename CleanupAllocator = Celery::Pmr::ArrayAllocator<
                 Tree::Pmr::RedBlackNode<Misc::Pair<Key, Value>> *
-            >
+            >,
+            typename = Base::EnsureArithmeticCompare<KeyCompare>
         >
         class Map :
             public Tree::Pmr::RedBlack<
@@ -358,11 +361,11 @@ namespace Celery::Collection
                 NodeType current = this->root;
                 while (current != nullptr)
                 {
-                    if (ArithCompare::Lt(std::forward<U>(key), current->data.First()))
+                    if (KeyCompare::Lt(std::forward<U>(key), current->data.First()))
                     {
                         current = current->left;
                     }
-                    else if (ArithCompare::Gt(std::forward<U>(key), current->data.First()))
+                    else if (KeyCompare::Gt(std::forward<U>(key), current->data.First()))
                     {
                         current = current->right;
                     }

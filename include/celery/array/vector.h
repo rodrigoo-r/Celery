@@ -150,7 +150,7 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
-                  Clear(); // Clear current contents
+                    Clear(); // Clear current contents
                 }
 
                 this->len = other.len;

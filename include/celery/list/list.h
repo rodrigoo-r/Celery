@@ -121,11 +121,86 @@ namespace Celery::List
                 }
             }
 
+            /**
+             * @brief Clear all elements from the list.
+             *
+             * Deallocates all nodes using the Allocator and resets head, tail,
+             * and size to represent an empty list.
+             */
+            void ConstructFrom(std::initializer_list<T> init_list)
+            {
+                Clear();
+
+                // Insert each element from the initializer list
+                for (const auto &elem : init_list)
+                {
+                    EmplaceBack(elem);
+                }
+            }
+
+            /**
+             * @brief Construct the list as a copy of another list.
+             *
+             * Allocates new nodes and copies elements from \p other
+             * into this list.
+             *
+             * @param other The LinkedList to copy from.
+             */
+            void ConstructFrom(const LinkedList &other)
+            {
+                if (this == &other) return; // Self-assignment check
+                Clear();
+
+                // Copy elements from other
+                Internal::LinkedListNode<T> *current = other.head;
+                while (current)
+                {
+                    EmplaceBack(current->data);
+                    current = current->next;
+                }
+            }
+
+            /**
+             * @brief Construct the list by moving resources from another list.
+             *
+             * Transfers ownership of nodes from \p other to this list,
+             * leaving \p other in a valid but empty state.
+             *
+             * @param other The LinkedList to move from.
+             */
+            void ConstructFrom(LinkedList &&other)
+            {
+                if (this == &other) return; // Self-assignment check
+                Clear();
+
+                // Transfer ownership of nodes
+                head = other.head;
+                tail = other.tail;
+                this->len = other.len;
+
+                // Invalidate the other list
+                other.head = nullptr;
+                other.tail = nullptr;
+                other.len = 0;
+            }
+
         public:
             /**
              * @brief Default constructor initializes an empty list.
              */
             LinkedList() = default;
+
+            /**
+             * @brief Construct the list from an initializer list.
+             *
+             * Each element in \p init_list is copied/emplaced into the list.
+             *
+             * @param init_list Initial values to insert.
+             */
+            LinkedList(std::initializer_list<T> init_list)
+            {
+                ConstructFrom(init_list);
+            }
 
             /**
              * @brief Copy constructor.
@@ -137,15 +212,7 @@ namespace Celery::List
              */
             LinkedList(const LinkedList &other)
             {
-                // Copy elements from other
-                for (
-                    Internal::LinkedListNode<T> *current = other.head;
-                    current != nullptr;
-                    current = current->next
-                )
-                {
-                    EmplaceBack(current->data);
-                }
+                ConstructFrom(other);
             }
 
             /**
@@ -158,15 +225,52 @@ namespace Celery::List
              */
             LinkedList(LinkedList &&other)
             noexcept {
-                // Transfer ownership of nodes
-                head = other.head;
-                tail = other.tail;
-                this->len = other.len;
+                ConstructFrom(other);
+            }
 
-                // Invalidate the other list
-                other.head = nullptr;
-                other.tail = nullptr;
-                other.len = 0;
+            /**
+             * @brief Move assignment operator.
+             *
+             * Clears current contents, deallocates existing nodes,
+             * and transfers ownership of nodes from \p other.
+             *
+             * @param other The LinkedList to move from.
+             * @return Reference to this LinkedList.
+             */
+            LinkedList &operator=(LinkedList &&other)
+            noexcept
+            {
+                ConstructFrom(std::forward<decltype(other)>(other));
+                return *this;
+            }
+
+            /**
+             * @brief Copy assignment operator.
+             *
+             * Clears current contents, ensures sufficient capacity, and copies
+             * elements from \p other to this list.
+             *
+             * @param other The LinkedList to copy from.
+             * @return Reference to this LinkedList.
+             */
+            LinkedList &operator=(const LinkedList &other)
+            {
+                ConstructFrom(other);
+                return *this;
+            }
+
+            /**
+             * @brief Assignment from an initializer list.
+             *
+             * Clears current contents and inserts each element from \p init_list.
+             *
+             * @param init_list Initial values to insert.
+             * @return Reference to this LinkedList.
+             */
+            LinkedList &operator=(std::initializer_list<T> init_list)
+            {
+                ConstructFrom(init_list);
+                return *this;
             }
 
             /**

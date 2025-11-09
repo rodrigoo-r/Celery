@@ -45,9 +45,14 @@ namespace Celery::Misc
          *
          * @param other The other Optional to copy from.
          */
+        template <bool IsConstruct = false>
         void ConstructFrom(const Optional &other)
         {
-            if (this == &other) return; // Self-assignment check
+            // Avoid self-assignment during assignment operations
+            if constexpr (!IsConstruct)
+            {
+                if (this == &other) return; // Self-assignment check
+            }
 
             if (other.engaged)
             {
@@ -107,7 +112,7 @@ namespace Celery::Misc
          */
         Optional(const Optional &other)
         {
-            ConstructFrom(other);
+            ConstructFrom<true>(other);
         }
 
         /**
@@ -120,7 +125,7 @@ namespace Celery::Misc
          */
         Optional(Optional &&other) noexcept
         {
-            constructFrom(other);
+            ConstructFrom(other);
         }
 
         /**

@@ -117,9 +117,15 @@ namespace Celery::Array
              *
              * @param other Source vector to copy from.
              */
+            template<bool IsConstruct = false>
             void ConstructFrom(const Vector &other)
             {
-                if (*this == other) return; // Self-assignment check
+                // Only check self-assignment for assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                }
+
                 Clear(); // Clear current contents
                 this->len = other.len;
                 this->capacity = other.capacity;
@@ -136,9 +142,15 @@ namespace Celery::Array
              *
              * @param other Source vector to move from.
              */
+            template<bool IsConstruct = false>
             void ConstructFrom(Vector &&other)
             {
-                if (*this == other) return; // Self-assignment check
+                // Only check self-assignment for assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                }
+
                 Clear(); // Clear current contents
                 this->len = other.len;
                 this->capacity = other.capacity;
@@ -185,7 +197,7 @@ namespace Celery::Array
              */
             Vector(const Vector &other)
             {
-                ConstructFrom(std::forward<decltype(other)>(other));
+                ConstructFrom<true>(std::forward<decltype(other)>(other));
             }
 
             /**
@@ -198,7 +210,7 @@ namespace Celery::Array
              */
             Vector(Vector &&other) noexcept
             {
-                ConstructFrom(std::forward<decltype(other)>(other));
+                ConstructFrom<true>(std::forward<decltype(other)>(other));
             }
 
             /**

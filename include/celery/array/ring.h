@@ -103,6 +103,97 @@ namespace Celery::Buffer
              */
             virtual void HandleBatch(T *data, size_t count) = 0;
 
+            /**
+             * @brief Construct the ring buffer from an initializer list.
+             *
+             * Each element in \p init_list is copied/emplaced into the buffer.
+             *
+             * @param init_list Initial values to insert.
+             */
+            void ConstructFrom(std::initializer_list<T> init_list)
+            {
+                if (this->len != 0)
+                {
+                    Clear(); // Clear current contents
+                }
+                else
+                {
+                    if constexpr (UseHeap)
+                    {
+                        data = Allocator::Allocate(Capacity);
+                    }
+                }
+
+                // Insert each element from the initializer list
+                for (const auto &elem : init_list)
+                {
+                    EmplaceBack(elem);
+                }
+            }
+
+            /**
+             * @brief Construct the ring buffer as a copy of another ring buffer.
+             *
+             * Allocates storage if needed and copies elements from \p other
+             * into this buffer using the \p Batch method.
+             *
+             * @param other Source ring buffer to copy from.
+             */
+            void ConstructFrom(const Ring &other)
+            {
+                if (this == &other) return; // Self-assignment check
+
+                if (this->len != 0)
+                {
+                    Clear(); // Clear current contents
+                }
+                else
+                {
+                    // Allocate heap storage if needed
+                    if constexpr (UseHeap)
+                    {
+                        data = Allocator::Allocate(Capacity);
+                    }
+                }
+
+                // Copy elements from other
+                Batch(other.data, other.len);
+            }
+
+            /**
+             * @brief Construct the ring buffer by moving resources from another ring buffer.
+             *
+             * Transfers ownership of resources from \p other to this buffer,
+             * leaving \p other in a valid but empty state.
+             *
+             * @param other Source ring buffer to move from.
+             */
+            void ConstructFrom(Ring &&other)
+            {
+                if (this == &other) return; // Self-assignment check
+
+                if (this->len != 0)
+                {
+                    Clear(); // Clear current contents
+                }
+
+                if constexpr (UseHeap)
+                {
+                    data = other.data;
+                    other.data = nullptr;
+                }
+                else
+                {
+                    // Move inline data
+                    for (size_t i = 0; i < other.len; ++i)
+                    {
+                        data[i] = std::move(other.data[i]);
+                    }
+                }
+                len = other.len;
+                other.len = 0;
+            }
+
         public:
             /**
              * @brief Construct a new RingBuffer.
@@ -120,6 +211,18 @@ namespace Celery::Buffer
             }
 
             /**
+             * @brief Construct the ring buffer from an initializer list.
+             *
+             * Each element in \p init_list is copied/emplaced into the buffer.
+             *
+             * @param init_list Initial values to insert.
+             */
+            Ring(std::initializer_list<T> init_list)
+            {
+                ConstructFrom(init_list);
+            }
+
+            /**
              * @brief Copy constructor.
              *
              * Allocates storage if needed and copies elements from \p other
@@ -129,14 +232,7 @@ namespace Celery::Buffer
              */
             Ring(const Ring &other)
             {
-                // Allocate heap storage if needed
-                if constexpr (UseHeap)
-                {
-                    data = Allocator::Allocate(Capacity);
-                }
-
-                // Copy elements from other
-                Batch(other.data, other.len);
+                ConstructFrom(other);
             }
 
             /**
@@ -151,21 +247,37 @@ namespace Celery::Buffer
              */
             Ring(Ring &&other) noexcept
             {
-                if constexpr (UseHeap)
-                {
-                    data = other.data;
-                    other.data = nullptr;
-                }
-                else
-                {
-                    // Move inline data
-                    for (size_t i = 0; i < other.len; ++i)
-                    {
-                        data[i] = std::move(other.data[i]);
-                    }
-                }
-                len = other.len;
-                other.len = 0;
+                ConstructFrom(other);
+            }
+
+            /**
+             * @brief Copy assignment operator.
+             *
+             * Clears current contents and copies elements from \p other
+             * into this buffer using the \p Batch method.
+             *
+             * @param other The Ring buffer to copy from.
+             * @return Reference to this Ring buffer.
+             */
+            Ring &operator=(const Ring &other)
+            {
+                ConstructFrom(other);
+                return *this;
+            }
+
+            /**
+             * @brief Move assignment operator.
+             *
+             * Clears current contents and transfers ownership of resources
+             * from \p other to this buffer.
+             *
+             * @param other The Ring buffer to move from.
+             * @return Reference to this Ring buffer.
+             */
+            Ring &operator=(Ring &&other) noexcept
+            {
+                ConstructFrom(other);
+                return *this;
             }
 
             /**

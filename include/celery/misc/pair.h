@@ -57,8 +57,8 @@ namespace Celery::Misc
         Pair(U &&first, V &&second)
         {
             // Placement new to construct the elements in the aligned storage
-            new (fst) Fst(first);
-            new (snd) Snd(second);
+            new (fst) Fst(std::forward<U>(first));
+            new (snd) Snd(std::forward<V>(second));
         }
 
         /**
@@ -72,8 +72,8 @@ namespace Celery::Misc
         Pair(const Pair &other)
         {
             // Placement new to copy-construct the elements
-            new (fst) Fst(other.fst);
-            new (snd) Snd(other.snd);
+            new (fst) Fst(*reinterpret_cast<const Fst*>(other.fst));
+            new (snd) Snd(*reinterpret_cast<const Snd*>(other.snd));
         }
 
         /**

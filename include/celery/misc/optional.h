@@ -38,6 +38,42 @@ namespace Celery::Misc
         alignas (T) unsigned char storage[sizeof(T)];
         bool engaged = false;
 
+        /**
+         * @brief Helper method to construct from another Optional.
+         *
+         * If the other Optional is engaged, copies its value into this one.
+         *
+         * @param other The other Optional to copy from.
+         */
+        void ConstructFrom(const Optional &other)
+        {
+            if (this == &other) return; // Self-assignment check
+
+            if (other.engaged)
+            {
+                new (storage) T(other.Value());
+                engaged = true;
+            }
+        }
+
+        /**
+         * @brief Helper method to move-construct from another Optional.
+         *
+         * If the other Optional is engaged, moves its value into this one
+         * and disengages the other.
+         *
+         * @param other The other Optional to move from.
+         */
+        void ConstructFrom(Optional &&other) noexcept
+        {
+            if (other.engaged)
+            {
+                new (storage) T(std::move(other.Value()));
+                engaged = true;
+                other.engaged = false;
+            }
+        }
+
     public:
         /**
          * @brief Default constructor creates an empty Optional.
@@ -71,11 +107,7 @@ namespace Celery::Misc
          */
         Optional(const Optional &other)
         {
-            if (other.engaged)
-            {
-                new (storage) T(other.Value());
-                engaged = true;
-            }
+            ConstructFrom(other);
         }
 
         /**
@@ -88,12 +120,37 @@ namespace Celery::Misc
          */
         Optional(Optional &&other) noexcept
         {
-            if (other.engaged)
-            {
-                new (storage) T(std::move(other.Value()));
-                engaged = true;
-                other.engaged = false;
-            }
+            constructFrom(other);
+        }
+
+        /**
+         * @brief Copy assignment operator.
+         *
+         * If the other Optional is engaged, copies its value into this one,
+         * destroying any existing value.
+         *
+         * @param other The other Optional to copy from.
+         * @return Reference to this Optional after assignment.
+         */
+        Optional &operator=(const Optional &other)
+        noexcept {
+            ConstructFrom(other);
+            return *this;
+        }
+
+        /**
+         * @brief Move assignment operator.
+         *
+         * If the other Optional is engaged, moves its value into this one,
+         * destroying any existing value and disengaging the other.
+         *
+         * @param other The other Optional to move from.
+         * @return Reference to this Optional after assignment.
+         */
+        Optional &operator=(Optional &&other) noexcept
+        {
+            ConstructFrom(std::forward<decltype(other)>(other));
+            return *this;
         }
 
         /**

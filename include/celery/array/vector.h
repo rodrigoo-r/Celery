@@ -89,6 +89,62 @@ namespace Celery::Array
                 // Allocate initial capacity
                 capacity = static_cast<Trait::VeryLarge>(InitialCapacity);
                 this->data = Allocator::Allocate(capacity);
+                this->len = 0;
+            }
+
+            /**
+             * @brief Construct the vector from an initializer list.
+             *
+             * Each element in \p init_list is copied/emplaced into the vector.
+             *
+             * @param init_list Initial values to insert.
+             */
+            void ConstructFrom(std::initializer_list<T> init_list)
+            {
+                this->Init();
+
+                // Insert each element from the initializer list
+                for (const auto &elem : init_list)
+                {
+                    EmplaceBack(elem);
+                }
+            }
+
+            /**
+             * @brief Construct the vector as a copy of another vector.
+             *
+             * Allocates sufficient storage and copies each element from \p other.
+             *
+             * @param other Source vector to copy from.
+             */
+            void ConstructFrom(const Vector &other)
+            {
+                Clear(); // Clear current contents
+                this->len = other.len;
+                this->capacity = other.capacity;
+                this->data = Allocator::Allocate(capacity);
+
+                Utility::Copy(other.data, this->data, this->len);
+            }
+
+            /**
+             * @brief Construct the vector by moving resources from another vector.
+             *
+             * Transfers ownership of resources from \p other to this vector,
+             * leaving \p other in a valid but empty state.
+             *
+             * @param other Source vector to move from.
+             */
+            void ConstructFrom(Vector &&other)
+            {
+                Clear(); // Clear current contents
+                this->len = other.len;
+                this->capacity = other.capacity;
+                this->data = other.data;
+
+                other.data = nullptr;
+                other.len = 0;
+                other.capacity = 0;
             }
 
         public:
@@ -114,13 +170,7 @@ namespace Celery::Array
              */
             Vector(std::initializer_list<T> init_list) : Base::Indexable<T>(), Resizable()
             {
-                this->Init();
-
-                // Insert each element from the initializer list
-                for (const auto &elem : init_list)
-                {
-                    EmplaceBack(elem);
-                }
+                ConstructFrom(init_list);
             }
 
             /**
@@ -133,11 +183,7 @@ namespace Celery::Array
              */
             Vector(const Vector &other)
             {
-                this->len = other.len;
-                this->capacity = other.capacity;
-                this->data = Allocator::Allocate(capacity);
-
-                Utility::Copy(other.data, this->data, this->len);
+                ConstructFrom(std::forward<decltype(other)>(other));
             }
 
             /**
@@ -150,13 +196,7 @@ namespace Celery::Array
              */
             Vector(Vector &&other) noexcept
             {
-                this->len = other.len;
-                this->capacity = other.capacity;
-                this->data = other.data;
-
-                other.data = nullptr;
-                other.len = 0;
-                other.capacity = 0;
+                ConstructFrom(std::forward<decltype(other)>(other));
             }
 
             /**
@@ -172,16 +212,7 @@ namespace Celery::Array
             {
                 if (this != &other)
                 {
-                    Clear();
-                    Allocator::Deallocate(this->data);
-
-                    this->len = other.len;
-                    this->capacity = other.capacity;
-                    this->data = other.data;
-
-                    other.data = nullptr;
-                    other.len = 0;
-                    other.capacity = 0;
+                    ConstructFrom(std::forward<decltype(other)>(other));
                 }
                 return *this;
             }
@@ -199,20 +230,23 @@ namespace Celery::Array
             {
                 if (this != &other)
                 {
-                    // Clear current contents
-                    Clear();
-                    if (other.len == 0) return *this; // Nothing to copy
-
-                    // Ensure capacity
-                    EnsureGrowth(other.len);
-
-                    // Copy elements from other
-                    Utility::Copy(
-                        other.data,
-                        this->data,
-                        other.len
-                    );
+                    ConstructFrom(other);
                 }
+
+                return *this;
+            }
+
+            /**
+             * @brief Assignment from an initializer list.
+             *
+             * Clears current contents and inserts each element from \p init_list.
+             *
+             * @param init_list Initial values to insert.
+             * @return Reference to this vector.
+             */
+            Vector &operator=(std::initializer_list<T> init_list)
+            {
+                ConstructFrom(init_list);
                 return *this;
             }
 

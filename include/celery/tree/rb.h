@@ -623,6 +623,50 @@ namespace Celery::Tree
                 --this->len; // Update container size.
             }
 
+            /**
+             * @brief Construct the tree by copying from another tree.
+             *
+             * Clears current tree and performs deep copy of `other` tree
+             * by iterating over its elements and inserting them into this tree.
+             *
+             * @param other Tree to copy from.
+             */
+            void ConstructFrom(const RedBlack &other)
+            {
+                if (this == &other) return; // Self-assignment check
+
+                Clear(); // Clear current tree.
+
+                // Copy constructor: perform deep copy of other tree.
+                root = nullptr;
+                for (auto &el : other)
+                {
+                    // Insert each element from other tree.
+                    EmplaceBack(el);
+                }
+            }
+
+            /**
+             * @brief Construct the tree by moving from another tree.
+             *
+             * Clears current tree and transfers ownership of nodes from `other`.
+             * Leaves `other` in a valid but empty state.
+             *
+             * @param other Tree to move from.
+             */
+            void ConstructFrom(RedBlack &&other)
+            {
+                Clear(); // Clear current tree.
+
+                // Move constructor: transfer ownership of resources.
+                root = other.root;
+                this->len = other.len;
+
+                // Invalidate the other tree
+                other.root = nullptr;
+                other.len = 0;
+            }
+
         public:
             /**
              * @brief Construct an empty Red-Black tree.
@@ -657,13 +701,7 @@ namespace Celery::Tree
              */
             RedBlack(const RedBlack &other)
             {
-                // Copy constructor: perform deep copy of other tree.
-                root = nullptr;
-                for (auto &el : other)
-                {
-                    // Insert each element from other tree.
-                    EmplaceBack(el);
-                }
+                ConstructFrom(other);
             }
 
             /**
@@ -676,12 +714,35 @@ namespace Celery::Tree
              */
             RedBlack(RedBlack &&other) noexcept
             {
-                // Move constructor: transfer ownership of resources.
-                root = other.root;
-                this->len = other.len;
+                ConstructFrom(other);
+            }
 
-                other.root = nullptr;
-                other.len = 0;
+            /**
+             * @brief Copy assignment operator.
+             *
+             * Clears current tree and performs deep copy from `other`.
+             *
+             * @param other Tree to copy from.
+             * @return Reference to this tree.
+             */
+            RedBlack &operator=(const RedBlack &other)
+            noexcept {
+                ConstructFrom(other);
+                return *this;
+            }
+
+            /**
+             * @brief Move assignment operator.
+             *
+             * Clears current tree and transfers ownership from `other`.
+             *
+             * @param other Tree to move from.
+             * @return Reference to this tree.
+             */
+            RedBlack &operator=(RedBlack &&other) noexcept
+            {
+                ConstructFrom(other);
+                return *this;
             }
 
             /**

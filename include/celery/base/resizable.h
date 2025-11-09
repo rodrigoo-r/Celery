@@ -56,6 +56,16 @@ namespace Celery::Base
         virtual ~Resizable() = default;
 
         /**
+         * @brief Get the current capacity of the object.
+         *
+         * @return Trait::VeryLarge The current capacity.
+         */
+        [[nodiscard]] Trait::VeryLarge Capacity() const
+        {
+            return capacity;
+        }
+
+        /**
          * @brief Resize the object to a new capacity.
          *
          * Implementations must define how the object adjusts internal storage or

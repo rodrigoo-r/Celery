@@ -48,7 +48,7 @@ namespace Celery::Collection
             class U = Element,
             typename = Trait::EnsureSame<U, Element>
         >
-        static bool Eq(U&& a, U&& b)
+        static bool Eq(const U& a, const U& b)
         {
             // Detect if operator== exists for Key
             if constexpr (Base::Comparable<Key> || Base::DefaultEqualityComparable<Key>)
@@ -80,7 +80,7 @@ namespace Celery::Collection
             class U = Element,
             typename = Trait::EnsureSame<U, Element>
         >
-        static bool Neq(U&& a, U&& b)
+        static bool Neq(const U& a, const U& b)
         {
             // Detect if operator!= exists for Key
             if constexpr (Base::Comparable<Key> || Base::DefaultEqualityComparable<Key>)
@@ -131,7 +131,7 @@ namespace Celery::Collection
             class U = Element,
             typename = Trait::EnsureSame<U, Element>
         >
-        static bool Lt(U&& a, U&& b)
+        static bool Lt(const U& a, const U& b)
         {
             // Detect if operator< exists for Key
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
@@ -166,7 +166,7 @@ namespace Celery::Collection
             class U = Element,
             typename = Trait::EnsureSame<U, Element>
         >
-        static bool Gt(U&& a, U&& b)
+        static bool Gt(const U& a, const U& b)
         {
             // Detect if operator> exists for Key
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
@@ -201,7 +201,7 @@ namespace Celery::Collection
             class U = Element,
             typename = Trait::EnsureSame<U, Element>
         >
-        static bool Gte(U&& a, U&& b)
+        static bool Gte(const U& a, const U& b)
         {
             // Detect if operator>= exists for Key
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)
@@ -236,7 +236,7 @@ namespace Celery::Collection
             class U = Element,
             typename = Trait::EnsureSame<U, Element>
         >
-        static bool Lte(U&& a, U&& b)
+        static bool Lte(const U& a, const U& b)
         {
             // Detect if operator<= exists for Key
             if constexpr (Base::ArithmeticComparable<Key> || Base::DefaultArithmeticComparable<Key>)

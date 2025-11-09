@@ -91,7 +91,7 @@ namespace Celery::Io
              */
             OStream(const OStream &other)
             {
-                this->WriteStream(other.Ptr(), other.Len());
+                this->Batch(other.Ptr(), other.Len());
             }
 
             /**
@@ -103,8 +103,8 @@ namespace Celery::Io
              */
             OStream(OStream &&other) noexcept
             {
-                this->WriteStream(other.Ptr(), other.Len());
-                other.Clear();
+                this->Batch(other.Ptr(), other.Len());
+                other.len = 0;
             }
 
             /**

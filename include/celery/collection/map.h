@@ -424,7 +424,7 @@ namespace Celery::Collection
             Value &At(U &&key)
             {
                 // Try to locate the key in the tree
-                auto node = LocateNoCopy(key);
+                auto node = LocateNoCopy(std::forward<U>(key));
 
                 // If not found, create a new entry with default Value
                 if (node == nullptr)

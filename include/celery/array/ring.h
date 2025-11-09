@@ -139,9 +139,14 @@ namespace Celery::Buffer
              *
              * @param other Source ring buffer to copy from.
              */
+            template<bool IsConstruct = false>
             void ConstructFrom(const Ring &other)
             {
-                if (this == &other) return; // Self-assignment check
+                // Only check self-assignment for assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                }
 
                 if (this->len != 0)
                 {
@@ -168,9 +173,14 @@ namespace Celery::Buffer
              *
              * @param other Source ring buffer to move from.
              */
+            template<bool IsConstruct = false>
             void ConstructFrom(Ring &&other)
             {
-                if (this == &other) return; // Self-assignment check
+                // Only check self-assignment for assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                }
 
                 if (this->len != 0)
                 {
@@ -232,7 +242,7 @@ namespace Celery::Buffer
              */
             Ring(const Ring &other)
             {
-                ConstructFrom(other);
+                ConstructFrom<true>(other);
             }
 
             /**
@@ -247,7 +257,7 @@ namespace Celery::Buffer
              */
             Ring(Ring &&other) noexcept
             {
-                ConstructFrom(other);
+                ConstructFrom<true>(other);
             }
 
             /**

@@ -127,9 +127,14 @@ namespace Celery::List
              * Deallocates all nodes using the Allocator and resets head, tail,
              * and size to represent an empty list.
              */
+            template <bool IsConstruct = false>
             void ConstructFrom(std::initializer_list<T> init_list)
             {
-                Clear();
+                // Only clear if not constructing
+                if constexpr (IsConstruct)
+                {
+                    Clear();
+                }
 
                 // Insert each element from the initializer list
                 for (const auto &elem : init_list)
@@ -146,10 +151,15 @@ namespace Celery::List
              *
              * @param other The LinkedList to copy from.
              */
+            template <bool IsConstruct = false>
             void ConstructFrom(const LinkedList &other)
             {
-                if (this == &other) return; // Self-assignment check
-                Clear();
+                // Only check self-assignment for assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                    Clear();
+                }
 
                 // Copy elements from other
                 Internal::LinkedListNode<T> *current = other.head;
@@ -168,10 +178,15 @@ namespace Celery::List
              *
              * @param other The LinkedList to move from.
              */
+            template <bool IsConstruct = false>
             void ConstructFrom(LinkedList &&other)
             {
-                if (this == &other) return; // Self-assignment check
-                Clear();
+                // Only check self-assignment for assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                    Clear();
+                }
 
                 // Transfer ownership of nodes
                 head = other.head;
@@ -199,7 +214,7 @@ namespace Celery::List
              */
             LinkedList(std::initializer_list<T> init_list)
             {
-                ConstructFrom(init_list);
+                ConstructFrom<true>(init_list);
             }
 
             /**
@@ -212,7 +227,7 @@ namespace Celery::List
              */
             LinkedList(const LinkedList &other)
             {
-                ConstructFrom(other);
+                ConstructFrom<true>(other);
             }
 
             /**
@@ -225,7 +240,7 @@ namespace Celery::List
              */
             LinkedList(LinkedList &&other)
             noexcept {
-                ConstructFrom(other);
+                ConstructFrom<true>(other);
             }
 
             /**

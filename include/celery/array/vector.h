@@ -119,6 +119,7 @@ namespace Celery::Array
              */
             void ConstructFrom(const Vector &other)
             {
+                if (*this == other) return; // Self-assignment check
                 Clear(); // Clear current contents
                 this->len = other.len;
                 this->capacity = other.capacity;
@@ -137,6 +138,7 @@ namespace Celery::Array
              */
             void ConstructFrom(Vector &&other)
             {
+                if (*this == other) return; // Self-assignment check
                 Clear(); // Clear current contents
                 this->len = other.len;
                 this->capacity = other.capacity;

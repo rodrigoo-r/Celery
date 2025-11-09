@@ -56,6 +56,28 @@ namespace Celery::Pmr
         }
 
         /**
+         * @brief Deleted copy constructor to prevent copying.
+         */
+        BumpPage(const BumpPage &other) = delete;
+
+        /**
+         * @brief Move constructor transfers ownership from another BumpPage.
+         * @param other The other BumpPage to move from.
+         */
+        BumpPage(BumpPage &&other) noexcept
+        {
+            // Transfer ownership of resources
+            size = other.size;
+            used = other.used;
+            data = other.data;
+
+            // Clear other to prevent double free
+            other.size = 0;
+            other.used = 0;
+            other.data = nullptr;
+        }
+
+        /**
          * @brief Checks if the page is full.
          * @return True if no more space is available.
          */
@@ -90,6 +112,7 @@ namespace Celery::Pmr
          */
         ~BumpPage()
         {
+            if (!data) return;
             if constexpr (!std::is_trivially_destructible_v<T>)
             {
                 const Trait::VeryLarge count = used / sizeof(T);
@@ -135,7 +158,56 @@ namespace Celery::Pmr
         List::Pmr::LinkedList<T *, FreeListAllocator> free_list; /**< List of reusable objects. */
         List::Pmr::LinkedList<BumpPage<T, PageSize, BufferAllocator>, PageAllocator> pages; /**< Managed memory pages. */
 
+        /**
+         * @brief Move-constructs from another BumpAllocator.
+         *
+         * Transfers ownership of pages and free list from `other`.
+         *
+         * @param other The other BumpAllocator to move from.
+         */
+        void ConstructFrom(BumpAllocator &&other)
+        {
+            if (this == &other) return; // Self-assignment check
+            // Move free list and pages from other
+            free_list = std::move(other.free_list);
+            pages = std::move(other.pages);
+
+            // Clear other to prevent double free
+            other.free_list = {};
+            other.pages = {};
+        }
+
     public:
+        BumpAllocator() = default;
+        BumpAllocator(const BumpAllocator &) = delete;
+        BumpAllocator &operator=(const BumpAllocator &) = delete;
+
+        /**
+         * @brief Move constructor.
+         *
+         * Transfers ownership of pages and free list from `other`.
+         *
+         * @param other The other BumpAllocator to move from.
+         */
+        BumpAllocator(BumpAllocator &&other) noexcept
+        {
+            ConstructFrom(std::forward<decltype(other)>(other));
+        }
+
+        /**
+         * @brief Move assignment operator.
+         *
+         * Transfers ownership of pages and free list from `other`.
+         *
+         * @param other The other BumpAllocator to move from.
+         * @return Reference to this BumpAllocator.
+         */
+        BumpAllocator &operator=(BumpAllocator &&other)
+        noexcept {
+            ConstructFrom(std::forward<decltype(other)>(other));
+            return *this;
+        }
+
         /**
          * @brief Allocates and constructs an object of type T.
          *

@@ -69,4 +69,5 @@ namespace Celery::Trait
     // --- Default Traits --- //
     constexpr Decimal GrowthFactor = 1.8;
     constexpr Uint InitialCapacity = 25;
+    constexpr Decimal MaxLoadFactor = 0.75;
 }

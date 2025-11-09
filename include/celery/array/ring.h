@@ -110,18 +110,20 @@ namespace Celery::Buffer
              *
              * @param init_list Initial values to insert.
              */
+            template <bool IsConstruct = false>
             void ConstructFrom(std::initializer_list<T> init_list)
             {
-                if (this->len != 0)
+                if constexpr (UseHeap)
                 {
-                    Clear(); // Clear current contents
-                }
-                else
-                {
-                    if constexpr (UseHeap)
+                    if (!data)
                     {
                         data = Allocator::Allocate(Capacity);
                     }
+                }
+
+                if constexpr (!IsConstruct)
+                {
+                    Clear(); // Clear current contents
                 }
 
                 // Insert each element from the initializer list

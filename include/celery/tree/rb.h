@@ -635,7 +635,10 @@ namespace Celery::Tree
 
                 // Ensure T is comparable at compile-time.
                 static_assert(
-                    Base::Comparable<T> || (
+                    (
+                        Base::ArithmeticComparableBase<ArithCompare, T> &&
+                        Base::EqualityComparableBase<EqCompare, T>
+                    ) || (
                         Base::DefaultEqualityComparable<T> &&
                         Base::DefaultArithmeticComparable<T>
                     ),

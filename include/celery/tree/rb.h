@@ -631,11 +631,15 @@ namespace Celery::Tree
              *
              * @param other Tree to copy from.
              */
+            template <bool IsConstruct = false>
             void ConstructFrom(const RedBlack &other)
             {
-                if (this == &other) return; // Self-assignment check
-
-                Clear(); // Clear current tree.
+                // Avoid self-assignment during assignment operations
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                    Clear(); // Clear current tree.
+                }
 
                 // Copy constructor: perform deep copy of other tree.
                 root = nullptr;
@@ -654,9 +658,14 @@ namespace Celery::Tree
              *
              * @param other Tree to move from.
              */
+            template <bool IsConstruct = false>
             void ConstructFrom(RedBlack &&other)
             {
-                Clear(); // Clear current tree.
+                if constexpr (!IsConstruct)
+                {
+                    if (this == &other) return; // Self-assignment check
+                    Clear(); // Clear current tree.
+                }
 
                 // Move constructor: transfer ownership of resources.
                 root = other.root;
@@ -701,7 +710,7 @@ namespace Celery::Tree
              */
             RedBlack(const RedBlack &other)
             {
-                ConstructFrom(other);
+                ConstructFrom<true>(other);
             }
 
             /**
@@ -714,7 +723,7 @@ namespace Celery::Tree
              */
             RedBlack(RedBlack &&other) noexcept
             {
-                ConstructFrom(other);
+                ConstructFrom<true>(other);
             }
 
             /**

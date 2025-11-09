@@ -254,50 +254,94 @@ namespace Celery::Base
     };
 
     /**
-     * @brief Concept that checks if a type T supports equality comparison.
+     * @brief Concept that checks if a type T supports equality comparison via a base class.
      *
-     * A type T is considered EqualityComparable if it provides
-     * static methods Eq and Neq in the EqualityCompare struct
+     * A type T is considered EqualityComparableBase if it provides
+     * static methods Eq and Neq in the specified Base struct
      * that return bool when called with two T objects.
+     *
+     * @tparam Base The base struct providing comparison methods.
+     * @tparam T The type to check for equality comparability.
      */
-    template <typename T>
-    concept EqualityComparable = requires(T &&a, T &&b)
+    template <
+        typename Base,
+        typename T,
+        typename = Trait::EnsureInherits<
+            EqualityCompare<T>,
+            Base
+        >
+    >
+    concept EqualityComparableBase = requires(T &&a, T &&b)
     {
         {
-            EqualityCompare<T>::Eq(std::forward<T>(a), std::forward<T>(b))
+            Base::Eq(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
 
         {
-            EqualityCompare<T>::Neq(std::forward<T>(a), std::forward<T>(b))
+            Base::Neq(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+    };
+
+    /**
+     * @brief Concept that checks if a type T supports equality comparison.
+     *
+     * A type T is considered EqualityComparable if it satisfies
+     * the EqualityComparableBase concept with EqualityCompare<T> as the base.
+     */
+    template <typename T>
+    concept EqualityComparable = EqualityComparableBase<
+        EqualityCompare<T>,
+        T
+    >;
+
+    /**
+     * @brief Concept that checks if a type T supports arithmetic comparison via a base class.
+     *
+     * A type T is considered ArithmeticComparableBase if it provides
+     * static methods Lt, Gt, Lte, and Gte in the specified Base struct
+     * that return bool when called with two T objects.
+     *
+     * @tparam Base The base struct providing comparison methods.
+     * @tparam T The type to check for arithmetic comparability.
+     */
+    template <
+        typename Base,
+        typename T,
+        typename = Trait::EnsureInherits<
+            ArithmeticCompare<T>,
+            Base
+        >
+    >
+    concept ArithmeticComparableBase = requires(T &&a, T &&b)
+    {
+        {
+            Base::Lt(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            Base::Gt(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            Base::Lte(std::forward<T>(a), std::forward<T>(b))
+        } -> std::convertible_to<bool>;
+
+        {
+            Base::Gte(std::forward<T>(a), std::forward<T>(b))
         } -> std::convertible_to<bool>;
     };
 
     /**
      * @brief Concept that checks if a type T supports arithmetic comparison.
      *
-     * A type T is considered ArithmeticComparable if it provides
-     * static methods Lt, Gt, Lte, and Gte in the ArithmeticCompare struct
-     * that return bool when called with two T objects.
+     * A type T is considered ArithmeticComparable if it satisfies
+     * the ArithmeticComparableBase concept with ArithmeticCompare<T> as the base.
      */
     template <typename T>
-    concept ArithmeticComparable = requires(T &&a, T &&b)
-    {
-        {
-            ArithmeticCompare<T>::Lt(std::forward<T>(a), std::forward<T>(b))
-        } -> std::convertible_to<bool>;
-
-        {
-            ArithmeticCompare<T>::Gt(std::forward<T>(a), std::forward<T>(b))
-        } -> std::convertible_to<bool>;
-
-        {
-            ArithmeticCompare<T>::Lte(std::forward<T>(a), std::forward<T>(b))
-        } -> std::convertible_to<bool>;
-
-        {
-            ArithmeticCompare<T>::Gte(std::forward<T>(a), std::forward<T>(b))
-        } -> std::convertible_to<bool>;
-    };
+    concept ArithmeticComparable = ArithmeticComparableBase<
+        ArithmeticCompare<T>,
+        T
+    >;
 
     /**
      * @brief Concept that checks if a type T supports both equality and arithmetic comparison.

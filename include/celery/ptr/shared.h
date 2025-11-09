@@ -172,6 +172,98 @@ namespace Celery::Ptr
             }
 
             /**
+             * @brief Copy assignment operator.
+             *
+             * Decrements the current reference count and increments the
+             * reference count of the assigned object.
+             *
+             * @param other The Shared pointer to assign from.
+             * @return Reference to this Shared pointer.
+             */
+            Shared &operator=(Shared &&other)
+            noexcept {
+                if (this != &other)
+                {
+                    // Decrement current reference count
+                    if (ref_count)
+                    {
+                        Trait::VeryLarge count;
+                        if constexpr (ThreadSafe)
+                        {
+                            count = ref_count->fetch_sub(1) - 1;
+                        } else
+                        {
+                            count = --(*ref_count);
+                        }
+
+                        // If count reaches zero, deallocate
+                        if (count == 0)
+                        {
+                            Allocator::Deallocate(this->data);
+                            RefCountAllocator::Deallocate(ref_count);
+                        }
+                    }
+
+                    // Move from other
+                    this->data = other.data;
+                    ref_count = other.ref_count;
+
+                    other.ptr = nullptr;
+                    other.ref_count = nullptr;
+                }
+                return *this;
+            }
+
+            /**
+             * @brief Copy assignment operator.
+             *
+             * Decrements the current reference count and increments the
+             * reference count of the assigned object.
+             *
+             * @param other The Shared pointer to assign from.
+             * @return Reference to this Shared pointer.
+             */
+            Shared &operator=(const Shared &other)
+            {
+                if (this != &other)
+                {
+                    // Decrement current reference count
+                    if (ref_count)
+                    {
+                        Trait::VeryLarge count;
+                        if constexpr (ThreadSafe)
+                        {
+                            count = ref_count->fetch_sub(1) - 1;
+                        } else
+                        {
+                            count = --(*ref_count);
+                        }
+
+                        // If count reaches zero, deallocate
+                        if (count == 0)
+                        {
+                            Allocator::Deallocate(this->data);
+                            RefCountAllocator::Deallocate(ref_count);
+                        }
+                    }
+
+                    // Copy from other
+                    this->data = other.data;
+                    ref_count = other.ref_count;
+
+                    // Increment new reference count
+                    if constexpr (ThreadSafe)
+                    {
+                        ref_count->fetch_add(1);
+                    } else
+                    {
+                        ++(*ref_count);
+                    }
+                }
+                return *this;
+            }
+
+            /**
              * @brief Destructor decrements the reference count and deallocates if zero.
              */
             ~Shared()

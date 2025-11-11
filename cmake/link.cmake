@@ -2,10 +2,6 @@
 # Links all necessary libraries and sets up the build environment.
 # ============================================================================ #
 
-# xxHash static library
-add_library(xxhash STATIC ${xxhash_SOURCE_DIR}/xxhash.c)
-target_include_directories(xxhash PUBLIC ${xxhash_SOURCE_DIR})
-
 # Link libraries
 target_include_directories(${PROJECT_NAME}
         PUBLIC

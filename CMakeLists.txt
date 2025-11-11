@@ -9,9 +9,7 @@ project(Celery)
 set(CMAKE_CXX_STANDARD 20)
 
 # Include modular CMake files
-include(cmake/source.cmake)
 include(cmake/link.cmake)
-include(cmake/release.cmake)
 
 # Alias
 add_library(Celery::Celery ALIAS Celery)

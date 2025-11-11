@@ -9,7 +9,6 @@ project(Celery)
 set(CMAKE_CXX_STANDARD 20)
 
 # Include modular CMake files
-include(cmake/deps.cmake)
 include(cmake/source.cmake)
 include(cmake/link.cmake)
 include(cmake/release.cmake)

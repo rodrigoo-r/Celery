@@ -43,7 +43,7 @@ namespace Celery::Io
             typename Allocator = Celery::Pmr::ArrayAllocator<char>,
             typename = std::enable_if_t<
                 std::is_base_of_v<
-                    Descriptor,
+                    WriteDescriptor,
                     Desc
                 >
             >

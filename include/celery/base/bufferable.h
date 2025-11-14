@@ -66,7 +66,7 @@ namespace Celery::Base
          * @return Pointer to the underlying buffer of type `T`.
          */
         T *Ptr()
-        {
+        const {
             return data;
         }
     };

@@ -197,10 +197,9 @@ namespace Celery::Io
      * @brief Alias for Celery::Io::Pmr::IStream with default allocator settings.
      *
      * @tparam Desc      Input descriptor (default: Stdin)
-     * @tparam Capacity  Buffer capacity (default: 2048)
      */
-    template<typename Desc = Stdin, unsigned int Capacity = 2048>
-    using IStream = Pmr::IStream<Desc, Capacity>;
+    template<typename Desc = Stdin>
+    using IStream = Pmr::IStream<Desc>;
 
     /**
      * @brief Thread-local default output streams.

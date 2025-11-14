@@ -337,6 +337,21 @@ namespace Celery::Str
             }
 
             /**
+             * @brief Append a character buffer of given length to this string (in-place).
+             *
+             * Ensures capacity and appends \c length bytes from \c str.
+             *
+             * @param str Pointer to the character buffer to append.
+             * @param length Number of bytes to append from \c str.
+             */
+            void Append(const char *str, size_t length)
+            {
+                this->EnsureGrowth(this->len + length);
+                memcpy(this->data + this->len, str, length);
+                this->len += length;
+            }
+
+            /**
              * @brief Concatenate this String with a single character and return a new String.
              *
              * Creates a copy of this string and appends \c other.

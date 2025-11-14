@@ -344,7 +344,7 @@ namespace Celery::Str
              * @param str Pointer to the character buffer to append.
              * @param length Number of bytes to append from \c str.
              */
-            void Append(const char *str, size_t length)
+            void Write(const char *str, size_t length)
             {
                 this->EnsureGrowth(this->len + length);
                 memcpy(this->data + this->len, str, length);

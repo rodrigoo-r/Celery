@@ -60,10 +60,13 @@ namespace Celery::Io
 
     /** @brief Input descriptor for reading data from standard input.
      *
-     * This class represents an input descriptor that can read data
-     * from standard input (STDIN_FILENO). It inherits from ReadDescriptor
-     * and provides a static Read method that performs the actual reading operation.
+     * This class template represents an input descriptor that can read data
+     * from standard input (STDIN_FILENO). It inherits from ReadDescriptor and
+     * provides a static Read method that performs the actual reading operation.
+     *
+     * @tparam FileDescriptor The file descriptor to read from (default is STDIN_FILENO).
      */
+    template <unsigned short FileDescriptor>
     class InputDescriptor :
         public ReadDescriptor
     {
@@ -72,7 +75,7 @@ namespace Celery::Io
         {
 #            ifndef _WIN32
                 // POSIX-compliant read
-                return read(STDIN_FILENO, buffer, size);
+                return read(FileDescriptor, buffer, size);
 #            else
                 // Fallback because Windows likes being special:
                 std::cin.read(buffer, size);

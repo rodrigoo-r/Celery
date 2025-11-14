@@ -17,13 +17,14 @@
 
 #pragma once
 #include <cstddef>
+#include "celery/trait/default.h"
 
 namespace Celery::Io
 {
     class WriteDescriptor
     {
     public:
-        static inline void Write(char *data, size_t size)
+        static inline void Write(char *data, Trait::VeryLarge size)
         {
             // Placeholder implementation
         }
@@ -32,7 +33,7 @@ namespace Celery::Io
     class ReadDescriptor
     {
     public:
-        static inline size_t Read(char *buffer, size_t size)
+        static inline Trait::SignedVeryLarge Read(char *buffer, Trait::VeryLarge size)
         {
             // Placeholder implementation
             return 0;

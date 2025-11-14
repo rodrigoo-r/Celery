@@ -17,15 +17,26 @@
 
 #pragma once
 #include <cstddef>
+#include "celery/string/string.h"
 
 namespace Celery::Io
 {
     class WriteDescriptor
     {
     public:
-        static inline void Write(const char *data, size_t size)
+        static inline void Write(char *data, size_t size)
         {
             // Placeholder implementation
+        }
+    };
+
+    class ReadDescriptor
+    {
+    public:
+        static inline Celery::Str::String Read(size_t size)
+        {
+            // Placeholder implementation
+            return Celery::Str::String();
         }
     };
 }

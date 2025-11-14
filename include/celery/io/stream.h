@@ -19,6 +19,7 @@
 #include "celery/array/ring.h"
 #include "celery/io/std.h"
 #include "celery/trait/default.h"
+#include "celery/string/string.h"
 #include "celery/except/bad_read.h"
 
 namespace Celery::Io
@@ -134,7 +135,7 @@ namespace Celery::Io
 
         template<
             typename Desc = Stdin,
-            Trait::Decimal GrowthFactor = Trait::DefaultGrowthFactor,
+            Trait::Decimal GrowthFactor = Trait::GrowthFactor,
             Trait::Uint InitialCapacity = Trait::InitialCapacity,
             Trait::Uint InlineBufferSize = 256,
             typename Allocator = Celery::Pmr::ArrayAllocator<char>,

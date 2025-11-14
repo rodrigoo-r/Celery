@@ -40,17 +40,8 @@ namespace Celery::Io
      * that performs the actual writing operation.
      *
      * @tparam FileDescriptor The file descriptor to write to (STDOUT_FILENO or STDERR_FILENO).
-     *
-     * @note SFINAE is used to ensure that only valid file descriptors are accepted.
      */
-    template <
-        unsigned short FileDescriptor,
-        // SFINAE to ensure valid file descriptor
-        typename = std::enable_if_t<
-            (FileDescriptor == STDOUT_FILENO ||
-                FileDescriptor == STDERR_FILENO)
-        >
-    >
+    template <unsigned short FileDescriptor>
     class OutputDescriptor :
         public WriteDescriptor
     {

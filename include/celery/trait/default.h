@@ -32,6 +32,9 @@ namespace Celery::Trait
     typedef float Float;
     typedef double Decimal;
 
+    // --- Special Type Aliases --- //
+    using SignedVeryLarge = std::make_signed_t<VeryLarge>;
+
     // --- Static Assertions --- //
     static_assert(
         sizeof(VeryLarge) >= 8,

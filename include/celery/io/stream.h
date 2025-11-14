@@ -167,6 +167,16 @@ namespace Celery::Io
                     bytes_read = Desc::Read(buffer, sizeof(buffer));
                     if (bytes_read > 0)
                     {
+                        // Scan for newline character
+                        for (Trait::VeryLarge i = 0; i < static_cast<Trait::VeryLarge>(bytes_read); ++i)
+                        {
+                            if (buffer[i] == '\n')
+                            {
+                                result.Append(buffer, i); // Append up to newline
+                                return result; // Stop reading at newline
+                            }
+                        }
+
                         result.Append(buffer, bytes_read); // Append read data
                     }
                     else if (bytes_read == 0)

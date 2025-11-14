@@ -47,10 +47,6 @@ namespace Celery::List
         template<
             typename T,
             typename Allocator = Celery::Pmr::Allocator<Internal::LinkedListNode<T>>,
-            // SFINAE to ensure T is copy-constructible
-            typename = std::enable_if_t<
-                std::is_copy_constructible_v<T>
-            >,
             typename = Trait::EnsureAllocator<Allocator>
         >
         class LinkedList :

@@ -172,12 +172,12 @@ namespace Celery::Io
                         {
                             if (buffer[i] == '\n')
                             {
-                                result.Append(buffer, i); // Append up to newline
+                                result.Write(buffer, i); // Append up to newline
                                 return result; // Stop reading at newline
                             }
                         }
 
-                        result.Append(buffer, bytes_read); // Append read data
+                        result.Write(buffer, bytes_read); // Append read data
                     }
                     else if (bytes_read == 0)
                     {

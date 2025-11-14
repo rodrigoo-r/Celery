@@ -20,7 +20,7 @@
 
 namespace Celery::Io
 {
-    class Descriptor
+    class WriteDescriptor
     {
     public:
         static inline void Write(const char *data, size_t size)

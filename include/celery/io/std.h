@@ -40,7 +40,7 @@ namespace Celery::Io
                 FileDescriptor == STDERR_FILENO)
         >
     >
-    class OutputDescriptor : public Descriptor
+    class OutputDescriptor : public WriteDescriptor
     {
     public:
         static inline void Write(const char *data, const size_t size)

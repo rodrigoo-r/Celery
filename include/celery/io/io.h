@@ -123,7 +123,7 @@ namespace Celery::Io
      *
      * @returns A `Celery::Str::String` containing the line read from stdin.
      */
-    Celery::Str::String ReadLine()
+    inline static Celery::Str::String ReadLine()
     {
         return Stdin::Read();
     }

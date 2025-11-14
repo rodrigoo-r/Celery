@@ -246,7 +246,7 @@ namespace Celery::Str
              * @param other The String to append.
              * @returns reference to this String after append.
              */
-            String &operator+=(const String &other)
+            void Write(const String &other)
             {
                 // Ensure enough capacity
                 this->EnsureGrowth(this->len + other.len);
@@ -254,7 +254,46 @@ namespace Celery::Str
                 // Copy each character from other
                 memcpy(this->data + this->len, other.data, other.len);
                 this->len += other.len;
-                return *this;
+            }
+
+            /**
+             * @brief Append a null-terminated C-string to this string (in-place).
+             *
+             * Computes the length of the C-string, ensures capacity, and copies
+             * the characters into the internal buffer.
+             *
+             * @param other Null-terminated C-string to append.
+             * @returns reference to this String after append.
+             */
+            void Write(const char *other)
+            {
+                // Get the length of the C-string
+                size_t other_len = strlen(other);
+
+                // Ensure enough capacity
+                this->EnsureGrowth(this->len + other_len);
+
+                // Copy each character from other
+                memcpy(this->data + this->len, other, other_len);
+                this->len += other_len;
+            }
+
+            /**
+             * @brief Append a single character to this string (in-place).
+             *
+             * Ensures capacity for one more character and appends it.
+             *
+             * @param other Character to append.
+             * @returns reference to this String after append.
+             */
+            void Write(char other)
+            {
+                // Ensure enough capacity
+                this->EnsureGrowth(this->len + 1);
+
+                // Append the character
+                this->data[this->len] = other;
+                ++this->len;
             }
 
             /**
@@ -268,15 +307,21 @@ namespace Celery::Str
              */
             String &operator+=(const char *other)
             {
-                // Get the length of the C-string
-                size_t other_len = strlen(other);
+                this->Write(other);
+                return *this;
+            }
 
-                // Ensure enough capacity
-                this->EnsureGrowth(this->len + other_len);
-
-                // Copy each character from other
-                memcpy(this->data + this->len, other, other_len);
-                this->len += other_len;
+            /**
+             * @brief Append another String to this string (in-place).
+             *
+             * Ensures enough capacity and appends the bytes from \c other.
+             *
+             * @param other The String to append.
+             * @returns reference to this String after append.
+             */
+            String &operator+=(const String &other)
+            {
+                this->Write(other);
                 return *this;
             }
 
@@ -290,12 +335,7 @@ namespace Celery::Str
              */
             String &operator+=(char other)
             {
-                // Ensure enough capacity
-                this->EnsureGrowth(this->len + 1);
-
-                // Append the character
-                this->data[this->len] = other;
-                ++this->len;
+                this->Write(other);
                 return *this;
             }
 

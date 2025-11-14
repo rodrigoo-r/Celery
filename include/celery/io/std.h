@@ -46,11 +46,10 @@ namespace Celery::Io
         static inline void Write(const char *data, const size_t size)
         {
 #           ifndef _WIN32
-                // Normal person:
+                // POSIX-compliant write
                 write(FileDescriptor, data, size);
 #           else
-                // Mentally disabled person who uses
-                // malware as their operating system:
+                // Fallback because Windows likes being special:
                 std::cout.write(data, size);
 #           endif
         }

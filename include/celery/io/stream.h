@@ -18,6 +18,8 @@
 #pragma once
 #include "celery/array/ring.h"
 #include "celery/io/std.h"
+#include "celery/trait/default.h"
+#include "celery/except/bad_read.h"
 
 namespace Celery::Io
 {
@@ -129,6 +131,56 @@ namespace Celery::Io
                 this->WriteStream(this->Ptr(), this->Len());
             }
         };
+
+        template<
+            typename Desc = Stdin,
+            Trait::Decimal GrowthFactor = Trait::DefaultGrowthFactor,
+            Trait::Uint InitialCapacity = Trait::InitialCapacity,
+            Trait::Uint InlineBufferSize = 256,
+            typename Allocator = Celery::Pmr::ArrayAllocator<char>,
+            typename = std::enable_if_t<
+                std::is_base_of_v<
+                    ReadDescriptor,
+                    Desc
+                >
+            >
+        >
+        class IStream
+        {
+            using Result = Celery::Str::Pmr::String<
+                GrowthFactor,
+                InitialCapacity,
+                Allocator
+            >;
+
+        public:
+            Result Read()
+            {
+                Result result;
+                char buffer[InlineBufferSize];
+                Trait::SignedVeryLarge bytesRead = 0;
+
+                // Read in chunks until no more data is available
+                while(true)
+                {
+                    bytes_read = Desc::Read(buffer, sizeof(buffer));
+                    if (bytes_read > 0)
+                    {
+                        result.Append(buffer, bytes_read); // Append read data
+                    }
+                    else if (bytes_read == 0)
+                    {
+                        break; // End of input
+                    }
+                    else
+                    {
+                        throw Except::BadRead(); // Read error
+                    }
+                }
+
+                return result;
+            }
+        };
     }
 
     /**
@@ -141,10 +193,20 @@ namespace Celery::Io
     using OStream = Pmr::OStream<Desc, Capacity>;
 
     /**
+     * @brief Alias for Celery::Io::Pmr::IStream with default allocator settings.
+     *
+     * @tparam Desc      Input descriptor (default: Stdin)
+     * @tparam Capacity  Buffer capacity (default: 2048)
+     */
+    template<typename Desc = Stdin, unsigned int Capacity = 2048>
+    using IStream = Pmr::IStream<Desc, Capacity>;
+
+    /**
      * @brief Thread-local default output streams.
      *
      * @deprecated Use Celery::Io::Print instead.
      */
     inline thread_local OStream<> IStdout;
     inline thread_local OStream<Stderr> IStderr;
+    inline IStream<> IStdin;
 }

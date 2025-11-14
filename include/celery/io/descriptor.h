@@ -33,7 +33,7 @@ namespace Celery::Io
     class ReadDescriptor
     {
     public:
-        static inline Celery::Str::String Read(size_t size)
+        static inline Celery::Str::String Read()
         {
             // Placeholder implementation
             return Celery::Str::String();

@@ -125,6 +125,7 @@ namespace Celery::Io
      */
     inline static Celery::Str::String ReadLine()
     {
-        return Stdin::Read();
+        // Placeholder implementation
+        return Stdin::Read(nullptr, 0);
     }
 }

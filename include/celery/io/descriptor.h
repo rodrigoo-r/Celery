@@ -17,7 +17,6 @@
 
 #pragma once
 #include <cstddef>
-#include "celery/string/string.h"
 
 namespace Celery::Io
 {
@@ -33,10 +32,10 @@ namespace Celery::Io
     class ReadDescriptor
     {
     public:
-        static inline Celery::Str::String Read()
+        static inline size_t Read(char *buffer, size_t size)
         {
             // Placeholder implementation
-            return Celery::Str::String();
+            return 0;
         }
     };
 }

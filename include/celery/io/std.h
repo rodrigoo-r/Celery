@@ -77,28 +77,15 @@ namespace Celery::Io
         public ReadDescriptor
     {
     public:
-        static inline Celery::Str::String Read()
+        static inline size_t Read(char *buffer, const size_t size)
         {
 #            ifndef _WIN32
-                Celery::Str::String result;
-                // POSIX-compliant read from stdin
-                while (true)
-                {
-                    char buffer[1024];
-                    ssize_t bytes_read = read(STDIN_FILENO, buffer, sizeof(buffer));
-                    if (bytes_read <= 0)
-                        break;
-
-                    result.Append(buffer, bytes_read);
-                }
-
-                return result;
+                // POSIX-compliant read
+                return read(STDIN_FILENO, buffer, size);
 #            else
                 // Fallback because Windows likes being special:
-                std::string buffer;
-                std::getline(std::cin, buffer);
-                Celery::Str::String result(buffer.c_str(), buffer.size());
-                return result;
+                std::cin.read(buffer, size);
+                return static_cast<size_t>(std::cin.gcount());
 #            endif
         }
     };

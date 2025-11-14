@@ -89,7 +89,7 @@ namespace Celery::Io
                     if (bytes_read <= 0)
                         break;
 
-                    result.append(buffer, bytes_read);
+                    result.Append(buffer, bytes_read);
                 }
 
                 return result;

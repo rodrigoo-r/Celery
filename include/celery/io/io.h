@@ -114,4 +114,17 @@ namespace Celery::Io
         Print(std::forward<Args>(args)...);
         Print('\n');
     }
+
+    /**
+     * @brief Read a line of input from standard input.
+     *
+     * This function reads a line of text from standard input (stdin)
+     * and returns it as a `Celery::Str::String`.
+     *
+     * @returns A `Celery::Str::String` containing the line read from stdin.
+     */
+    Celery::Str::String ReadLine()
+    {
+        return Stdin::Read();
+    }
 }

@@ -125,6 +125,8 @@ namespace Celery::Io
      */
     inline static Celery::Str::String ReadLine()
     {
+        // Flush stdout to ensure prompt visibility
+        IStdout.Flush();
         return IStdin.Read();
     }
 }

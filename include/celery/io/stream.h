@@ -159,7 +159,7 @@ namespace Celery::Io
             {
                 Result result;
                 char buffer[InlineBufferSize];
-                Trait::SignedVeryLarge bytesRead = 0;
+                Trait::SignedVeryLarge bytes_read = 0;
 
                 // Read in chunks until no more data is available
                 while(true)

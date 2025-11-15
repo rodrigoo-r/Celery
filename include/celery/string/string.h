@@ -473,9 +473,25 @@ namespace Celery::Str
              */
             static inline String NoCopy(char *str)
             {
+                return NoCopy(str, strlen(str));
+            }
+
+            /**
+             * @brief Create a String that references a character buffer without copying.
+             *
+             * Constructs a String instance that points to the provided
+             * character buffer without allocating or copying data.
+             * The resulting String's length is set to the provided length.
+             *
+             * @param str Pointer to the character buffer to reference.
+             * @param length Number of bytes in the buffer.
+             * @returns String instance referencing the provided buffer.
+             */
+            static inline String NoCopy(char *str, Trait::Uint length)
+            {
                 // Create a String that references the provided C-string without copying
                 String result;
-                result.len = strlen(str);
+                result.len = length;
                 result.data = str;
                 result.capacity = result.len;
                 return result;

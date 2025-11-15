@@ -461,22 +461,6 @@ namespace Celery::Str
             }
 
             /**
-             * @brief Create a String that references a C-string without copying.
-             *
-             * Constructs a String instance that points to the provided
-             * null-terminated C-string without allocating or copying data.
-             * The resulting String's length is set to the length of the
-             * C-string (excluding the terminator).
-             *
-             * @param str Null-terminated C-string to reference.
-             * @returns String instance referencing the provided C-string.
-             */
-            static inline String NoCopy(char *str)
-            {
-                return NoCopy(str, strlen(str));
-            }
-
-            /**
              * @brief Create a String that references a character buffer without copying.
              *
              * Constructs a String instance that points to the provided
@@ -495,6 +479,22 @@ namespace Celery::Str
                 result.data = str;
                 result.capacity = result.len;
                 return result;
+            }
+
+            /**
+             * @brief Create a String that references a C-string without copying.
+             *
+             * Constructs a String instance that points to the provided
+             * null-terminated C-string without allocating or copying data.
+             * The resulting String's length is set to the length of the
+             * C-string (excluding the terminator).
+             *
+             * @param str Null-terminated C-string to reference.
+             * @returns String instance referencing the provided C-string.
+             */
+            static inline String NoCopy(char *str)
+            {
+                return NoCopy(str, strlen(str));
             }
         };
     }

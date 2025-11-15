@@ -45,7 +45,7 @@ namespace Celery::Serialize
         static inline void Raw(U &&obj, Io::Pmr::OStream<> &stream)
         {
             // Integral type
-            Algorithm::Itoa(std::forward<T>(obj), stream);
+            Algorithm::Itoa(std::forward<U>(obj), stream);
         }
     };
 }

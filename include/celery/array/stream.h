@@ -118,6 +118,26 @@ namespace Celery::Array
                 read_index = n + 1;
                 return this->data[n];
             }
+
+            /*
+             * @brief Check if there is a next element in the stream.
+             *
+             * @return true if there is a next element, false otherwise.
+             */
+            [[nodiscard]] bool HasNext() const noexcept
+            {
+                return read_index < this->len;
+            }
+
+            /*
+             * @brief Check if there is a previous element in the stream.
+             *
+             * @return true if there is a previous element, false otherwise.
+             */
+            [[nodiscard]] bool HasPrev() const noexcept
+            {
+                return read_index > 0;
+            }
         }
     }
 

@@ -133,9 +133,7 @@ namespace Celery::Base
          */
         template <
             class U = T,
-            typename = std::enable_if_t<
-                !std::is_same_v<T, Trait::VeryLarge>
-            >
+            typename = Trait::EnsureSame<T, U>
         >
         void Remove(const U &value)
         {
@@ -163,7 +161,10 @@ namespace Celery::Base
          * @param ptr Pointer to the element to remove.
          * @throws Except::OutOfRange When `ptr` is out of bounds.
          */
-        template <class U = T>
+        template <
+            class U = T,
+            typename = Trait::EnsureSame<T, U>
+        >
         void Erase(U *&&ptr)
         {
             auto &data = static_cast<Derived*>(this)->data;

@@ -138,7 +138,7 @@ namespace Celery::Array
             {
                 return read_index > 0;
             }
-        }
+        };
     }
 
     template <typename T>

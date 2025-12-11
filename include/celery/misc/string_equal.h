@@ -46,10 +46,22 @@ namespace Celery::Misc
                 >
             >
         >
-        bool operator()(T &&a, U &&b) const noexcept
+        static bool Cmp(T &&a, U &&b)
         {
             return a.Size() == b.Size() &&
                    memcmp(a.Ptr(), b.Ptr(), a.Size()) == 0;
         }
+
+		template <
+            typename T,
+            typename U
+		>
+		bool operator()(T &&a, U &&b) const noexcept
+		{
+			return Cmp(
+                std::forward<T>(a),
+                std::forward<U>(b)
+            );
+		}
     };
 }

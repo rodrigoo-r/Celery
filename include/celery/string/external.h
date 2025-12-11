@@ -115,6 +115,15 @@ namespace Celery::Str
         External(External &&other) noexcept = default;
 
         /**
+         * @brief Default copy assignment operator.
+         *
+         * Behavior & complexity:
+         * - O(1). No copying of the underlying data is performed.
+         */
+        External &operator=(const External &other) = default;
+        External &operator=(External &&other) noexcept = default;
+
+        /**
          * @brief Default constructor creates an empty External view.
          *
          * Behavior & complexity:

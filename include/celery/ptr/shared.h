@@ -167,7 +167,7 @@ namespace Celery::Ptr
                 ref_count(other.ref_count)
             {
                 this->data = other.data;
-                other.ptr = nullptr;
+                other.data = nullptr;
                 other.ref_count = nullptr;
             }
 
@@ -208,7 +208,7 @@ namespace Celery::Ptr
                     this->data = other.data;
                     ref_count = other.ref_count;
 
-                    other.ptr = nullptr;
+                    other.data = nullptr;
                     other.ref_count = nullptr;
                 }
                 return *this;

@@ -526,7 +526,7 @@ namespace Celery::Buffer
             typename T,
             unsigned int Capacity = 50,
             bool UseHeap = Capacity >= 256,
-            typename Allocator = Celery::Pmr::ArrayAllocator<T>,
+            typename Allocator = Celery::Pmr::ArrayAllocator<T>
         >
         class WrapAroundRing : public Ring<T, Capacity, UseHeap, Allocator>
         {

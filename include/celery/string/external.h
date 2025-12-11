@@ -106,6 +106,20 @@ namespace Celery::Str
         }
 
         /**
+         * @brief Default constructor creates an empty External view.
+         *
+         * Behavior & complexity:
+         * - O(1). No copying is performed.
+         * - The view represents an empty sequence (length 0).
+         */
+        External()
+        {
+            // Empty view
+            this->data = nullptr;
+            this->len = 0;
+        }
+
+        /**
          * @brief Equality operator to compare two External views.
          *
          * Compares the size and content of the two views for equality.

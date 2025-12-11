@@ -539,7 +539,7 @@ namespace Celery::Buffer
 
         public:
             using Ring<T, Capacity, UseHeap, Allocator>::Ring;
-        }
+        };
     } // namespace Pmr
 
     /**

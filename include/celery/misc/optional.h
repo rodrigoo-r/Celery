@@ -260,5 +260,14 @@ namespace Celery::Misc
         {
             return Optional();
         }
+
+		template <typename... Args>
+		static Optional Emplace(Args&&... args)
+		{
+    		Optional opt;
+    		new (opt.storage) T(std::forward<Args>(args)...);
+    		opt.engaged = true;
+    		return opt;
+		}
     };
 } // namespace Celery::Misc

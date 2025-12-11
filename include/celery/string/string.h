@@ -20,6 +20,7 @@
 #include "celery/array/vector.h"
 #include "celery/memory/system.h"
 #include "celery/trait/default.h"
+#include "celery/string/external.h"
 
 namespace Celery::Str
 {
@@ -479,6 +480,19 @@ namespace Celery::Str
                 result.data = str;
                 result.capacity = result.len;
                 return result;
+            }
+
+            /**
+             * @brief Create an External view of this String's data.
+             *
+             * Constructs and returns a Str::External instance that points
+             * to this String's internal buffer and length.
+             *
+             * @returns Str::External view of this String's data.
+             */
+            Str::External External()
+            {
+                return Str::External(this->data, this->len);
             }
 
             /**

@@ -105,6 +105,15 @@ namespace Celery::Str
             this->len = strlen(this->data);
         }
 
+		/**
+         * @brief Default copy constructor.
+         *
+         * Behavior & complexity:
+         * - O(1). No copying of the underlying data is performed.
+         */
+		External(const External &other) = default;
+        External(External &&other) noexcept = default;
+
         /**
          * @brief Default constructor creates an empty External view.
          *

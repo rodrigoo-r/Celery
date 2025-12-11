@@ -138,6 +138,16 @@ namespace Celery::Array
             {
                 return read_index > 0;
             }
+
+            /*
+             * @brief Get the current read position in the stream.
+             *
+             * @return The current read index.
+             */
+			size_t Pos() const noexcept
+            {
+                return read_index;
+            }
         };
     }
 

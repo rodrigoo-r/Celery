@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "Celery/trait/default.h"
+#include "celery/trait/default.h"
 #include <xxhash.h>
 
 namespace Celery::Misc

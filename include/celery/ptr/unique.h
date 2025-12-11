@@ -125,11 +125,12 @@ namespace Celery::Ptr
      */
     template<
         typename T,
-        typename Allocator = Celery::Pmr::MonotonicAllocator<T>
+        typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
+        typename ...Args
     >
-    Pmr::Unique<T, Allocator> MakeUnique()
+    Pmr::Unique<T, Allocator> MakeUnique(Args&&... args)
     {
-        T *obj = Allocator::Allocate();
+        T *obj = Allocator::Allocate(std::forward<Args>(args)...);
         // SFINAE checks are done by Unique, so we can safely ignore them here
         return { obj };
     }

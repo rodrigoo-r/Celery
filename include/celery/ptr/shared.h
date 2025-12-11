@@ -314,11 +314,12 @@ namespace Celery::Ptr
     template <
         typename T,
         typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
-        typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<Trait::VeryLarge>
+        typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<Trait::VeryLarge>,
+        typename ...Args
     >
-    Pmr::Shared<T, false, Allocator, RefCountAllocator> MakeShared()
+    Pmr::Shared<T, false, Allocator, RefCountAllocator> MakeShared(Args&&... args)
     {
-        T *obj = Allocator::Allocate();
+        T *obj = Allocator::Allocate(std::forward<Args>(args)...);
         // SFINAE checks are done by Shared, so we can safely ignore them here
         return { obj };
     }
@@ -338,11 +339,12 @@ namespace Celery::Ptr
     template <
         typename T,
         typename Allocator = Celery::Pmr::MonotonicAllocator<T>,
-        typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<std::atomic<Trait::VeryLarge>>
+        typename RefCountAllocator = Celery::Pmr::MonotonicAllocator<std::atomic<Trait::VeryLarge>>,
+        typename ...Args
     >
-    Pmr::Shared<T, true, Allocator, RefCountAllocator> MakeConcurrent()
+    Pmr::Shared<T, true, Allocator, RefCountAllocator> MakeConcurrent(Args&&... args)
     {
-        T *obj = Allocator::Allocate();
+        T *obj = Allocator::Allocate(std::forward<Args>(args)...);
         // SFINAE checks are done by Shared, so we can safely ignore them here
         return { obj };
     }

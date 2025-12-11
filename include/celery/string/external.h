@@ -104,5 +104,38 @@ namespace Celery::Str
             this->data = const_cast<char *>(data_ptr);
             this->len = strlen(this->data);
         }
+
+        /**
+         * @brief Equality operator to compare two External views.
+         *
+         * Compares the size and content of the two views for equality.
+         *
+         * @param other The other External view to compare against.
+         * @return true if both views have the same size and identical content.
+         * @return false otherwise.
+         *
+         * Behavior & complexity:
+         * - O(n) where n is the size of the views, due to `memcmp`.
+         */
+        bool operator==(const External &other) const noexcept
+        {
+            return this->Size() == other.Size() &&
+                   memcmp(this->Ptr(), other.Ptr(), this->Size()) == 0;
+        }
+
+        /**
+         * @brief Inequality operator to compare two External views.
+         *
+         * @param other The other External view to compare against.
+         * @return true if the views are not equal.
+         * @return false if the views are equal.
+         *
+         * Behavior & complexity:
+         * - O(n) where n is the size of the views, due to `operator==`.
+         */
+        bool operator!=(const External &other) const noexcept
+        {
+            return !(*this == other);
+        }
     };
 }

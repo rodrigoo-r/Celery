@@ -51,5 +51,5 @@ namespace Celery::Misc
             return a.Size() == b.Size() &&
                    memcmp(a.Ptr(), b.Ptr(), a.Size()) == 0;
         }
-    }
+    };
 }

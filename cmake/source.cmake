@@ -10,5 +10,5 @@ file(GLOB_RECURSE CELERY_SOURCES CONFIGURE_DEPENDS
 )
 
 # Add executable target
-add_library(Celery STATIC ${CELERY_SOURCES})
+add_library(Celery INTERFACE ${CELERY_SOURCES})
 add_library(Celery::Celery ALIAS Celery)

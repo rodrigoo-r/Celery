@@ -86,6 +86,22 @@ namespace Celery::Array
             }
 
             /*
+             * @brief Get the next element in the stream without changing the read index.
+             *
+             * @return Reference to the next element.
+             * @throws Except::OutOfRange when the read index is out of bounds.
+             */
+            T &Peek()
+            {
+                if (read_index >= this->len)
+                {
+                    throw Except::OutOfRange();
+                }
+
+                return this->data[read_index];
+            }
+
+            /*
              * @brief Get the current element in the stream without changing the read index.
              *
              * @return Reference to the current element.

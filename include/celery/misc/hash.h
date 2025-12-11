@@ -32,6 +32,7 @@ namespace Celery::Misc
     {
         /// @brief Marker type indicating that the hash function is avalanching.
         using is_avalanching = void;
+        using is_transparent = void;
 
         /**
          * @brief Computes the hash value for the given object.

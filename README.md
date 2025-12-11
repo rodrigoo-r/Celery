@@ -51,6 +51,10 @@ we do not actively test (and do not plan to do so) Celery on Windows,
 instead focusing on Linux and macOS. However, as long as you have a 
 C++20-compliant compiler, Celery should work on Windows as well.
 
+**NOTE::** Celery includes a `Celery::Misc::Hash` utility for hashing,
+which requires the `xxHash` library. Make sure to include it in your project
+or link against it when using Celery.
+
 ---
 
 ## Contributing

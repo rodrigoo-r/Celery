@@ -140,6 +140,16 @@ namespace Celery::Array
             }
 
             /*
+             * @brief Set the current read position in the stream.
+             *
+             * @param pos The position to set the read index to.
+             */
+            void SetPos(size_t pos) noexcept
+            {
+                read_index = pos;
+            }
+
+            /*
              * @brief Get the current read position in the stream.
              *
              * @return The current read index.

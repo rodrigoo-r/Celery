@@ -225,6 +225,19 @@ namespace Celery::Misc
             return *reinterpret_cast<T *>(storage);
         }
 
+		/**
+         * @brief Const accessor for the contained value.
+         *
+         * Throws Except::OutOfRange if no value is present.
+         *
+         * @return Const reference to the contained value.
+         * @throws Except::OutOfRange if no value is present.
+         */
+		const T& Value() const
+		{
+    		return *reinterpret_cast<const T*>(storage);
+		}
+
         /**
          * @brief Member access operator for the contained value.
          *

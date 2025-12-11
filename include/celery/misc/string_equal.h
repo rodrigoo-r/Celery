@@ -15,6 +15,8 @@
     accordingly.
 */
 
+#pragma once
+
 #include <celery/trait/default.h>
 #include <celery/trait/type.h>
 #include <celery/string/string.h>

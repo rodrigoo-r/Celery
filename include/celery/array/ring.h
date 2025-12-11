@@ -509,6 +509,37 @@ namespace Celery::Buffer
                 }
             }
         };
+
+        /**
+         * @brief Wrap-around ring buffer that forwards full batches to HandleBatch.
+         *
+         * Inherits from Ring and exposes the same interface. When the buffer
+         * becomes full, it automatically calls \p HandleBatch to process the
+         * current contents before wrapping around.
+         *
+         * @tparam T Element type stored in the buffer.
+         * @tparam Capacity Maximum number of elements the buffer can hold.
+         * @tparam UseHeap If true, use heap allocation for storage.
+         * @tparam Allocator Allocator type used when \p UseHeap is true.
+         */
+        template<
+            typename T,
+            unsigned int Capacity = 50,
+            bool UseHeap = Capacity >= 256,
+            typename Allocator = Celery::Pmr::ArrayAllocator<T>,
+        >
+        class WrapAroundRing : public Ring<T, Capacity, UseHeap, Allocator>
+        {
+        protected:
+            void HandleBatch(T *data, size_t count) override
+            {
+                // Default implementation does nothing.
+                // Users should override this method to define custom behavior.
+            }
+
+        public:
+            using Ring<T, Capacity, UseHeap, Allocator>::Ring;
+        }
     } // namespace Pmr
 
     /**

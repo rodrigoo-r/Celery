@@ -242,5 +242,23 @@ namespace Celery::Misc
 
             return reinterpret_cast<T *>(storage);
         }
+
+        /// Creates an Optional containing a value
+        static Optional Some(const T& value)
+        {
+            return Optional(value);
+        }
+
+        /// Creates an Optional containing a moved value
+        static Optional Some(T&& value)
+        {
+            return Optional(std::move(value));
+        }
+
+        /// Creates an empty Optional
+        static Optional None()
+        {
+            return Optional();
+        }
     };
 } // namespace Celery::Misc

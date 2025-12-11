@@ -3,10 +3,15 @@
 # ============================================================================ #
 
 cmake_minimum_required(VERSION 3.20)
-project(Celery C CXX)
+project(Celery)
 
 # Set C++20
 set(CMAKE_CXX_STANDARD 20)
 
+add_library(Celery INTERFACE)
+
+# Alias
+add_library(Celery::Celery ALIAS Celery)
+
 # Include modular CMake files
-include(cmake/source.cmake)
+include(cmake/link.cmake)

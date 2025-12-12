@@ -17,6 +17,9 @@
 
 #pragma once
 #include "celery/trait/default.h"
+#include "celery/string/string.h"
+#include "celery/string/external.h"
+#include "celery/trait/type.h"
 #include <xxhash.h>
 
 namespace Celery::Misc
@@ -46,6 +49,21 @@ namespace Celery::Misc
         template <typename T>
         Trait::VeryLarge operator()(T &&obj) const noexcept
         {
+			// Hash string and views
+			if constexpr (
+				Celery::Trait::EnsureSameBase<T, Celery::Str::String> ||
+                Celery::Trait::EnsureSameBase<T, Celery::Str::External>
+			)
+			{
+				// Hash the underlying data, not the object itself
+				return static_cast<Trait::VeryLarge>(
+                    XXH3_64bits(
+                        obj.Ptr(),
+                        static_cast<size_t>(obj.Size())
+                    )
+                );
+			}
+
             auto hash = XXH3_64bits(&obj, sizeof(T));
             return static_cast<Trait::VeryLarge>(hash);
         }

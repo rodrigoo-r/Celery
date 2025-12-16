@@ -155,10 +155,12 @@ namespace Celery::Ptr
                 // Increment reference count
                 if constexpr (ThreadSafe)
                 {
-                    ref_count->fetch_add(1);
+                    if (ref_count)
+                        ref_count->fetch_add(1);
                 } else
                 {
-                    (*ref_count)++;
+                    if (ref_count)
+                        (*ref_count)++;
                 }
             }
 

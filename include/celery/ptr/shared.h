@@ -270,6 +270,28 @@ namespace Celery::Ptr
             }
 
             /**
+             * @brief Equality operator to compare two Shared pointers.
+             *
+             * @param other The Shared pointer to compare with.
+             * @return true if both point to the same object, false otherwise.
+             */
+            bool operator==(const Shared &other) const
+            {
+                return this->data == other.data;
+            }
+
+            /**
+             * @brief Equality operator to compare with a raw pointer.
+             *
+             * @param ptr The raw pointer to compare with.
+             * @return true if pointing to the same object, false otherwise.
+             */
+            bool operator==(T *ptr) const
+            {
+                return this->data == ptr;
+            }
+
+            /**
              * @brief Destructor decrements the reference count and deallocates if zero.
              */
             ~Shared()

@@ -120,8 +120,14 @@ namespace Celery::Ptr
                 }
 
 				// Only store if ptr is not null
-				if (ptr != nullptr)
-				{
+				if (ptr == nullptr)
+                {
+                    // Null pointer case
+                    this->data = nullptr;
+                    ref_count = nullptr;
+                }
+				else
+                {
 					// Here, we assume ptr is a valid pointer allocated via Allocator
                 	// Allocate the object
                 	this->data = ptr;

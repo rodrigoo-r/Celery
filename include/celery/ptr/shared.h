@@ -119,22 +119,26 @@ namespace Celery::Ptr
                     );
                 }
 
-                // Here, we asume ptr is a valid pointer allocated via Allocator
-                // Allocate the object
-                this->data = ptr;
+				// Only store if ptr is not null
+				if (ptr != nullptr)
+				{
+					// Here, we assume ptr is a valid pointer allocated via Allocator
+                	// Allocate the object
+                	this->data = ptr;
 
-                // Allocate and initialize the reference count
-                ref_count = RefCountAllocator::Allocate();
+                	// Allocate and initialize the reference count
+                	ref_count = RefCountAllocator::Allocate();
 
-                if constexpr (ThreadSafe)
-                {
-                    // Initialize atomic reference count to 1
-                    ref_count->store(1);
-                } else
-                {
-                    // Initialize non-atomic reference count to 1
-                    *ref_count = 1;
-                }
+                	if constexpr (ThreadSafe)
+                	{
+                    	// Initialize atomic reference count to 1
+                    	ref_count->store(1);
+                	} else
+                	{
+                    	// Initialize non-atomic reference count to 1
+                    	*ref_count = 1;
+                	}
+				}
             }
 
             /**

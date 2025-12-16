@@ -298,6 +298,26 @@ namespace Celery::Ptr
             }
 
             /**
+             * @brief Dereference operator to access the managed object.
+             *
+             * @return Pointer to the managed object.
+             */
+            T *operator->() const
+            {
+                return this->data;
+            }
+
+            /**
+             * @brief Dereference operator to access the managed object.
+             *
+             * @return Reference to the managed object.
+             */
+            T &operator*() const
+            {
+                return *(this->data);
+            }
+
+            /**
              * @brief Destructor decrements the reference count and deallocates if zero.
              */
             ~Shared()

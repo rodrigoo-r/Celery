@@ -72,6 +72,25 @@ namespace Celery::Str
             this->len = length;
         }
 
+
+		/**
+         * @brief Construct an External view from a string literal.
+         *
+         * @tparam N Size of the string literal including null terminator.
+         * @param literal The string literal to create a view for.
+         *
+         * Behavior & complexity:
+         * - O(1). No copying is performed.
+         * - The view represents the characters in the literal excluding the
+         *   terminating null character.
+         */
+		template <std::size_t N>
+		External(const char (&literal)[N])
+		{
+    		this->data = const_cast<char*>(literal);
+    		this->len  = N - 1; // exclude null terminator
+		}
+
         /**
          * @brief Construct an External view from a null-terminated C string.
          *

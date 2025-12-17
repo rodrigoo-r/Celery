@@ -58,6 +58,7 @@ namespace Celery::Str
         template <
             typename T,
             typename = std::enable_if_t<
+                !std::is_array_v<T> && // exclude array types to avoid ambiguity
                 std::is_pointer_v<std::decay_t<T>> &&
                 std::is_same_v<
                     std::remove_cv_t<std::remove_pointer_t<std::decay_t<T>>>,

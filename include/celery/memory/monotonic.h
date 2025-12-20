@@ -260,6 +260,15 @@ namespace Celery::Pmr
         }
 
         /**
+         * @brief Clears all allocated pages and the free list.
+         */
+        void Clear()
+        {
+            free_list.AggressiveClear();
+            pages.Clear();
+        }
+
+        /**
          * @brief Clears the free list on destruction.
          */
         ~BumpAllocator()
@@ -324,6 +333,14 @@ namespace Celery::Pmr
         static inline void Deallocate(T *ptr)
         {
             bump_allocator.Deallocate(ptr);
+        }
+
+        /**
+         * @brief Clears all allocated memory in the bump allocator.
+         */
+        static inline void Clear()
+        {
+            bump_allocator.Clear();
         }
     };
 }

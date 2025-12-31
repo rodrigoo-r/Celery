@@ -480,7 +480,7 @@ namespace Celery::Buffer
              *
              * @return T* Pointer to the first element of the buffer.
              */
-            [[nodiscard]] T *Ptr() const noexcept
+            [[nodiscard]] T *Ptr() noexcept
             {
                 return data;
             }
@@ -549,5 +549,5 @@ namespace Celery::Buffer
      * @tparam Capacity Buffer capacity (default 50).
      */
     template<typename T, unsigned int Capacity = 50>
-    using RingBuffer = Pmr::Ring<T, Capacity>;
+    using Ring = Pmr::Ring<T, Capacity>;
 } // namespace Celery::Buffer

@@ -17,7 +17,6 @@
 
 #pragma once
 #include <exception>
-#include "Celery/String/External.h"
 
 /**
  * @namespace Celery::Except
@@ -40,7 +39,7 @@ namespace Celery::Except
      */
     class Exception : public std::exception
     {
-        Celery::Str::External msg;
+        const char *msg;
 
     public:
         /**
@@ -50,7 +49,7 @@ namespace Celery::Except
          * Note: The string is not owned by this object. Keep the string
          * valid for the lifetime of the exception.
          */
-        Exception(Celery::Str::External &msg) : msg(msg)
+        Exception(const char *msg) : msg(msg)
         {}
 
         /**
@@ -63,7 +62,7 @@ namespace Celery::Except
         [[nodiscard]] const char *what()
         const noexcept override
         {
-            return msg.Ptr();
+            return msg;
         }
     };
 }

@@ -36,7 +36,7 @@ namespace Celery::File
         );
         if (!file)
         {
-            throw std::runtime_error(path.Ptr());
+            throw Except::CouldNotRead(path);
         }
 
         // Seek to the end to get the size
@@ -46,7 +46,7 @@ namespace Celery::File
         if (size < 0)
         {
             fclose(file);
-            throw Except::CouldNotRead(path.Ptr());
+            throw Except::CouldNotRead(path);
         }
 
         // Allocate buffer
@@ -60,7 +60,7 @@ namespace Celery::File
         {
             Celery::Pmr::ArrayAllocator<char>::Deallocate(buffer);
             fclose(file);
-            throw Except::CouldNotRead(path.Ptr());
+            throw Except::CouldNotRead(path);
         }
 
         fclose(file);

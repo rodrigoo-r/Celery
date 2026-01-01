@@ -25,7 +25,7 @@
 
 namespace Celery::File
 {
-    Str::String Read(Str::External path)
+    inline Str::String Read(Str::External path)
     {
         FILE *file = fopen(
             path.Ptr(),

@@ -16,9 +16,9 @@
 */
 
 #pragma once
-#include "celery/list/list.h"
-#include "celery/memory/system.h"
-#include "celery/trait/default.h"
+#include "Celery/List/List.h"
+#include "Celery/Memory/System.h"
+#include "Celery/Trait/Default.h"
 
 namespace Celery::Pmr
 {

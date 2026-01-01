@@ -16,14 +16,14 @@
 */
 
 #pragma once
-#include "celery/base/pushable.h"
-#include "celery/base/removable.h"
-#include "celery/base/sizeable.h"
-#include "celery/except/out_of_range.h"
-#include "celery/list/iterator.h"
-#include "celery/list/node.h"
-#include "celery/memory/system.h"
-#include "celery/trait/type.h"
+#include "Celery/Base/Pushable.h"
+#include "Celery/Base/Removable.h"
+#include "Celery/Base/Sizeable.h"
+#include "Celery/Except/OutOfRange.h"
+#include "Celery/List/Iterator.h"
+#include "Celery/List/Node.h"
+#include "Celery/Memory/System.h"
+#include "Celery/Trait/Type.h"
 
 namespace Celery::List
 {

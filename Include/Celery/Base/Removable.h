@@ -18,8 +18,8 @@
 #pragma once
 #include <type_traits>
 
-#include "celery/trait/default.h"
-#include "celery/util/reindex.h"
+#include "Celery/Trait/Default.h"
+#include "Celery/Util/Reindex.h"
 
 namespace Celery::Base
 {

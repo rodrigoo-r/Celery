@@ -17,7 +17,7 @@
 
 #pragma once
 #include <cstddef>
-#include "celery/trait/default.h"
+#include "Celery/Trait/Default.h"
 
 namespace Celery::Io
 {

@@ -16,10 +16,10 @@
 */
 
 #pragma once
-#include "celery/trait/default.h"
-#include "celery/string/string.h"
-#include "celery/string/external.h"
-#include "celery/trait/type.h"
+#include "Celery/Trait/Default.h"
+#include "Celery/String/String.h"
+#include "Celery/String/External.h"
+#include "Celery/Trait/Type.h"
 #include <xxhash.h>
 
 namespace Celery::Misc

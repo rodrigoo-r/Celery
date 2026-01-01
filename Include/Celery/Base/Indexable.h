@@ -16,11 +16,11 @@
 */
 
 #pragma once
-#include "bufferable.h"
-#include "celery/except/out_of_range.h"
-#include "celery/trait/default.h"
-#include "celery/util/reindex.h"
-#include "sizeable.h"
+#include "Bufferable.h"
+#include "Celery/Except/OutOfRange.h"
+#include "Celery/Trait/Default.h"
+#include "Celery/Util/Reindex.h"
+#include "Sizeable.h"
 
 namespace Celery::Base
 {

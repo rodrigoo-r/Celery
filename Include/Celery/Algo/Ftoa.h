@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "celery/algo/itoa.h"
+#include "Celery/Algo/Itoa.h"
 
 namespace Celery::Algorithm
 {

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "celery/util/macro.h"
+#include "Celery/Util/Macro.h"
 #define CELERY_ANSI_CODE_RESET          0
 #define CELERY_ANSI_CODE_BOLD           1
 #define CELERY_ANSI_CODE_DIM            2

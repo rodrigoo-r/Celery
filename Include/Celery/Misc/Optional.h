@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include "celery/except/out_of_range.h"
-#include "celery/trait/type.h"
+#include "Celery/Except/OutOfRange.h"
+#include "Celery/Trait/Type.h"
 
 namespace Celery::Misc
 {

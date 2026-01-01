@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include "celery/memory/monotonic.h"
-#include "celery/tree/rb.h"
+#include "Celery/Memory/Monotonic.h"
+#include "Celery/Tree/Rb.h"
 
 namespace Celery::Collection
 {

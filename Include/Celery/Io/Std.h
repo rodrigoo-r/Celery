@@ -19,7 +19,7 @@
 #include <cstddef>
 #include <iostream>
 
-#include "descriptor.h"
+#include "Descriptor.h"
 
 // Guard against incompatible platforms
 #ifndef _WIN32

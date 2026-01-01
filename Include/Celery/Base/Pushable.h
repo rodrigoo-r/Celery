@@ -18,7 +18,7 @@
 #pragma once
 #include <utility>
 
-#include "celery/trait/type.h"
+#include "Celery/Trait/Type.h"
 
 namespace Celery::Base
 {

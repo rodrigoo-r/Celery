@@ -18,7 +18,7 @@
 #pragma once
 #include <type_traits>
 
-#include "celery/memory/system.h"
+#include "Celery/Memory/System.h"
 
 namespace Celery::Trait
 {

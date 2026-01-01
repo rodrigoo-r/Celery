@@ -19,9 +19,9 @@
 #include <atomic>
 
 
-#include "celery/base/bufferable.h"
-#include "celery/base/dereferenceable.h"
-#include "celery/memory/monotonic.h"
+#include "Celery/Base/Bufferable.h"
+#include "Celery/Base/Dereferenceable.h"
+#include "Celery/Memory/Monotonic.h"
 
 namespace Celery::Ptr
 {

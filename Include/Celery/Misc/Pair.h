@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include <celery/trait/type.h>
-#include <celery/trait/default.h>
+#include <Celery/Trait/Type.h>
+#include <Celery/Trait/Default.h>
 #include <tuple>
 
 namespace Celery::Misc

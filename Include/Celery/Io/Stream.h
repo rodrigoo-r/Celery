@@ -16,11 +16,11 @@
 */
 
 #pragma once
-#include "celery/array/ring.h"
-#include "celery/io/std.h"
-#include "celery/trait/default.h"
-#include "celery/string/string.h"
-#include "celery/except/bad_read.h"
+#include "Celery/Array/Ring.h"
+#include "Celery/Io/Std.h"
+#include "Celery/Trait/Default.h"
+#include "Celery/String/String.h"
+#include "Celery/Except/BadRead.h"
 
 namespace Celery::Io
 {

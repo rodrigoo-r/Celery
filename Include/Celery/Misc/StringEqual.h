@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <celery/trait/default.h>
-#include <celery/trait/type.h>
-#include <celery/string/string.h>
-#include <celery/string/external.h>
+#include <Celery/Trait/Default.h>
+#include <Celery/Trait/Type.h>
+#include <Celery/String/String.h>
+#include <Celery/String/External.h>
 
 namespace Celery::Misc
 {

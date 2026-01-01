@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <celery/array/vector.h>
+#include <Celery/Array/Vector.h>
 
 namespace Celery::Array
 {

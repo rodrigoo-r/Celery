@@ -17,11 +17,11 @@
 
 #pragma once
 
-#include "celery/serialize/displayable.h"
-#include "celery/serialize/default.h"
-#include "celery/string/external.h"
-#include "celery/trait/type.h"
-#include "stream.h"
+#include "Celery/Serialize/Displayable.h"
+#include "Celery/Serialize/Default.h"
+#include "Celery/String/External.h"
+#include "Celery/Trait/Type.h"
+#include "Stream.h"
 
 namespace Celery::Io
 {

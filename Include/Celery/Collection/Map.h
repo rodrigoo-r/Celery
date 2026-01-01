@@ -16,9 +16,9 @@
 */
 
 #pragma once
-#include "celery/memory/monotonic.h"
-#include "celery/misc/pair.h"
-#include "celery/tree/rb.h"
+#include "Celery/Memory/Monotonic.h"
+#include "Celery/Misc/Pair.h"
+#include "Celery/Tree/Rb.h"
 #include <utility>
 
 namespace Celery::Collection

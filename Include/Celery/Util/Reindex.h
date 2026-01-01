@@ -20,8 +20,8 @@
 #include <type_traits>
 
 
-#include "celery/except/out_of_range.h"
-#include "celery/trait/default.h"
+#include "Celery/Except/OutOfRange.h"
+#include "Celery/Trait/Default.h"
 
 namespace Celery::Utility
 {

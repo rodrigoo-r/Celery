@@ -18,9 +18,9 @@
 #pragma once
 #include <utility>
 
-#include "celery/array/vector.h"
-#include "celery/base/comparable.h"
-#include "celery/memory/monotonic.h"
+#include "Celery/Array/Vector.h"
+#include "Celery/Base/Comparable.h"
+#include "Celery/Memory/Monotonic.h"
 
 namespace Celery::Tree
 {

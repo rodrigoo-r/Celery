@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include "celery/algo/ftoa.h"
-#include "displayable.h"
+#include "Celery/Algo/Ftoa.h"
+#include "Displayable.h"
 
 namespace Celery::Serialize
 {

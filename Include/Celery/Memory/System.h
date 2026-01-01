@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "celery/except/bad_alloc.h"
+#include "Celery/Except/BadAlloc.h"
 
 namespace Celery::Pmr
 {

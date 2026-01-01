@@ -16,7 +16,7 @@
 */
 
 #pragma once
-#include "celery/trait/default.h"
+#include "Celery/Trait/Default.h"
 #include <cstring>
 #include <type_traits>
 

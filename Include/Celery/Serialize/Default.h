@@ -16,10 +16,10 @@
 */
 
 #pragma once
-#include "celery/serialize/char.h"
-#include "celery/serialize/cstr.h"
-#include "celery/serialize/string.h"
-#include "celery/serialize/external.h"
-#include "celery/serialize/bool.h"
-#include "celery/serialize/float.h"
-#include "celery/serialize/integral.h"
+#include "Celery/Serialize/Char.h"
+#include "Celery/Serialize/Cstr.h"
+#include "Celery/Serialize/String.h"
+#include "Celery/Serialize/External.h"
+#include "Celery/Serialize/Bool.h"
+#include "Celery/Serialize/Float.h"
+#include "Celery/Serialize/Integral.h"

@@ -18,8 +18,8 @@
 #pragma once
 #include <concepts>
 
-#include "celery/io/stream.h"
-#include "celery/string/string.h"
+#include "Celery/Io/Stream.h"
+#include "Celery/String/String.h"
 
 namespace Celery::Serialize
 {

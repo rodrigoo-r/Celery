@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "celery/array/vector.h"
-#include "celery/memory/system.h"
-#include "celery/trait/default.h"
-#include "celery/string/external.h"
+#include "Celery/Array/Vector.h"
+#include "Celery/Memory/System.h"
+#include "Celery/Trait/Default.h"
+#include "Celery/String/External.h"
 
 namespace Celery::Str
 {

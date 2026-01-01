@@ -16,8 +16,8 @@
 */
 
 #pragma once
-#include "celery/string/external.h"
-#include "displayable.h"
+#include "Celery/String/External.h"
+#include "Displayable.h"
 
 namespace Celery::Serialize
 {

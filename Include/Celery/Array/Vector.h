@@ -19,15 +19,15 @@
 #include <initializer_list>
 
 
-#include "celery/base/indexable.h"
-#include "celery/base/iterable.h"
-#include "celery/base/pushable.h"
-#include "celery/base/removable.h"
-#include "celery/base/resizable.h"
-#include "celery/memory/system.h"
-#include "celery/trait/default.h"
-#include "celery/trait/type.h"
-#include "celery/util/copy.h"
+#include "Celery/Base/Indexable.h"
+#include "Celery/Base/Iterable.h"
+#include "Celery/Base/Pushable.h"
+#include "Celery/Base/Removable.h"
+#include "Celery/Base/Resizable.h"
+#include "Celery/Memory/System.h"
+#include "Celery/Trait/Default.h"
+#include "Celery/Trait/Type.h"
+#include "Celery/Util/Copy.h"
 
 #pragma once
 

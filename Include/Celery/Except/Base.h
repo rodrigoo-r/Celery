@@ -17,6 +17,7 @@
 
 #pragma once
 #include <exception>
+#include "Celery/String/External.h"
 
 /**
  * @namespace Celery::Except

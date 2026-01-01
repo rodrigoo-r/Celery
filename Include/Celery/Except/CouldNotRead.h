@@ -45,7 +45,11 @@ namespace Celery::Except
             : Exception("Could not read a file or socket.")
         {}
 
-        CouldNotRead(Celery::Str::External &details)
+        /**
+         * @brief Constructs a CouldNotRead exception with a custom message.
+         * @param details Additional details about the read failure.
+         */
+        CouldNotRead(Celery::Str::External details)
             : Exception(details.Ptr())
         {}
     };

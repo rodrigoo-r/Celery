@@ -14,4 +14,4 @@ add_library(Celery INTERFACE)
 add_library(Celery::Celery ALIAS Celery)
 
 # Include modular CMake files
-include(cmake/link.cmake)
+include(Cmake/Link.cmake)

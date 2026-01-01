@@ -46,7 +46,7 @@ namespace Celery::Except
         {}
 
         CouldNotRead(Celery::Str::External &details)
-            : Exception(details)
+            : Exception(details.Ptr())
         {}
     };
 }

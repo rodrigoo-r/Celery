@@ -60,11 +60,11 @@ or link against it when using Celery.
 ## Contributing
 
 Contributions are welcome! If you would like to contribute to Celery,
-please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+please refer to [Contributing.md](Contributing.md) for guidelines.
 
 ---
 
 ## License
 
 Celery is licensed under the Apache License 2.0.
-See [LICENSE](LICENSE) for more details.
+See [License](License) for more details.

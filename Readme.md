@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="assets/Logo.png" height="80" width="80">
+    <img src="Assets/Logo.png" height="80" width="80">
     <h1>Celery</h1>
     <p>A High-Performance C++ STL-like library.</p>
 </div>

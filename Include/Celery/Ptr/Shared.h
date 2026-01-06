@@ -70,16 +70,15 @@ namespace Celery::Ptr
                 T
             >
         {
-            // Make Dereferenceable a friend to access protected members
-            friend class Base::Dereferenceable<
-                Shared<
-                    T,
-                    ThreadSafe,
-                    Allocator,
-                    RefCountAllocator
-                >,
-                T
+            using Self = Shared<
+                T,
+                ThreadSafe,
+                Allocator,
+                RefCountAllocator
             >;
+
+            // Make Dereferenceable a friend to access protected members
+            friend class Base::Dereferenceable<Self, T>;
 
         protected:
             std::conditional_t<
@@ -315,6 +314,19 @@ namespace Celery::Ptr
             T &operator*() const
             {
                 return *(this->data);
+            }
+
+            static Self Null()
+            {
+                return Self(nullptr);
+            }
+
+            template<typename ...Args>
+            static Self Make(Args&&... args)
+            {
+                T *obj = Allocator::Allocate(std::forward<Args>(args)...);
+                // SFINAE checks are done by Shared, so we can safely ignore them here
+                return { obj };
             }
 
             /**

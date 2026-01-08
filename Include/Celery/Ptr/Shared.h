@@ -263,12 +263,15 @@ namespace Celery::Ptr
                     ref_count = other.ref_count;
 
                     // Increment new reference count
-                    if constexpr (ThreadSafe)
+                    if (ref_count)
                     {
-                        ref_count->fetch_add(1);
-                    } else
-                    {
-                        ++(*ref_count);
+                        if constexpr (ThreadSafe)
+                        {
+                            ref_count->fetch_add(1);
+                        } else
+                        {
+                            ++(*ref_count);
+                        }
                     }
                 }
                 return *this;

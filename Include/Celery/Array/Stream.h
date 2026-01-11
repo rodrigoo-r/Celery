@@ -17,33 +17,24 @@
 
 #pragma once
 
-#include <Celery/Array/Vector.h>
+#include <Celery/Base/Indexable.h>
 
 namespace Celery::Array
 {
     namespace Pmr
     {
-        /*
-         * @brief A Stream class extending Vector to provide sequential access.
-         *
-         * This class allows for streaming access to elements in a Vector,
-         * maintaining a read index to traverse the elements sequentially.
-         *
-         * @tparam T Element type stored in the Stream.
-         * @tparam GrowthFactor Multiplicative growth factor used when expanding capacity.
-         * @tparam InitialCapacity Initial number of elements to allocate.
-         * @tparam Allocator Allocator type providing Allocate/Deallocate for T.
-         *
-         * @note Inherits from Celery::Array::Vector with the same template parameters.
-         */
         template <
             typename T,
-            Trait::Decimal GrowthFactor = Trait::GrowthFactor,
-            Trait::Uint InitialCapacity = Trait::InitialCapacity,
-            typename Allocator = Celery::Pmr::ArrayAllocator<T>
+            typename Container,
+            typename = std::enable_if_t<
+                std::is_base_of_v<
+                    Base::Indexable<T>,
+                    Container
+                >
+            >
         >
         class Stream
-            : public Vector<T, GrowthFactor, InitialCapacity, Allocator>
+            : public Container
         {
         protected:
             // Current read index for streaming

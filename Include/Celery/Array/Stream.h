@@ -17,7 +17,8 @@
 
 #pragma once
 
-#include <Celery/Base/Indexable.h>
+#include "Celery/Base/Indexable.h"
+#include "Celery/Array/Vector.h"
 
 namespace Celery::Array
 {
@@ -169,5 +170,8 @@ namespace Celery::Array
     }
 
     template <typename T>
-    using Stream = Pmr::Stream<T>;
+    using Stream = Pmr::Stream<
+        T,
+        Array::Vector<T>
+    >;
 }

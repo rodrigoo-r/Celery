@@ -42,8 +42,8 @@ namespace Celery::Array
             Trait::VeryLarge read_index = 0;
 
         public:
-            // Inherit constructors from Vector base class
-            using Vector<T, GrowthFactor, InitialCapacity, Allocator>::Vector;
+            // Inherit constructors from base class
+            using Container::Container;
 
             /*
              * @brief Get the next element in the stream and advance the read index.

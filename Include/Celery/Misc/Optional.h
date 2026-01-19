@@ -54,6 +54,12 @@ namespace Celery::Misc
                 if (this == &other) return; // Self-assignment check
             }
 
+            if (engaged)
+            {
+                reinterpret_cast<T *>(storage)->~T();
+                engaged = false;
+            }
+
             if (other.engaged)
             {
                 new (storage) T(other.Value());
@@ -71,6 +77,12 @@ namespace Celery::Misc
          */
         void ConstructFrom(Optional &&other) noexcept
         {
+            if (engaged)
+            {
+                reinterpret_cast<T *>(storage)->~T();
+                engaged = false;
+            }
+
             if (other.engaged)
             {
                 new (storage) T(std::move(other.Value()));

@@ -75,6 +75,8 @@ namespace Celery::Misc
             {
                 new (storage) T(std::move(other.Value()));
                 engaged = true;
+
+                reinterpret_cast<T *>(other.storage)->~T();
                 other.engaged = false;
             }
         }

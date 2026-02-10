@@ -41,80 +41,7 @@ namespace Celery::Array
 	class BufferedBase
 	{
 	public:
-		/**
-        * @brief Construct from an initializer list.
-        *
-        * Each element in \p init_list is copied/emplaced into the vector.
-        *
-        * @param init_list Initial values to insert.
-        */
-        BufferedBase(std::initializer_list<T> init_list) : Base::Indexable<T>(), Resizable()
-        {
-        	static_cast<Derived *>(this)->ConstructFrom(init_list);
-        }
-
-        /**
-        * @brief Copy constructor.
-        *
-        * Creates a new vector as a copy of \p other by allocating
-        * sufficient storage and copying each element.
-        *
-        * @param other Source vector to copy from.
-        */
-        BufferedBase(const Derived &other)
-        {
-        	static_cast<Derived *>(this)->ConstructFrom<true>(std::forward<decltype(other)>(other));
-        }
-
-        /**
-        * @brief Move constructor.
-        *
-        * Transfers ownership of resources from \p other to this vector,
-        * leaving \p other in a valid but empty state.
-        *
-        * @param other Source vector to move from.
-        */
-        BufferedBase(Derived &&other) noexcept
-        {
-        	static_cast<Derived *>(this)->ConstructFrom<true>(std::forward<decltype(other)>(other));
-        }
-
-        /**
-        * @brief Move assignment operator.
-        *
-        * Clears current contents, deallocates existing storage,
-        * and transfers ownership of resources from \p other.
-        *
-        * @param other Source vector to move from.
-        * @return Reference to this vector.
-        */
-        Derived &operator=(Derived &&other) noexcept
-        {
-            if (this != &other)
-            {
-            	static_cast<Derived *>(this)->ConstructFrom(std::forward<decltype(other)>(other));
-            }
-        	return *this;
-        }
-
-        /**
-         * @brief Copy assignment operator.
-         *
-         * Clears current contents, ensures sufficient capacity, and copies
-         * elements from \p other to this vector.
-         *
-         * @param other Source vector to copy from.
-         * @return Reference to this vector.
-         */
-        Derived &operator=(const Derived &other)
-        {
-            if (this != &other)
-            {
-            	ConstructFrom(other);
-            }
-
-        	return *this;
-        }
+		BufferedBase() = default;
 
         /**
         * @brief Assignment from an initializer list.
@@ -138,7 +65,7 @@ namespace Celery::Array
      	*/
     	void Clear()
     	{
-        	if (this->len == 0)
+        	if (static_cast<Derived *>(this)->len == 0)
             	return; // Already empty
 
 	        // Call the destructor for each element if necessary
@@ -165,13 +92,13 @@ namespace Celery::Array
     	void EnsureGrowth(const Trait::VeryLarge cap)
     	{
         	if (!static_cast<Derived *>(this)->data)
-            	Init(); // Lazy initialization
+            	static_cast<Derived *>(this)->Init(); // Lazy initialization
 
         	const auto required = static_cast<Trait::VeryLarge>(static_cast<Derived *>(this)->len + cap);
-        	if (required <= capacity)
+        	if (required <= static_cast<Derived *>(this)->capacity)
             	return; // Already enough capacity
 
-        	auto new_cap = capacity;
+        	auto new_cap = static_cast<Derived *>(this)->capacity;
 
         	// Grow until we reach the required capacity
         	while (new_cap < required)
@@ -253,7 +180,7 @@ namespace Celery::Array
         	// Only call destructor if T is not trivially destructible
         	if constexpr (!std::is_trivially_destructible_v<T>)
         	{
-            	this->data[static_cast<Derived *>(this)->len].~T();
+            	static_cast<Derived *>(this)->data[static_cast<Derived *>(this)->len].~T();
         	}
     	}
 
@@ -345,7 +272,7 @@ namespace Celery::Array
             template<bool IsConstruct = false>
             void ConstructFrom(std::initializer_list<T> init_list)
             {
-                Clear(); // Clear current contents
+                this->Clear(); // Clear current contents
 
                 // Insert each element from the initializer list
                 for (const auto &elem : init_list)
@@ -368,7 +295,7 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
-                    Clear(); // Clear current contents
+                    this->Clear(); // Clear current contents
                 }
 
                 this->len = other.len;
@@ -393,7 +320,7 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
-                    Clear(); // Clear current contents
+                    this->Clear(); // Clear current contents
                 }
 
                 this->len = other.len;
@@ -405,8 +332,33 @@ namespace Celery::Array
                 other.capacity = 0;
             }
 
+			using BufferedBaseType =
+				BufferedBase<
+					Vector<
+						T,
+        				GrowthFactor,
+        				InitialCapacity,
+        				Allocator
+        			>,
+        			T,
+        			GrowthFactor
+        		>;
         public:
-			using BufferedBase::BufferedBase; // Inherit constructors from BufferedBase
+			using BufferedBaseType::BufferedBaseType; // Inherit constructors from BufferedBase
+
+        	Vector& operator=(const Vector &other) noexcept
+        	{
+        		if (this != &other)
+        			ConstructFrom(other);
+        		return *this;
+        	}
+
+        	Vector &operator=(Vector &&other) noexcept
+        	{
+        		if (this != &other)
+        			ConstructFrom(std::move(other));
+        		return *this;
+        	}
 
             /**
              * @brief Default constructor.
@@ -414,11 +366,57 @@ namespace Celery::Array
              * Initializes the internal storage and sets length to zero (via
              * the Base::Indexable and Base::Resizable base initializations).
              */
-            Vector() : Base::Indexable<T>(), Resizable()
+            Vector() :
+        		Base::Indexable<T>(),
+        		Resizable()
             {
                 // Vector is lazily initialized, thus
                 // no allocation is done here.
                 this->len = 0;
+            }
+
+        	/**
+			* @brief Construct from an initializer list.
+			*
+			* Each element in \p init_list is copied/emplaced into the vector.
+			*
+			* @param init_list Initial values to insert.
+			*/
+        	Vector(std::initializer_list<T> init_list) :
+				Base::Indexable<T>(),
+				Resizable()
+            {
+	            ConstructFrom(init_list);
+            }
+
+        	/**
+			* @brief Copy constructor.
+			*
+			* Creates a new vector as a copy of \p other by allocating
+			* sufficient storage and copying each element.
+			*
+			* @param other Source vector to copy from.
+			*/
+        	Vector(const Vector &other) :
+				Base::Indexable<T>(),
+				Resizable()
+            {
+            	ConstructFrom(other);
+            }
+
+        	/**
+			* @brief Move constructor.
+			*
+			* Transfers ownership of resources from \p other to this vector,
+			* leaving \p other in a valid but empty state.
+			*
+			* @param other Source vector to move from.
+			*/
+        	Vector(Vector &&other) :
+				Base::Indexable<T>(),
+				Resizable()
+            {
+            	ConstructFrom(std::move(other));
             }
 
             /**
@@ -430,7 +428,7 @@ namespace Celery::Array
             void Reset()
             {
                 // Clear the vector
-                Clear();
+                this->Clear();
 
                 // Deallocate current data
                 Allocator::Deallocate(this->data);
@@ -489,7 +487,7 @@ namespace Celery::Array
             {
                 if (!this->data) return; // Nothing to do
                 // Call the destructor for each element
-                Clear();
+                this->Clear();
 
                 // Deallocate the data
                 Allocator::Deallocate(this->data);

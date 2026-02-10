@@ -98,7 +98,7 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
-                    Clear(); // Clear current contents
+                    this->Clear(); // Clear current contents
                 }
 
                 this->len = other.len;
@@ -126,7 +126,7 @@ namespace Celery::Array
                 if constexpr (!IsConstruct)
                 {
                     if (this == &other) return; // Self-assignment check
-                    Clear(); // Clear current contents
+                    this->Clear(); // Clear current contents
                 }
 
                 this->len = other.len;
@@ -183,7 +183,7 @@ namespace Celery::Array
              * Initializes the internal storage and sets length to zero (via
              * the Base::Indexable and Base::Resizable base initializations).
              */
-            Vector() :
+            SmallVector() :
         		Base::Indexable<T>(),
         		Resizable()
             {

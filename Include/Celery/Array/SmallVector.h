@@ -66,7 +66,7 @@ namespace Celery::Array
             public Base::Resizable,
             public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
             public Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
-            public Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>.
+            public Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
             public BufferedBase<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T, GrowthFactor>
         {
             // Make Base::BufferedRemovable and Base::BufferedIterable friends to access protected members

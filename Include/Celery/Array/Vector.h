@@ -33,6 +33,256 @@
 
 namespace Celery::Array
 {
+	template <
+		typename Derived,
+        typename T,
+        Trait::Decimal GrowthFactor
+    >
+	class BufferedBase
+	{
+	public:
+		/**
+        * @brief Construct from an initializer list.
+        *
+        * Each element in \p init_list is copied/emplaced into the vector.
+        *
+        * @param init_list Initial values to insert.
+        */
+        BufferedBase(std::initializer_list<T> init_list) : Base::Indexable<T>(), Resizable()
+        {
+        	static_cast<Derived *>(this)->ConstructFrom(init_list);
+        }
+
+        /**
+        * @brief Copy constructor.
+        *
+        * Creates a new vector as a copy of \p other by allocating
+        * sufficient storage and copying each element.
+        *
+        * @param other Source vector to copy from.
+        */
+        BufferedBase(const Derived &other)
+        {
+        	static_cast<Derived *>(this)->ConstructFrom<true>(std::forward<decltype(other)>(other));
+        }
+
+        /**
+        * @brief Move constructor.
+        *
+        * Transfers ownership of resources from \p other to this vector,
+        * leaving \p other in a valid but empty state.
+        *
+        * @param other Source vector to move from.
+        */
+        BufferedBase(Derived &&other) noexcept
+        {
+        	static_cast<Derived *>(this)->ConstructFrom<true>(std::forward<decltype(other)>(other));
+        }
+
+        /**
+        * @brief Move assignment operator.
+        *
+        * Clears current contents, deallocates existing storage,
+        * and transfers ownership of resources from \p other.
+        *
+        * @param other Source vector to move from.
+        * @return Reference to this vector.
+        */
+        Derived &operator=(Derived &&other) noexcept
+        {
+            if (this != &other)
+            {
+            	static_cast<Derived *>(this)->ConstructFrom(std::forward<decltype(other)>(other));
+            }
+        	return *this;
+        }
+
+        /**
+         * @brief Copy assignment operator.
+         *
+         * Clears current contents, ensures sufficient capacity, and copies
+         * elements from \p other to this vector.
+         *
+         * @param other Source vector to copy from.
+         * @return Reference to this vector.
+         */
+        Derived &operator=(const Derived &other)
+        {
+            if (this != &other)
+            {
+            	ConstructFrom(other);
+            }
+
+        	return *this;
+        }
+
+        /**
+        * @brief Assignment from an initializer list.
+        *
+        * Clears current contents and inserts each element from \p init_list.
+        *
+        * @param init_list Initial values to insert.
+        * @return Reference to this vector.
+        */
+        Derived &operator=(std::initializer_list<T> init_list)
+        {
+            ConstructFrom(init_list);
+        	return *this;
+        }
+
+    	/**
+     	* @brief Clear all elements from the vector.
+     	*
+     	* Calls destructors for non-trivially-destructible elements and
+     	* resets the stored length to zero. Does not deallocate capacity.
+     	*/
+    	void Clear()
+    	{
+        	if (this->len == 0)
+            	return; // Already empty
+
+	        // Call the destructor for each element if necessary
+    	    if constexpr (!std::is_trivially_destructible_v<T>)
+        	{
+            	for (Trait::VeryLarge i = 0; i < static_cast<Derived *>(this)->len; ++i)
+            	{
+                	static_cast<Derived *>(this)->data[i].~T();
+            	}
+        	}
+
+	        // Reset length
+    	    static_cast<Derived *>(this)->len = 0;
+    	}
+
+	    /**
+    	 * @brief Ensure capacity is at least \p cap, growing by the configured factor.
+     	*
+     	* Repeatedly multiplies the current capacity by \c GrowthFactor until
+     	* it meets or exceeds \p cap, then resizes to that capacity.
+     	*
+     	* @param cap Minimum required capacity.
+     	*/
+    	void EnsureGrowth(const Trait::VeryLarge cap)
+    	{
+        	if (!static_cast<Derived *>(this)->data)
+            	Init(); // Lazy initialization
+
+        	const auto required = static_cast<Trait::VeryLarge>(static_cast<Derived *>(this)->len + cap);
+        	if (required <= capacity)
+            	return; // Already enough capacity
+
+        	auto new_cap = capacity;
+
+        	// Grow until we reach the required capacity
+        	while (new_cap < required)
+        	{
+            	new_cap = static_cast<Trait::VeryLarge>(new_cap * GrowthFactor);
+        	}
+
+	        // Resize to the new capacity
+    	    static_cast<Derived *>(this)->Resize(new_cap);
+    	}
+
+    	/**
+     	* @brief Construct an element at the end of the vector by copying \p value.
+     	*
+     	* If necessary, the vector will grow using the configured growth factor.
+     	*
+     	* @param args Arguments forwarded to T's constructor.
+     	*/
+    	template<typename... Args>
+    	void EmplaceBack(Args &&...args)
+    	{
+        	// Resize if necessary
+        	EnsureGrowth(1);
+
+        	// Construct the new element in place
+        	new (
+				&static_cast<Derived *>(this)->data[
+					static_cast<Derived *>(this)->len
+				]
+			) T(std::forward<Args>(args)...);
+        	++static_cast<Derived *>(this)->len;
+    	}
+
+	    /**
+    	 * @brief Push an element to the back of the vector.
+     	 *
+     	 * This forwards to EmplaceBack using move semantics.
+     	 *
+     	 * @param value Rvalue reference to the element to push.
+     	 */
+    	template<class U = T, typename = Trait::EnsureSame<T, U>>
+    	void PushBack(U &&value)
+    	{
+        	if constexpr (!std::is_trivially_constructible_v<T>)
+        	{
+            	// Move the value into place
+            	EmplaceBack(std::forward<U>(value));
+        	}
+        	else
+        	{
+            	// For trivially constructible types, we can optimize
+            	// by directly assigning the value after ensuring capacity.
+            	EnsureGrowth(1);
+            	static_cast<Derived *>(this)->data[
+					static_cast<Derived *>(this)->len
+				] = std::forward<U>(value);
+            	++static_cast<Derived *>(this)->len;
+        	}
+    	}
+
+    	/**
+     	* @brief Remove the last element from the vector.
+     	*
+     	* Throws Except::OutOfRange if the vector is empty. For non-trivial
+     	* destructible types, the destructor is invoked.
+     	*
+     	* @throws Except::OutOfRange when the vector has zero elements.
+     	*/
+    	void PopBack()
+    	{
+        	if (static_cast<Derived *>(this)->len == 0)
+        	{
+            	throw Except::OutOfRange();
+        	}
+
+        	// Decrease length
+        	--static_cast<Derived *>(this)->len;
+
+        	// Only call destructor if T is not trivially destructible
+        	if constexpr (!std::is_trivially_destructible_v<T>)
+        	{
+            	this->data[static_cast<Derived *>(this)->len].~T();
+        	}
+    	}
+
+    	/**
+     	* @brief Remove the last element and return it by reference for move semantics.
+     	*
+     	* Throws Except::OutOfRange if the vector is empty. Does not call the
+     	* destructor, allowing the caller to move from the returned reference.
+     	*
+     	* @return Reference to the removed element for move semantics.
+     	* @throws Except::OutOfRange when the vector has zero elements.
+     	*/
+    	T &PopBackMove()
+    	{
+        	if (static_cast<Derived *>(this)->len == 0)
+        	{
+            	throw Except::OutOfRange();
+        	}
+
+        	// Decrease length
+        	--static_cast<Derived *>(this)->len;
+
+        	// Return the element by reference for move semantics
+        	return static_cast<Derived *>(this)->data[
+				static_cast<Derived *>(this)->len
+			];
+    	}
+	};
+
     namespace Pmr
     {
         /**
@@ -63,11 +313,13 @@ namespace Celery::Array
             public Base::Resizable,
             public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
             public Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
-            public Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>
+            public Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,
+			public BufferedBase<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T, GrowthFactor>
         {
             // Make Base::BufferedRemovable and Base::BufferedIterable friends to access protected members
             friend class Base::BufferedRemovable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>;
             friend class Base::BufferedIterable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>;
+			friend class BufferedBase<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T, GrowthFactor>;
 
             /**
              * @brief Initialize internal storage with the configured initial capacity.
@@ -154,6 +406,8 @@ namespace Celery::Array
             }
 
         public:
+			using BufferedBase::BufferedBase; // Inherit constructors from BufferedBase
+
             /**
              * @brief Default constructor.
              *
@@ -164,118 +418,6 @@ namespace Celery::Array
             {
                 // Vector is lazily initialized, thus
                 // no allocation is done here.
-                this->len = 0;
-            }
-
-            /**
-             * @brief Construct from an initializer list.
-             *
-             * Each element in \p init_list is copied/emplaced into the vector.
-             *
-             * @param init_list Initial values to insert.
-             */
-            Vector(std::initializer_list<T> init_list) : Base::Indexable<T>(), Resizable()
-            {
-                ConstructFrom(init_list);
-            }
-
-            /**
-             * @brief Copy constructor.
-             *
-             * Creates a new vector as a copy of \p other by allocating
-             * sufficient storage and copying each element.
-             *
-             * @param other Source vector to copy from.
-             */
-            Vector(const Vector &other)
-            {
-                ConstructFrom<true>(std::forward<decltype(other)>(other));
-            }
-
-            /**
-             * @brief Move constructor.
-             *
-             * Transfers ownership of resources from \p other to this vector,
-             * leaving \p other in a valid but empty state.
-             *
-             * @param other Source vector to move from.
-             */
-            Vector(Vector &&other) noexcept
-            {
-                ConstructFrom<true>(std::forward<decltype(other)>(other));
-            }
-
-            /**
-             * @brief Move assignment operator.
-             *
-             * Clears current contents, deallocates existing storage,
-             * and transfers ownership of resources from \p other.
-             *
-             * @param other Source vector to move from.
-             * @return Reference to this vector.
-             */
-            Vector &operator=(Vector &&other) noexcept
-            {
-                if (this != &other)
-                {
-                    ConstructFrom(std::forward<decltype(other)>(other));
-                }
-                return *this;
-            }
-
-            /**
-             * @brief Copy assignment operator.
-             *
-             * Clears current contents, ensures sufficient capacity, and copies
-             * elements from \p other to this vector.
-             *
-             * @param other Source vector to copy from.
-             * @return Reference to this vector.
-             */
-            Vector &operator=(const Vector &other)
-            {
-                if (this != &other)
-                {
-                    ConstructFrom(other);
-                }
-
-                return *this;
-            }
-
-            /**
-             * @brief Assignment from an initializer list.
-             *
-             * Clears current contents and inserts each element from \p init_list.
-             *
-             * @param init_list Initial values to insert.
-             * @return Reference to this vector.
-             */
-            Vector &operator=(std::initializer_list<T> init_list)
-            {
-                ConstructFrom(init_list);
-                return *this;
-            }
-
-            /**
-             * @brief Clear all elements from the vector.
-             *
-             * Calls destructors for non-trivially-destructible elements and
-             * resets the stored length to zero. Does not deallocate capacity.
-             */
-            void Clear()
-            {
-                if (this->len == 0) return; // Already empty
-
-                // Call the destructor for each element if necessary
-                if constexpr (!std::is_trivially_destructible_v<T>)
-                {
-                    for (Trait::VeryLarge i = 0; i < this->len; ++i)
-                    {
-                        this->data[i].~T();
-                    }
-                }
-
-                // Reset length
                 this->len = 0;
             }
 
@@ -335,127 +477,6 @@ namespace Celery::Array
                 // Update data pointer and capacity
                 this->data = new_data;
                 capacity = new_capacity;
-            }
-
-            /**
-             * @brief Ensure capacity is at least \p cap, growing by the configured factor.
-             *
-             * Repeatedly multiplies the current capacity by \c GrowthFactor until
-             * it meets or exceeds \p cap, then resizes to that capacity.
-             *
-             * @param cap Minimum required capacity.
-             */
-            void EnsureGrowth(const Trait::VeryLarge cap)
-            {
-                if (!this->data) Init(); // Lazy initialization
-
-                const auto required = static_cast<Trait::VeryLarge>(this->len + cap);
-                if (required <= capacity) return; // Already enough capacity
-
-                auto new_cap = capacity;
-
-                // Grow until we reach the required capacity
-                while (new_cap < required)
-                {
-                    new_cap = static_cast<Trait::VeryLarge>(new_cap * GrowthFactor);
-                }
-
-                // Resize to the new capacity
-                Resize(new_cap);
-            }
-
-            /**
-             * @brief Construct an element at the end of the vector by copying \p value.
-             *
-             * If necessary, the vector will grow using the configured growth factor.
-             *
-             * @param args Arguments forwarded to T's constructor.
-             */
-            template <typename ...Args>
-            void EmplaceBack(Args&&... args)
-            {
-                // Resize if necessary
-                EnsureGrowth(1);
-
-                // Construct the new element in place
-                new (&this->data[this->len]) T(std::forward<Args>(args)...);
-                ++this->len;
-            }
-
-            /**
-             * @brief Push an element to the back of the vector.
-             *
-             * This forwards to EmplaceBack using move semantics.
-             *
-             * @param value Rvalue reference to the element to push.
-             */
-            template <
-                class U = T,
-                typename = Trait::EnsureSame<T, U>
-            >
-            void PushBack(U &&value)
-            {
-                if constexpr (!std::is_trivially_constructible_v<T>)
-                {
-                    // Move the value into place
-                    EmplaceBack(std::forward<U>(value));
-                }
-                else
-                {
-                    // For trivially constructible types, we can optimize
-                    // by directly assigning the value after ensuring capacity.
-                    EnsureGrowth(1);
-                    this->data[this->len] = std::forward<U>(value);
-                    ++this->len;
-                }
-            }
-
-            /**
-             * @brief Remove the last element from the vector.
-             *
-             * Throws Except::OutOfRange if the vector is empty. For non-trivial
-             * destructible types, the destructor is invoked.
-             *
-             * @throws Except::OutOfRange when the vector has zero elements.
-             */
-            void PopBack()
-            {
-                if (this->len == 0)
-                {
-                    throw Except::OutOfRange();
-                }
-
-                // Decrease length
-                --this->len;
-
-                // Only call destructor if T is not trivially destructible
-                if constexpr (!std::is_trivially_destructible_v<T>)
-                {
-                    this->data[this->len].~T();
-                }
-            }
-
-            /**
-             * @brief Remove the last element and return it by reference for move semantics.
-             *
-             * Throws Except::OutOfRange if the vector is empty. Does not call the
-             * destructor, allowing the caller to move from the returned reference.
-             *
-             * @return Reference to the removed element for move semantics.
-             * @throws Except::OutOfRange when the vector has zero elements.
-             */
-            T &PopBackMove()
-            {
-                if (this->len == 0)
-                {
-                    throw Except::OutOfRange();
-                }
-
-                // Decrease length
-                --this->len;
-
-                // Return the element by reference for move semantics
-                return this->data[this->len];
             }
 
             /**

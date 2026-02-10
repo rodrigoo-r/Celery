@@ -131,7 +131,7 @@ namespace Celery::Array
                 this->len = other.len;
                 this->capacity = other.capacity;
 
-                if (other->on_heap)
+                if (other.on_heap)
                 {
                     this->data = other.data;
                     this->on_heap = true;
@@ -296,6 +296,7 @@ namespace Celery::Array
                 // Update data pointer and capacity
                 this->data = new_data;
                 capacity = new_capacity;
+        	    this->on_heap = true;
             }
 
             /**

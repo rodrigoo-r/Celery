@@ -62,7 +62,6 @@ namespace Celery::Array
             typename = Trait::EnsureArrayAllocator<Allocator>
         >
         class SmallVector :
-        :
             public Base::Indexable<T>,
             public Base::Resizable,
             public Base::Pushable<Vector<T, GrowthFactor, InitialCapacity, Allocator>, T>,

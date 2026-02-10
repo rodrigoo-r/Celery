@@ -107,7 +107,6 @@ namespace Celery::Array
                 if (this->len <= HeapThreshold)
                 {
                     this->data = stack;
-                    Utility::Copy(other.data, this->data, this->len);
                     this->on_heap = false;
                 }
                 else

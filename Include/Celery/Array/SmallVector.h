@@ -85,9 +85,9 @@ namespace Celery::Array
                 this->data = Allocator::Allocate(capacity);
                 on_heap = true;
 
-                if (this->size > 0)
+                if (this->len > 0)
                 {
-                    Utility::Copy(stack, this->data, this->size);
+                    Utility::Copy(stack, this->data, this->len);
                 }
             }
 

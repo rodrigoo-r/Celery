@@ -22,6 +22,7 @@
 #pragma once
 
 #include <initializer_list>
+#include <algorithm>
 
 
 #include "Celery/Base/Indexable.h"
@@ -297,6 +298,7 @@ namespace Celery::Array
                 this->data = new_data;
                 capacity = new_capacity;
         	    this->on_heap = true;
+				this->len = std::min(this->len, capacity); // Adjust length if it exceeds new capacity
             }
 
             /**

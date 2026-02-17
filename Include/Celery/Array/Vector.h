@@ -210,7 +210,7 @@ namespace Celery::Array
 
 		void ResizeFill(const Trait::VeryLarge new_size, const T &value)
         {
-            this->Resize(new_size);
+            static_cast<Derived *>(this)->Resize(new_size);
 			for (
 				Trait::VeryLarge i = static_cast<Derived *>(this)->len;
 				i < new_size;

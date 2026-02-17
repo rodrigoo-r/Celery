@@ -263,41 +263,41 @@ namespace Celery::Array
              * @param new_capacity Desired new capacity (number of element slots).
              */
             void Resize(Trait::VeryLarge new_capacity)
-            override {
-                if (!this->data) Init(); // Lazy initialization
-                if (
+            override
+        	{
+        	    if (!this->data) Init(); // Lazy initialization
+        	    if (
                     (on_heap && new_capacity <= HeapThreshold) ||
                     (!on_heap && new_capacity <= capacity)
                 ) return;
 
-                // Allocate new data
-                T *new_data = Allocator::Allocate(new_capacity);
+        	    // Allocate new data
+        	    T *new_data = Allocator::Allocate(new_capacity);
 
-                // Copy existing elements to new data
-                if (this->len != 0)
-                {
-                    Utility::Copy(
+        	    // Copy existing elements to new data
+        	    if (this->len != 0)
+        	    {
+        	        Utility::Copy(
                         this->data,
                         new_data,
                         this->len
                     );
 
-                    // Destroy old elements before freeing
-                    if constexpr (!std::is_trivially_destructible_v<T>)
-                        for (Trait::VeryLarge i = 0; i < this->len; ++i)
-                            this->data[i].~T();
-                }
+        	        // Destroy old elements before freeing
+        	        if constexpr (!std::is_trivially_destructible_v<T>)
+        	            for (Trait::VeryLarge i = 0; i < this->len; ++i)
+        	                this->data[i].~T();
+        	    }
 
-                // Deallocate old data
+        	    // Deallocate old data
         	    if (this->on_heap)
-                    Allocator::Deallocate(this->data);
+        	        Allocator::Deallocate(this->data);
 
-                // Update data pointer and capacity
-                this->data = new_data;
-                capacity = new_capacity;
+        	    // Update data pointer and capacity
+        	    this->data = new_data;
+        	    capacity = new_capacity;
         	    this->on_heap = true;
-				this->len = new_capacity;
-            }
+        	}
 
             /**
              * @brief Destructor.

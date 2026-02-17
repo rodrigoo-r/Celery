@@ -207,6 +207,21 @@ namespace Celery::Array
 				static_cast<Derived *>(this)->len
 			];
     	}
+
+		void ResizeFill(const Trait::VeryLarge new_size, const T &value)
+        {
+            this->Resize(new_size);
+			for (
+				Trait::VeryLarge i = static_cast<Derived *>(this)->len;
+				i < new_size;
+				++i
+			)
+            {
+                new (&static_cast<Derived *>(this)->data[i]) T(value);
+            }
+
+            static_cast<Derived *>(this)->len = new_size;
+        }
 	};
 
     namespace Pmr
@@ -474,9 +489,7 @@ namespace Celery::Array
                 // Update data pointer and capacity
                 this->data = new_data;
                 capacity = new_capacity;
-				this->len = new_capacity; // Update length to new capacity as well
             }
-
             /**
              * @brief Destructor.
              *

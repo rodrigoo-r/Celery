@@ -17,8 +17,6 @@
 
 #pragma once
 #include <initializer_list>
-#include <algorithm>
-
 
 #include "Celery/Base/Indexable.h"
 #include "Celery/Base/Iterable.h"
@@ -476,7 +474,7 @@ namespace Celery::Array
                 // Update data pointer and capacity
                 this->data = new_data;
                 capacity = new_capacity;
-				this->len = std::min(this->len, capacity); // Adjust length if new capacity is smaller
+				this->len = new_capacity; // Update length to new capacity as well
             }
 
             /**

@@ -291,7 +291,7 @@ namespace Celery::Array
                 // Insert each element from the initializer list
                 for (const auto &elem : init_list)
                 {
-                    EmplaceBack(elem);
+                    this->EmplaceBack(elem);
                 }
             }
 
